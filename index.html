@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Langer Dystrybucja — hurtowa dystrybucja chemii budowlanej</title>
+  <meta name="description" content="Hurtowa dystrybucja chemii budowlanej: piany montażowe, silikony, akryle, kleje i akcesoria dla sklepów, hurtowni i ekip wykonawczych." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ===== BRAND TOKENS ===== */
+:root {
+  --flame:        #F04E23;
+  --flame-600:    #D63F18;
+  --flame-700:    #B63411;
+  --flame-tint:   #FBE7DF;
+  --flame-glow:   #FF6A3D;
+  --cobalt:       #1E3FB5;
+  --cobalt-600:   #182F95;
+  --cobalt-tint:  #E5E9F8;
+  --navy:         #0E1533;
+  --navy-800:     #161E45;
+  --navy-700:     #232C5E;
+  --navy-900:     #080C22;
+  --ash:          #8B9199;
+  --ash-700:      #565D67;
+  --light:        #EEF0F3;
+  --paper:        #F6F7F9;
+  --white:        #FFFFFF;
+  --line:         #E2E5EA;
+  --line-2:       #CFD4DC;
+  --font-display: 'Space Grotesk', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-text:    'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px; --s10:128px;
+  --r-sm:6px; --r-md:10px; --r-lg:16px; --r-xl:24px; --r-full:999px;
+  --e1: 0 1px 2px rgb(14 21 51 / 0.06), 0 1px 1px rgb(14 21 51 / 0.04);
+  --e2: 0 18px 48px -16px rgb(14 21 51 / 0.22), 0 6px 16px -8px rgb(14 21 51 / 0.10);
+  --e-flame: 0 16px 40px -12px rgb(240 78 35 / 0.45);
+  --max: 1240px;
+  --header-h: 76px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--navy);
+  font-family: var(--font-text);
+  font-size: 17px;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+::selection { background: var(--flame); color: #fff; }
+
+.wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding-inline: 32px; }
+@media (max-width: 760px){ .wrap { padding-inline: 20px; } }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--flame);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.eyebrow::before { content:''; width: 22px; height: 2px; background: var(--flame); display:inline-block; }
+.eyebrow.on-dark { color: var(--flame-glow); }
+
+h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; letter-spacing: -0.03em; font-weight: 700; }
+.display { font-size: clamp(44px, 7vw, 92px); line-height: 0.94; letter-spacing: -0.04em; }
+.h-sec   { font-size: clamp(32px, 4.4vw, 56px); letter-spacing: -0.035em; }
+.lead { font-size: clamp(17px, 2vw, 21px); line-height: 1.55; color: var(--ash-700); font-weight: 400; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing:-0.01em;
+  padding: 15px 26px; border-radius: var(--r-sm); transition: transform .12s, background .15s, box-shadow .15s, color .15s;
+  white-space: nowrap; }
+.btn svg { width: 18px; height: 18px; }
+.btn-flame { background: var(--flame); color:#fff; box-shadow: var(--e-flame); }
+.btn-flame:hover { background: var(--flame-600); transform: translateY(-2px); }
+.btn-flame:active { background: var(--flame-700); transform: translateY(0); }
+.btn-dark { background: var(--navy); color:#fff; }
+.btn-dark:hover { background: var(--navy-800); transform: translateY(-2px); }
+.btn-ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--line-2); }
+.btn-ghost:hover { border-color: var(--navy); background: var(--white); }
+.btn-ghost.on-dark { color:#fff; border-color: rgb(255 255 255 / 0.28); }
+.btn-ghost.on-dark:hover { border-color:#fff; background: rgb(255 255 255 / 0.08); }
+
+.chip { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+  padding: 7px 14px; border-radius: var(--r-full); border:1px solid var(--line-2); color: var(--ash-700);
+  background: var(--white); transition: all .12s; cursor:pointer; }
+.chip:hover { border-color: var(--navy); color: var(--navy); }
+.chip.active { background: var(--navy); color:#fff; border-color: var(--navy); }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2,0,0,1), transform .7s cubic-bezier(.2,0,0,1); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce){ .reveal { opacity:1; transform:none; transition:none; } html{scroll-behavior:auto;} }
+
+/* ===== HEADER ===== */
+.hdr { position: fixed; inset: 0 0 auto 0; height: var(--header-h); z-index: 100;
+  display: flex; align-items: center; transition: background .25s, box-shadow .25s, border-color .25s;
+  border-bottom: 1px solid transparent; }
+.hdr-solid { background: rgba(246,247,249,.86); backdrop-filter: blur(12px); border-bottom-color: var(--line); }
+.hdr-in { display: flex; align-items: center; gap: 24px; width: 100%; }
+.logo { display: inline-flex; align-items: center; gap: 12px; }
+.logo-words { display: flex; flex-direction: column; line-height: 1; }
+.logo-name { font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: -0.02em; }
+.logo-sub { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.28em; margin-top: 3px; }
+.hdr-nav { display: flex; gap: 4px; margin-left: auto; }
+.hdr-link { font-weight: 600; font-size: 15px; padding: 9px 14px; border-radius: var(--r-sm); color: inherit; transition: background .12s, color .12s; }
+.hdr:not(.hdr-solid) .hdr-link { color: #fff; }
+.hdr:not(.hdr-solid) .logo { color: #fff !important; }
+.hdr-link:hover { color: var(--flame); }
+.hdr-cta { display: flex; }
+.hdr-burger { display: none; color: inherit; padding: 6px; }
+.hdr:not(.hdr-solid) .hdr-burger { color: #fff; }
+.mobile-menu { position: fixed; inset: 0; background: rgba(8,12,34,.5); z-index: 200; }
+.mobile-sheet { position: absolute; top: 0; right: 0; height: 100%; width: min(320px, 86vw); background: var(--white);
+  padding: 24px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--e2); }
+.mm-close { align-self: flex-end; padding: 8px; color: var(--navy); margin-bottom: 12px; }
+.mm-link { font-family: var(--font-display); font-weight: 600; font-size: 20px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+
+/* ===== HERO ===== */
+.hero { position: relative; overflow: hidden; }
+.hero-h { color: #fff; max-width: 14ch; margin-bottom: 8px; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+.hstats { display: grid; grid-template-columns: repeat(4, auto); gap: 40px; margin-top: 56px; }
+.hstat-n { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px,3vw,40px); letter-spacing: -0.03em; line-height: 1; }
+.hstat-l { font-size: 14px; color: var(--ash-700); margin-top: 6px; font-weight: 500; }
+.hstats.on-dark .hstat-n { color: #fff; }
+.hstats.on-dark .hstat-l { color: rgba(255,255,255,.6); }
+
+.hero-navy { background: var(--navy); padding: calc(var(--header-h) + 80px) 0 100px; }
+.hero-navy-in { position: relative; z-index: 2; }
+.hero-grid-bg { position: absolute; inset: 0; opacity: .5;
+  background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size: 56px 56px; -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000, transparent 75%); mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000, transparent 75%); }
+.hero-navy::after { content:''; position:absolute; top:-160px; right:-120px; width:520px; height:520px; border-radius:50%;
+  background: radial-gradient(circle, rgba(240,78,35,.28), transparent 65%); filter: blur(20px); }
+
+.hero-poster { background: var(--flame); padding: calc(var(--header-h) + 80px) 0 96px; }
+.hero-poster-in { position: relative; z-index: 2; }
+.hero-watermark { position: absolute; right: -120px; bottom: -160px; color: rgba(14,21,51,.10); z-index: 1; }
+
+.hero-split { display: grid; grid-template-columns: 1.15fr .85fr; min-height: 92vh; }
+.hero-split-l { background: var(--navy); display: flex; align-items: center; padding: calc(var(--header-h) + 40px) 0 60px; }
+.hero-split-inner { max-width: 620px; margin-left: auto; padding: 0 56px 0 max(32px, calc((100vw - var(--max))/2 + 32px)); }
+.hero-split-r { background: var(--flame); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 40px; padding: 60px; overflow: hidden; }
+.hero-split-mark { color: rgba(14,21,51,.14); position: absolute; top: -40px; right: -40px; }
+.hero-split-r .hstats { grid-template-columns: repeat(2, auto); position: relative; z-index: 2; gap: 32px 48px; }
+.hero-split-r .hstat-n { color: var(--navy); }
+.hero-split-r .hstat-l { color: rgba(14,21,51,.7); }
+
+/* ===== MARQUEE ===== */
+.marquee { background: var(--navy-900); color: #fff; overflow: hidden; padding: 18px 0; }
+.marquee-track { display: flex; gap: 0; white-space: nowrap; width: max-content; animation: marq 34s linear infinite; }
+.marquee-item { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: 0.02em; padding: 0 6px; display: inline-flex; align-items: center; gap: 28px; color: rgba(255,255,255,.85); }
+.marquee-dot { color: var(--flame); font-size: 22px; }
+@keyframes marq { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce){ .marquee-track { animation: none; } }
+
+/* ===== SECTIONS ===== */
+.sec { padding: 104px 0; }
+.sec-head { max-width: 760px; margin-bottom: 56px; }
+.sec-head .eyebrow { margin-bottom: 20px; }
+.sec-dark { background: var(--navy); }
+.sec-base { background: var(--light); }
+
+.why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.why-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.why-card:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
+.why-ic { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: var(--r-md); background: var(--flame-tint); color: var(--flame); margin-bottom: 20px; }
+.why-t { font-size: 20px; margin-bottom: 10px; letter-spacing: -0.02em; }
+.why-d { color: var(--ash-700); font-size: 15.5px; line-height: 1.55; }
+
+.proc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.proc-step { position: relative; padding-top: 28px; border-top: 2px solid rgba(255,255,255,.16); }
+.proc-step::before { content:''; position:absolute; top:-2px; left:0; width: 64px; height: 2px; background: var(--flame); }
+.proc-n { font-family: var(--font-display); font-weight: 700; font-size: 40px; color: var(--flame); letter-spacing: -0.03em; line-height: 1; margin-bottom: 16px; }
+.proc-t { color: #fff; font-size: 21px; margin-bottom: 10px; letter-spacing: -0.02em; }
+.proc-d { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.55; }
+
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.cat-card { display: flex; align-items: flex-start; gap: 20px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.cat-card:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
+.cat-ic { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: var(--r-md); background: var(--light); color: var(--navy); }
+.cat-card:hover .cat-ic { background: var(--flame); color: #fff; }
+.cat-body { flex: 1; }
+.cat-t { font-size: 21px; margin-bottom: 8px; letter-spacing: -0.02em; }
+.cat-d { color: var(--ash-700); font-size: 14.5px; line-height: 1.5; }
+.cat-go { color: var(--ash); flex: none; transition: transform .2s, color .2s; }
+.cat-card:hover .cat-go { color: var(--flame); transform: translate(3px,-3px); }
+.cat-card-all { flex-direction: column; justify-content: space-between; gap: 24px; background: var(--navy); border-color: var(--navy); min-height: 180px; }
+.cat-card-all:hover { box-shadow: var(--e2); }
+
+/* ===== CONTACT ===== */
+.sec-contact { background: var(--white); border-top: 1px solid var(--line); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+.contact-list { list-style: none; padding: 0; margin: 36px 0 0; display: flex; flex-direction: column; gap: 18px; }
+.contact-list li { display: flex; align-items: center; gap: 16px; }
+.ci { flex: none; width: 48px; height: 48px; border-radius: var(--r-md); background: var(--navy); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.ci-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); }
+.ci-v { font-size: 17px; font-weight: 600; color: var(--navy); }
+.form { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 32px; display: flex; flex-direction: column; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field span { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
+.field input, .field textarea { font-family: var(--font-text); font-size: 16px; color: var(--navy); background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 13px 15px; transition: border-color .15s, box-shadow .15s; resize: vertical; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+.field input::placeholder, .field textarea::placeholder { color: var(--ash); }
+.form-note { font-size: 12.5px; color: var(--ash); text-align: center; margin: 4px 0 0; }
+.form-done { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 48px 32px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.form-done-ic { width: 64px; height: 64px; border-radius: 50%; background: var(--flame-tint); color: var(--flame); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+
+/* ===== FOOTER ===== */
+.footer { background: var(--navy-900); color: #fff; padding: 72px 0 32px; }
+.footer-in { display: grid; grid-template-columns: 1.3fr 2fr; gap: 56px; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,.12); }
+.footer-tag { color: rgba(255,255,255,.6); font-size: 15px; max-width: 360px; margin-top: 20px; line-height: 1.6; }
+.footer-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+.footer-col { display: flex; flex-direction: column; gap: 11px; }
+.footer-h { font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--flame-glow); margin-bottom: 6px; }
+.footer-col a, .footer-col span { color: rgba(255,255,255,.7); font-size: 15px; transition: color .12s; }
+.footer-col a:hover { color: #fff; }
+.footer-bottom { display: flex; justify-content: space-between; padding-top: 28px; color: rgba(255,255,255,.45); font-size: 13px; }
+
+/* ===== CATALOG ===== */
+.base-toolbar { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; }
+.search { flex: 1; display: flex; align-items: center; gap: 12px; background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 0 16px; transition: border-color .15s, box-shadow .15s; }
+.search:focus-within { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+.search svg { color: var(--ash); flex: none; }
+.search input { flex: 1; border: none; outline: none; background: none; font-family: var(--font-text); font-size: 16px; padding: 15px 0; color: var(--navy); }
+.search input::placeholder { color: var(--ash); }
+.search-x { color: var(--ash); display: inline-flex; padding: 4px; }
+.search-x:hover { color: var(--navy); }
+.sortbox { display: flex; align-items: center; gap: 10px; flex: none; }
+.sortbox label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
+.sortbox select { font-family: var(--font-text); font-size: 15px; font-weight: 600; color: var(--navy); background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 13px 14px; cursor: pointer; }
+.sortbox select:focus { outline: none; border-color: var(--navy); }
+.filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.filter-line { display: flex; align-items: baseline; gap: 16px; }
+.filter-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; flex: none; width: 84px; padding-top: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.base-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; font-size: 15px; color: var(--ash-700); font-weight: 600; }
+.base-meta .num { color: var(--navy); font-size: 18px; }
+.base-clear { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--flame); border: 1px solid var(--flame-tint); background: var(--flame-tint); padding: 6px 12px; border-radius: var(--r-full); }
+.base-clear:hover { background: var(--flame); color: #fff; }
+.pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.pcard { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.pcard:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
+.pcard-img { position: relative; aspect-ratio: 16/11; display: flex; align-items: center; justify-content: center; }
+.pcard-imgtag { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: currentColor; opacity: .55; }
+.pbadge { position: absolute; top: 12px; left: 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 5px 9px; border-radius: var(--r-full); color: #fff; }
+.role-magnet { background: var(--flame); }
+.role-margin { background: var(--cobalt); }
+.role-premium { background: var(--navy); }
+.pcard-body { padding: 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.pcard-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
+.pcard-name { font-size: 17px; line-height: 1.2; letter-spacing: -0.02em; }
+.pcard-variant { font-size: 13.5px; color: var(--ash-700); margin-top: -2px; }
+.pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.ptag { font-size: 11px; font-weight: 600; color: var(--ash-700); background: var(--light); border-radius: var(--r-full); padding: 3px 9px; }
+.pcard-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.pcard-pack { font-size: 13px; font-weight: 600; color: var(--navy); }
+.pcard-sku { font-size: 11.5px; color: var(--ash); margin-top: 2px; }
+.pcard-ask { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--flame); white-space: nowrap; }
+.pcard-ask:hover { color: var(--flame-600); }
+.empty { text-align: center; padding: 72px 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--white); border: 1px dashed var(--line-2); border-radius: var(--r-lg); }
+.empty-ic { width: 64px; height: 64px; border-radius: 50%; background: var(--light); color: var(--ash); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1080px){
+  .why-grid, .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .proc-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 24px; }
+  .pgrid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px){
+  .hdr-nav, .hdr-cta { display: none; }
+  .hdr-burger { display: inline-flex; }
+  .hero-split { grid-template-columns: 1fr; min-height: 0; }
+  .hero-split-inner { padding: 0 32px; margin: 0; max-width: none; }
+  .hero-split-r { padding: 48px 32px; }
+  .contact-grid, .footer-in { grid-template-columns: 1fr; gap: 40px; }
+  .hstats { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+}
+@media (max-width: 680px){
+  .sec { padding: 72px 0; }
+  .why-grid, .cat-grid, .proc-grid, .pgrid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .base-toolbar { flex-direction: column; align-items: stretch; }
+  .filter-line { flex-direction: column; gap: 8px; }
+  .filter-k { width: auto; padding-top: 0; }
+  .footer-cols { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 8px; }
+  .marquee-item { font-size: 20px; }
+}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel">
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* ===== DATA ===== */
+const CATEGORIES = [
+  { id: 'piany',     label: 'Piany montażowe', icon: 'piany',     blurb: 'Niskoprężne, pistoletowe, wężykowe, zimowe i ogniochronne.' },
+  { id: 'silikony',  label: 'Silikony',        icon: 'silikony',  blurb: 'Sanitarne, uniwersalne, budowlane i wysokotemperaturowe.' },
+  { id: 'akryle',    label: 'Akryle',          icon: 'akryle',    blurb: 'Malarskie, elastyczne i dekarskie — gotowe pod malowanie.' },
+  { id: 'kleje',     label: 'Kleje',           icon: 'kleje',     blurb: 'Montażowe, hybrydowe i poliuretanowe — mocne łączenie.' },
+  { id: 'akcesoria', label: 'Akcesoria',       icon: 'akcesoria', blurb: 'Pistolety, czyściki, taśmy i wszystko wokół chemii.' },
+];
+
+const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
+
+const PRODUCTS = [
+  { sku:'PU-SDL-CL750',  name:'Soudal Classic 750 ml',           brand:'Soudal',    category:'piany',     variant:'Pistoletowa · 750 ml',           pack:'12 szt. / karton', role:'magnet',  tags:['Pistoletowa','Całoroczna'],         note:'Bestseller — niskoprężna piana montażowa.' },
+  { sku:'PU-SDL-GUN870', name:'Soudal Gun Foam 870 ml',          brand:'Soudal',    category:'piany',     variant:'Pistoletowa · 870 ml',           pack:'12 szt. / karton', role:'neutral', tags:['Pistoletowa','Wysoka wydajność'] },
+  { sku:'PU-TYT-O2750',  name:'Tytan O2 Professional 750 ml',   brand:'Tytan',     category:'piany',     variant:'Pistoletowa · 750 ml',           pack:'12 szt. / karton', role:'neutral', tags:['Pistoletowa'] },
+  { sku:'PU-TYT-WIN750', name:'Tytan Zima 750 ml',              brand:'Tytan',     category:'piany',     variant:'Pistoletowa · 750 ml',           pack:'12 szt. / karton', role:'neutral', tags:['Zimowa','do −10°C'] },
+  { sku:'PU-PEN-GLD750', name:'Penosil Gold Gun 750 ml',        brand:'Penosil',   category:'piany',     variant:'Pistoletowa · 750 ml',           pack:'12 szt. / karton', role:'neutral', tags:['Pistoletowa'] },
+  { sku:'PU-LNG-70',     name:'Langer 70 PRO 750 ml',           brand:'Langer',    category:'piany',     variant:'Pistoletowa · 750 ml',           pack:'12 szt. / karton', role:'margin',  tags:['Marka własna','70 l wydajności'],   note:'Marka własna — najlepsza marża dla sklepu.' },
+  { sku:'PU-LNG-FR750',  name:'Langer Fire B1 750 ml',          brand:'Langer',    category:'piany',     variant:'Ogniochronna · 750 ml',          pack:'12 szt. / karton', role:'premium', tags:['Ogniochronna','B1'] },
+  { sku:'SI-SDL-SAN300', name:'Soudal Sanitary 300 ml',         brand:'Soudal',    category:'silikony',  variant:'Sanitarny · 300 ml',             pack:'24 szt. / karton', role:'magnet',  tags:['Sanitarny','Grzybobójczy'] },
+  { sku:'SI-SDL-UNI300', name:'Soudal Uniwersalny 300 ml',      brand:'Soudal',    category:'silikony',  variant:'Octowy · 300 ml',                pack:'24 szt. / karton', role:'neutral', tags:['Uniwersalny'] },
+  { sku:'SI-DB-HT300',   name:'Den Braven High-Temp 300 ml',    brand:'Den Braven',category:'silikony',  variant:'Wysokotemperaturowy · 300 ml',   pack:'12 szt. / karton', role:'premium', tags:['do 300°C','Kominkowy'] },
+  { sku:'SI-LNG-SAN300', name:'Langer Silikon Sanitarny 300 ml',brand:'Langer',    category:'silikony',  variant:'Neutralny · 300 ml',             pack:'24 szt. / karton', role:'margin',  tags:['Marka własna','Bezgrzybiczny'] },
+  { sku:'SI-TYT-CON310', name:'Tytan Budowlany 310 ml',         brand:'Tytan',     category:'silikony',  variant:'Octowy · 310 ml',                pack:'24 szt. / karton', role:'neutral', tags:['Budowlany'] },
+  { sku:'AK-SDL-PAINT300',name:'Soudal Akryl malarski 300 ml',  brand:'Soudal',    category:'akryle',    variant:'Malarski · 300 ml',              pack:'24 szt. / karton', role:'magnet',  tags:['Malarski','Do przemalowania'] },
+  { sku:'AK-LNG-ELA300', name:'Langer Akryl elastyczny 300 ml', brand:'Langer',    category:'akryle',    variant:'Elastyczny · 300 ml',            pack:'24 szt. / karton', role:'margin',  tags:['Marka własna','Elastyczny'] },
+  { sku:'AK-DB-ROOF310', name:'Den Braven Akryl dekarski 310 ml',brand:'Den Braven',category:'akryle',   variant:'Dekarski · 310 ml',              pack:'24 szt. / karton', role:'neutral', tags:['Dekarski','Zewnętrzny'] },
+  { sku:'KL-SDL-MAX290', name:'Soudal Fix All High Tack 290 ml',brand:'Soudal',    category:'kleje',     variant:'Hybrydowy · 290 ml',             pack:'12 szt. / karton', role:'premium', tags:['Hybrydowy','Mocne chwyty'] },
+  { sku:'KL-TYT-MS290',  name:'Tytan MS Polymer 290 ml',        brand:'Tytan',     category:'kleje',     variant:'Hybrydowy · 290 ml',             pack:'12 szt. / karton', role:'neutral', tags:['MS Polymer'] },
+  { sku:'KL-LNG-MNT400', name:'Langer Klej montażowy 400 g',    brand:'Langer',    category:'kleje',     variant:'Montażowy · 400 g',              pack:'12 szt. / karton', role:'margin',  tags:['Marka własna','Mocny chwyt'] },
+  { sku:'KL-PEN-PU300',  name:'Penosil Klej PU 300 ml',        brand:'Penosil',   category:'kleje',     variant:'Poliuretanowy · 300 ml',         pack:'12 szt. / karton', role:'neutral', tags:['Poliuretanowy'] },
+  { sku:'AC-SDL-GUN',    name:'Pistolet do pian Soudal Pro',    brand:'Soudal',    category:'akcesoria', variant:'Metalowy · teflonowany',         pack:'1 szt.',           role:'neutral', tags:['Pistolet'] },
+  { sku:'AC-LNG-GUN',    name:'Pistolet do pian Langer Metal',  brand:'Langer',    category:'akcesoria', variant:'Metalowy',                       pack:'1 szt.',           role:'margin',  tags:['Marka własna','Pistolet'] },
+  { sku:'AC-SDL-CLN500', name:'Czyścik do pian 500 ml',        brand:'Soudal',    category:'akcesoria', variant:'Aerozol · 500 ml',               pack:'12 szt. / karton', role:'neutral', tags:['Czyścik'] },
+  { sku:'AC-LNG-TAPE',   name:'Taśma malarska Langer 38 mm',   brand:'Langer',    category:'akcesoria', variant:'38 mm × 50 m',                  pack:'40 szt. / karton', role:'margin',  tags:['Marka własna','Taśma'] },
+];
+
+const ROLE_LABEL = {
+  magnet:  { t:'Bestseller',   cls:'role-magnet' },
+  margin:  { t:'Marka własna', cls:'role-margin' },
+  premium: { t:'Premium',      cls:'role-premium' },
+  neutral: null,
+};
+
+/* ===== TWEAKS PANEL ===== */
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2}
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+    transition:transform .12s,box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = { x: startRight - (ev.clientX - sx), y: startBottom - (ev.clientY - sy) };
+      panel.style.right = offsetRef.current.x + 'px';
+      panel.style.bottom = offsetRef.current.y + 'px';
+    };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" onMouseDown={(e) => e.stopPropagation()} onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+function TweakSection({ label }) {
+  return <div className="twk-sect">{label}</div>;
+}
+
+function TweakRow({ label, children }) {
+  return (
+    <div className="twk-row">
+      <div className="twk-lbl"><span>{label}</span></div>
+      {children}
+    </div>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row" style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', gap:10 }}>
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'} onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const idx = Math.max(0, options.indexOf(value));
+  const n = options.length;
+  return (
+    <TweakRow label={label}>
+      <div role="radiogroup" className="twk-seg">
+        <div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />
+        {options.map((o) => (
+          <button key={o} type="button" role="radio" aria-checked={o === value} onClick={() => onChange(o)}>{o}</button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakColor({ label, value, options, onChange }) {
+  const key = (o) => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (
+    <TweakRow label={label}>
+      <div className="twk-chips" role="radiogroup">
+        {options.map((o, i) => {
+          const on = key(o) === cur;
+          return (
+            <button key={i} type="button" className="twk-chip" data-on={on ? '1' : '0'}
+              style={{ background: o }} onClick={() => onChange(o)}>
+              {on && (
+                <svg viewBox="0 0 14 14" aria-hidden="true">
+                  <path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" stroke="#fff" />
+                </svg>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </TweakRow>
+  );
+}
+
+/* ===== ICONS ===== */
+const Svg = ({ s = 20, style, children }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style}>{children}</svg>
+);
+const IArrow = (p) => <Svg {...p}><path d="M5 12h14M13 6l6 6-6 6"/></Svg>;
+const ITruck = (p) => <Svg {...p}><path d="M3 6h11v9H3zM14 9h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></Svg>;
+const IBox   = (p) => <Svg {...p}><path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"/></Svg>;
+const ITag   = (p) => <Svg {...p}><path d="M3 11l8-8 9 9-8 8z"/><circle cx="8" cy="8" r="1.4"/></Svg>;
+const IHead  = (p) => <Svg {...p}><path d="M4 14v-2a8 8 0 0116 0v2M4 14a2 2 0 002 2h1v-5H6a2 2 0 00-2 2zM20 14a2 2 0 01-2 2h-1v-5h1a2 2 0 012 2zM18 16v1a3 3 0 01-3 3h-3"/></Svg>;
+const IClock = (p) => <Svg {...p}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></Svg>;
+const IShield= (p) => <Svg {...p}><path d="M12 3l8 3v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></Svg>;
+const IGrid  = (p) => <Svg {...p}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></Svg>;
+const IPhone = (p) => <Svg {...p}><path d="M5 4h4l2 5-3 2a11 11 0 005 5l2-3 5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></Svg>;
+const IMail  = (p) => <Svg {...p}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></Svg>;
+const IPin   = (p) => <Svg {...p}><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></Svg>;
+const ICheck = (p) => <Svg {...p}><path d="M20 6L9 17l-5-5"/></Svg>;
+const IMenu  = (p) => <Svg {...p}><path d="M3 6h18M3 12h18M3 18h18"/></Svg>;
+const IX     = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
+
+/* Category icon SVGs (inline, stroke-based, currentColor) */
+function CatIcon({ name, size = 48 }) {
+  const props = { width: size, height: size, viewBox: "0 0 48 48", fill: "none", stroke: "currentColor", strokeWidth: "1.6", strokeLinecap: "round", strokeLinejoin: "round" };
+  if (name === 'piany') return (
+    <svg {...props}>
+      <rect x="14" y="14" width="14" height="26" rx="1.5"/>
+      <rect x="16" y="10" width="10" height="4" rx="1"/>
+      <line x1="21" y1="10" x2="21" y2="6"/>
+      <line x1="21" y1="6" x2="32" y2="6"/>
+      <path d="M34 5 L40 3 M34 7 L41 7 M34 9 L40 11"/>
+      <line x1="14" y1="20" x2="28" y2="20"/>
+      <text x="21" y="33" textAnchor="middle" fontFamily="monospace" fontWeight="700" fontSize="6" stroke="none" fill="currentColor" letterSpacing="0.08em">PUR</text>
+    </svg>
+  );
+  if (name === 'silikony') return (
+    <svg {...props}>
+      <path d="M12 14 L12 40 C12 41 13 42 14 42 L30 42 C31 42 32 41 32 40 L32 14"/>
+      <rect x="10" y="10" width="24" height="4" rx="1"/>
+      <path d="M32 16 L40 10 L40 8 L38 8"/>
+      <line x1="12" y1="22" x2="32" y2="22"/>
+      <line x1="12" y1="28" x2="32" y2="28"/>
+    </svg>
+  );
+  if (name === 'akryle') return (
+    <svg {...props}>
+      <rect x="10" y="14" width="22" height="26" rx="1.5"/>
+      <path d="M32 18 L40 14 L40 26 L32 22"/>
+      <line x1="10" y1="22" x2="32" y2="22"/>
+      <text x="21" y="34" textAnchor="middle" fontFamily="monospace" fontWeight="700" fontSize="6" stroke="none" fill="currentColor" letterSpacing="0.08em">ACR</text>
+    </svg>
+  );
+  if (name === 'kleje') return (
+    <svg {...props}>
+      <path d="M10 16 L12 40 C12 41 13 42 14 42 L34 42 C35 42 36 41 36 40 L38 16"/>
+      <ellipse cx="24" cy="16" rx="14" ry="3"/>
+      <path d="M14 8 Q14 6 16 6 L32 6 Q34 6 34 8 L34 14"/>
+      <line x1="16" y1="26" x2="32" y2="26"/>
+    </svg>
+  );
+  if (name === 'akcesoria') return (
+    <svg {...props}>
+      <path d="M8 20 L32 20 L32 26 L8 26 Z"/>
+      <path d="M16 26 L18 38 L24 38 L22 26"/>
+      <line x1="32" y1="22" x2="42" y2="18"/>
+      <line x1="32" y1="24" x2="42" y2="24"/>
+      <circle cx="12" cy="16" r="3"/>
+      <line x1="12" y1="13" x2="12" y2="8"/>
+    </svg>
+  );
+  return null;
+}
+
+/* ===== BRAND MARK ===== */
+function LangerMark({ size = 40, className }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} aria-hidden="true">
+      <rect x="13" y="7" width="11" height="35" rx="5.5" fill="currentColor" />
+      <rect x="18.5" y="38" width="6" height="10" rx="3" fill="currentColor" />
+      <rect x="13" y="46" width="42" height="13" rx="6.5" fill="var(--flame)" />
+      <line x1="13" y1="52.5" x2="55" y2="52.5" stroke="#fff" strokeOpacity="0.35" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+function LangerLogo({ onDark, size = 40 }) {
+  return (
+    <a href="#top" className="logo" style={{ color: onDark ? '#fff' : 'var(--navy)' }}>
+      <LangerMark size={size} />
+      <span className="logo-words">
+        <span className="logo-name">LANGER</span>
+        <span className="logo-sub" style={{ color: onDark ? 'rgba(255,255,255,.6)' : 'var(--ash-700)' }}>DYSTRYBUCJA</span>
+      </span>
+    </a>
+  );
+}
+
+/* ===== HEADER ===== */
+function Header() {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 40);
+    on(); window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
+  }, []);
+  const links = [['#proces','Proces'],['#oferta','Oferta'],['#baza','Baza produktów'],['#dlaczego','Dlaczego my'],['#kontakt','Kontakt']];
+  return (
+    <header className={'hdr' + (scrolled ? ' hdr-solid' : '')}>
+      <div className="wrap hdr-in">
+        <LangerLogo onDark={!scrolled} size={38} />
+        <nav className="hdr-nav">
+          {links.map(([h,l]) => <a key={h} href={h} className="hdr-link">{l}</a>)}
+        </nav>
+        <div className="hdr-cta">
+          <a href="#kontakt" className="btn btn-flame" style={{ padding:'12px 20px', fontSize:15 }}>Zostań partnerem <IArrow s={17}/></a>
+        </div>
+        <button className="hdr-burger" onClick={() => setOpen(true)} aria-label="Menu"><IMenu s={24}/></button>
+      </div>
+      {open && (
+        <div className="mobile-menu" onClick={() => setOpen(false)}>
+          <div className="mobile-sheet" onClick={e => e.stopPropagation()}>
+            <button className="mm-close" onClick={() => setOpen(false)} aria-label="Zamknij"><IX s={24}/></button>
+            {links.map(([h,l]) => <a key={h} href={h} className="mm-link" onClick={() => setOpen(false)}>{l}</a>)}
+            <a href="#kontakt" className="btn btn-flame" onClick={() => setOpen(false)} style={{ marginTop:16 }}>Zostań partnerem <IArrow/></a>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
+
+/* ===== HERO ===== */
+const HERO = {
+  eyebrow: 'Hurtowa dystrybucja chemii budowlanej',
+  h1a: 'Chemia budowlana',
+  h1b: 'na czas',
+  h1c: ', w pełnych kartonach.',
+  lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze w piany montażowe, silikony, akryle i kleje. Sprawdzone marki, marka własna Langer z najlepszą marżą i krótkie terminy dostaw.',
+};
+
+function HeroStats({ onDark }) {
+  const stats = [['120+','produktów w ofercie'],['6','marek, w tym Langer'],['48 h','średni czas realizacji'],['1 200+','zaopatrywanych punktów']];
+  return (
+    <div className={'hstats' + (onDark ? ' on-dark' : '')}>
+      {stats.map(([n,l]) => (
+        <div className="hstat" key={l}>
+          <div className="hstat-n num">{n}</div>
+          <div className="hstat-l">{l}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Hero({ variant }) {
+  const Title = () => (
+    <h1 className="display hero-h">
+      {HERO.h1a} <span style={{ color:'var(--flame)' }}>{HERO.h1b}</span>{HERO.h1c}
+    </h1>
+  );
+  const CTAs = ({ darkBtns }) => (
+    <div className="hero-cta">
+      <a href="#kontakt" className="btn btn-flame">Zostań partnerem <IArrow/></a>
+      <a href="#baza" className={'btn ' + (darkBtns ? 'btn-ghost' : 'btn-ghost on-dark')}>Zobacz bazę produktów</a>
+    </div>
+  );
+
+  if (variant === 'poster') {
+    return (
+      <section id="top" className="hero hero-poster">
+        <LangerMark size={520} className="hero-watermark" />
+        <div className="wrap hero-poster-in">
+          <span className="eyebrow" style={{ color:'var(--navy)' }}>{HERO.eyebrow}</span>
+          <h1 className="display hero-h" style={{ color:'var(--navy)', maxWidth:980 }}>
+            {HERO.h1a} <span style={{ color:'#fff' }}>{HERO.h1b}</span>{HERO.h1c}
+          </h1>
+          <p className="lead" style={{ color:'var(--navy)', maxWidth:620, opacity:.85 }}>{HERO.lead}</p>
+          <div className="hero-cta">
+            <a href="#kontakt" className="btn btn-dark">Zostań partnerem <IArrow/></a>
+            <a href="#baza" className="btn btn-ghost" style={{ borderColor:'rgba(14,21,51,.3)', color:'var(--navy)' }}>Zobacz bazę produktów</a>
+          </div>
+          <HeroStats onDark={false} />
+        </div>
+      </section>
+    );
+  }
+
+  if (variant === 'split') {
+    return (
+      <section id="top" className="hero hero-split">
+        <div className="hero-split-l">
+          <div className="hero-split-inner">
+            <span className="eyebrow on-dark">{HERO.eyebrow}</span>
+            <Title/>
+            <p className="lead" style={{ color:'rgba(255,255,255,.72)', maxWidth:520 }}>{HERO.lead}</p>
+            <CTAs/>
+          </div>
+        </div>
+        <div className="hero-split-r">
+          <LangerMark size={260} className="hero-split-mark" />
+          <HeroStats onDark={false} />
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="top" className="hero hero-navy">
+      <div className="hero-grid-bg" />
+      <div className="wrap hero-navy-in">
+        <span className="eyebrow on-dark">{HERO.eyebrow}</span>
+        <Title/>
+        <p className="lead" style={{ color:'rgba(255,255,255,.74)', maxWidth:640 }}>{HERO.lead}</p>
+        <CTAs/>
+        <HeroStats onDark />
+      </div>
+    </section>
+  );
+}
+
+/* ===== MARQUEE ===== */
+function Marquee() {
+  const items = ['SOUDAL','TYTAN','PENOSIL','DEN BRAVEN','LANGER','SOUDAL','TYTAN','PENOSIL','DEN BRAVEN','LANGER'];
+  return (
+    <div className="marquee" aria-hidden="true">
+      <div className="marquee-track">
+        {items.concat(items).map((b,i) => (
+          <span className="marquee-item" key={i}>{b}<span className="marquee-dot">/</span></span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ===== WHY US ===== */
+function WhyUs() {
+  const items = [
+    [IClock,'Krótkie terminy','Średnio 48 h od zamówienia do rozładunku. Zamówienia do 13:00 kompletujemy tego samego dnia.'],
+    [IBox,'Pełen asortyment','Piany, silikony, akryle, kleje i akcesoria w jednym miejscu — bez żonglowania kilkoma hurtowniami.'],
+    [ITag,'Marka własna Langer','Produkty Langer w jakości premium, ale z marżą, która realnie zarabia na półce.'],
+    [ITruck,'Dostawa na paletach','Logistyka skrojona pod handel — pełne kartony, palety i transport własny w regionie.'],
+    [IHead,'Doradztwo handlowca','Stały opiekun, który zna Twój asortyment i podpowiada, co dobrać do zamówienia.'],
+    [IShield,'Stała jakość','Tylko sprawdzone marki i partie z atestami. Reklamacje załatwiamy bez przepychanek.'],
+  ];
+  return (
+    <section id="dlaczego" className="sec">
+      <div className="wrap">
+        <div className="sec-head reveal">
+          <span className="eyebrow">Dlaczego Langer</span>
+          <h2 className="h-sec">Hurtownia, która gra<br/>do jednej bramki z Tobą.</h2>
+        </div>
+        <div className="why-grid">
+          {items.map(([Ic,t,d],i) => (
+            <div className="why-card reveal" key={t} style={{ transitionDelay:(i*60)+'ms' }}>
+              <span className="why-ic"><Ic s={26}/></span>
+              <h3 className="why-t">{t}</h3>
+              <p className="why-d">{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== PROCESS ===== */
+function Process() {
+  const steps = [
+    ['01','Składasz zamówienie','Online z bazy produktów, mailem lub przez swojego handlowca. Pełne kartony, jasne jednostki sprzedaży.'],
+    ['02','Kompletujemy i pakujemy','Magazyn zbiera towar tego samego dnia. Kontrola ilości i partii przed wysyłką.'],
+    ['03','Wysyłka i transport','Transport własny w regionie lub spedycja w całej Polsce. Dostawa na paletach pod sklep.'],
+    ['04','Rozładunek i rozliczenie','Dostawa w 48 h, faktura z terminem, a Twój handlowiec pilnuje kolejnego uzupełnienia.'],
+  ];
+  return (
+    <section id="proces" className="sec sec-dark">
+      <div className="wrap">
+        <div className="sec-head reveal">
+          <span className="eyebrow on-dark">Proces dystrybucji</span>
+          <h2 className="h-sec" style={{ color:'#fff' }}>Od zamówienia do rozładunku<br/>w czterech krokach.</h2>
+        </div>
+        <div className="proc-grid">
+          {steps.map(([n,t,d],i) => (
+            <div className="proc-step reveal" key={n} style={{ transitionDelay:(i*70)+'ms' }}>
+              <div className="proc-n num">{n}</div>
+              <h3 className="proc-t">{t}</h3>
+              <p className="proc-d">{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== CATEGORIES ===== */
+function Categories({ onPick }) {
+  return (
+    <section id="oferta" className="sec">
+      <div className="wrap">
+        <div className="sec-head reveal">
+          <span className="eyebrow">Oferta</span>
+          <h2 className="h-sec">Pięć kategorii,<br/>jeden dostawca.</h2>
+        </div>
+        <div className="cat-grid">
+          {CATEGORIES.map((c,i) => (
+            <a href="#baza" key={c.id} onClick={() => onPick && onPick(c.id)}
+               className="cat-card reveal" style={{ transitionDelay:(i*60)+'ms' }}>
+              <span className="cat-ic"><CatIcon name={c.icon} size={40}/></span>
+              <div className="cat-body">
+                <h3 className="cat-t">{c.label}</h3>
+                <p className="cat-d">{c.blurb}</p>
+              </div>
+              <span className="cat-go"><IArrow s={20}/></span>
+            </a>
+          ))}
+          <a href="#baza" onClick={() => onPick && onPick('all')} className="cat-card cat-card-all reveal">
+            <div>
+              <h3 className="cat-t" style={{ color:'#fff' }}>Cała baza produktów</h3>
+              <p className="cat-d" style={{ color:'rgba(255,255,255,.7)' }}>Przeszukaj i filtruj pełny katalog.</p>
+            </div>
+            <span className="btn btn-flame" style={{ alignSelf:'flex-start' }}>Otwórz bazę <IArrow/></span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== CONTACT ===== */
+function Contact() {
+  const [sent, setSent] = useState(false);
+  return (
+    <section id="kontakt" className="sec sec-contact">
+      <div className="wrap contact-grid">
+        <div className="reveal">
+          <span className="eyebrow">Kontakt</span>
+          <h2 className="h-sec">Zostań partnerem<br/>Langer Dystrybucja.</h2>
+          <p className="lead" style={{ maxWidth:440, marginTop:16 }}>
+            Zostaw dane — handlowiec odezwie się w ciągu jednego dnia roboczego z ofertą i cennikiem hurtowym.
+          </p>
+          <ul className="contact-list">
+            <li><span className="ci"><IPhone/></span><div><div className="ci-k">Telefon</div><a href="tel:+48000000000" className="ci-v num">+48 000 000 000</a></div></li>
+            <li><span className="ci"><IMail/></span><div><div className="ci-k">E-mail</div><a href="mailto:biuro@langerdystrybucja.pl" className="ci-v">biuro@langerdystrybucja.pl</a></div></li>
+            <li><span className="ci"><IPin/></span><div><div className="ci-k">Magazyn i biuro</div><div className="ci-v">ul. Przykładowa 00, 00-000 Miasto</div></div></li>
+          </ul>
+        </div>
+        <div className="reveal">
+          {sent ? (
+            <div className="form-done">
+              <span className="form-done-ic"><ICheck s={32}/></span>
+              <h3 className="why-t" style={{ fontSize:24 }}>Dziękujemy!</h3>
+              <p className="why-d">Odezwiemy się w ciągu jednego dnia roboczego.</p>
+              <button className="btn btn-ghost" onClick={() => setSent(false)} style={{ marginTop:12 }}>Wyślij kolejne</button>
+            </div>
+          ) : (
+            <form className="form" onSubmit={e => { e.preventDefault(); setSent(true); }}>
+              <div className="form-row">
+                <label className="field"><span>Firma</span><input required placeholder="Nazwa firmy"/></label>
+                <label className="field"><span>NIP</span><input placeholder="000-000-00-00" inputMode="numeric"/></label>
+              </div>
+              <div className="form-row">
+                <label className="field"><span>Osoba kontaktowa</span><input required placeholder="Imię i nazwisko"/></label>
+                <label className="field"><span>Telefon</span><input required placeholder="+48 000 000 000" inputMode="tel"/></label>
+              </div>
+              <label className="field"><span>E-mail</span><input required type="email" placeholder="firma@email.pl"/></label>
+              <label className="field"><span>Wiadomość</span><textarea rows="3" placeholder="Czego potrzebujesz? Jaki asortyment Cię interesuje?"></textarea></label>
+              <button className="btn btn-flame" type="submit" style={{ width:'100%' }}>Wyślij zapytanie <IArrow/></button>
+              <p className="form-note">Wysyłając formularz akceptujesz kontakt handlowy. To wersja demonstracyjna — dane nie są zapisywane.</p>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ===== FOOTER ===== */
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="wrap footer-in">
+        <div className="footer-brand">
+          <LangerLogo onDark size={42}/>
+          <p className="footer-tag">Hurtowa dystrybucja chemii budowlanej. Piany, silikony, akryle, kleje i akcesoria dla handlu i ekip wykonawczych.</p>
+        </div>
+        <div className="footer-cols">
+          <div className="footer-col">
+            <div className="footer-h">Nawigacja</div>
+            <a href="#proces">Proces</a><a href="#oferta">Oferta</a><a href="#baza">Baza produktów</a><a href="#dlaczego">Dlaczego my</a><a href="#kontakt">Kontakt</a>
+          </div>
+          <div className="footer-col">
+            <div className="footer-h">Oferta</div>
+            {CATEGORIES.map(c => <a key={c.id} href="#baza">{c.label}</a>)}
+          </div>
+          <div className="footer-col">
+            <div className="footer-h">Kontakt</div>
+            <a href="tel:+48000000000" className="num">+48 000 000 000</a>
+            <a href="mailto:biuro@langerdystrybucja.pl">biuro@langerdystrybucja.pl</a>
+            <span style={{ color:'rgba(255,255,255,.5)' }}>ul. Przykładowa 00<br/>00-000 Miasto</span>
+          </div>
+        </div>
+      </div>
+      <div className="wrap footer-bottom">
+        <span>© {new Date().getFullYear()} Langer Dystrybucja</span>
+        <span>Wersja beta · dane kontaktowe do uzupełnienia</span>
+      </div>
+    </footer>
+  );
+}
+
+/* ===== CATALOG ===== */
+const CAT_TINT = {
+  piany:     ['#FBE7DF', 'var(--flame)'],
+  silikony:  ['#E5E9F8', 'var(--cobalt)'],
+  akryle:    ['#E7EAEF', 'var(--ash-700)'],
+  kleje:     ['#FEF1D9', '#B97A0A'],
+  akcesoria: ['#E4E7EA', 'var(--navy)'],
+};
+
+function ProductTile({ p }) {
+  const cat = CATEGORIES.find(c => c.id === p.category);
+  const [tint, fg] = CAT_TINT[p.category] || ['#eee','#333'];
+  const role = ROLE_LABEL[p.role];
+  return (
+    <article className="pcard">
+      <div className="pcard-img" style={{ background: tint, color: fg }}>
+        <CatIcon name={cat.icon} size={64} />
+        <span className="pcard-imgtag">Zdjęcie wkrótce</span>
+        {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
+      </div>
+      <div className="pcard-body">
+        <div className="pcard-brand">{p.brand}</div>
+        <h3 className="pcard-name">{p.name}</h3>
+        <div className="pcard-variant">{p.variant}</div>
+        <div className="pcard-tags">
+          {p.tags.map(t => <span className="ptag" key={t}>{t}</span>)}
+        </div>
+        <div className="pcard-foot">
+          <div>
+            <div className="pcard-pack">{p.pack}</div>
+            <div className="pcard-sku num">{p.sku}</div>
+          </div>
+          <a href="#kontakt" className="pcard-ask">Zapytaj o cenę <IArrow s={16}/></a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function ProductDatabase({ initialCatRef }) {
+  const [q, setQ] = useState('');
+  const [cat, setCat] = useState('all');
+  const [brand, setBrand] = useState('all');
+  const [sort, setSort] = useState('name');
+
+  React.useEffect(() => {
+    if (initialCatRef) initialCatRef.current = (c) => setCat(c === 'all' ? 'all' : c);
+  }, [initialCatRef]);
+
+  const results = useMemo(() => {
+    let r = PRODUCTS.filter(p => {
+      if (cat !== 'all' && p.category !== cat) return false;
+      if (brand !== 'all' && p.brand !== brand) return false;
+      if (q.trim()) {
+        const s = (p.name + ' ' + p.brand + ' ' + p.sku + ' ' + p.variant + ' ' + p.tags.join(' ')).toLowerCase();
+        if (!s.includes(q.trim().toLowerCase())) return false;
+      }
+      return true;
+    });
+    if (sort === 'name') r = [...r].sort((a,b) => a.name.localeCompare(b.name,'pl'));
+    if (sort === 'brand') r = [...r].sort((a,b) => a.brand.localeCompare(b.brand,'pl') || a.name.localeCompare(b.name,'pl'));
+    return r;
+  }, [q, cat, brand, sort]);
+
+  const active = q || cat !== 'all' || brand !== 'all';
+  const clear = () => { setQ(''); setCat('all'); setBrand('all'); };
+
+  return (
+    <section id="baza" className="sec sec-base">
+      <div className="wrap">
+        <div className="sec-head reveal">
+          <span className="eyebrow">Baza produktów</span>
+          <h2 className="h-sec">Przeszukaj cały katalog.</h2>
+          <p className="lead" style={{ maxWidth:560, marginTop:14 }}>
+            Wersja beta — ceny hurtowe pokazujemy po zalogowaniu. Filtruj po kategorii i marce, a o cenę pytaj jednym kliknięciem.
+          </p>
+        </div>
+
+        <div className="base-toolbar">
+          <div className="search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Szukaj: nazwa, marka, SKU, np. „silikon sanitarny"…" />
+            {q && <button className="search-x" onClick={() => setQ('')} aria-label="Wyczyść"><IX s={18}/></button>}
+          </div>
+          <div className="sortbox">
+            <label>Sortuj</label>
+            <select value={sort} onChange={e => setSort(e.target.value)}>
+              <option value="name">Nazwa A–Z</option>
+              <option value="brand">Marka</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="filters">
+          <div className="filter-line">
+            <span className="filter-k">Kategoria</span>
+            <div className="chips">
+              <button className={'chip' + (cat==='all'?' active':'')} onClick={() => setCat('all')}>Wszystkie</button>
+              {CATEGORIES.map(c => (
+                <button key={c.id} className={'chip' + (cat===c.id?' active':'')} onClick={() => setCat(c.id)}>{c.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="filter-line">
+            <span className="filter-k">Marka</span>
+            <div className="chips">
+              <button className={'chip' + (brand==='all'?' active':'')} onClick={() => setBrand('all')}>Wszystkie</button>
+              {BRANDS.map(b => (
+                <button key={b} className={'chip' + (brand===b?' active':'')} onClick={() => setBrand(b)}>{b}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="base-meta">
+          <span className="num">{results.length}</span> {results.length === 1 ? 'produkt' : (results.length >= 2 && results.length <= 4 ? 'produkty' : 'produktów')}
+          {active && <button className="base-clear" onClick={clear}>Wyczyść filtry <IX s={15}/></button>}
+        </div>
+
+        {results.length ? (
+          <div className="pgrid">
+            {results.map(p => <ProductTile key={p.sku} p={p} />)}
+          </div>
+        ) : (
+          <div className="empty">
+            <span className="empty-ic"><IGrid s={30}/></span>
+            <h3 className="why-t">Brak wyników</h3>
+            <p className="why-d">Nie znaleźliśmy produktów dla tych filtrów. Zmień zapytanie lub wyczyść filtry.</p>
+            <button className="btn btn-ghost" onClick={clear}>Wyczyść filtry</button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* ===== APP ===== */
+const TWEAK_DEFAULTS = { hero: 'Granat', accent: '#F04E23', marquee: true };
+const HERO_KEY = { 'Granat': 'navy', 'Split': 'split', 'Plakat': 'poster' };
+
+function useReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  });
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const catRef = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--flame', t.accent);
+    document.documentElement.style.setProperty('--flame-glow', t.accent);
+  }, [t.accent]);
+
+  useReveal();
+
+  const pickCat = (c) => {
+    if (catRef.current) catRef.current(c);
+    requestAnimationFrame(() => {
+      const el = document.getElementById('baza');
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 60, behavior: 'smooth' });
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <Header />
+      <Hero variant={HERO_KEY[t.hero] || 'navy'} />
+      {t.marquee && <Marquee />}
+      <WhyUs />
+      <Process />
+      <Categories onPick={pickCat} />
+      <ProductDatabase initialCatRef={catRef} />
+      <Contact />
+      <Footer />
+
+      <TweaksPanel>
+        <TweakSection label="Strona główna (hero)" />
+        <TweakRadio label="Wariant hero" value={t.hero} options={['Granat', 'Split', 'Plakat']} onChange={(v) => setTweak('hero', v)} />
+        <TweakColor label="Kolor akcentu" value={t.accent} options={['#F04E23', '#E5421A', '#1E3FB5', '#0E1533']} onChange={(v) => setTweak('accent', v)} />
+        <TweakToggle label="Pasek marek (marquee)" value={t.marquee} onChange={(v) => setTweak('marquee', v)} />
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
