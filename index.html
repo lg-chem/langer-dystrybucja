@@ -1029,7 +1029,7 @@ function ProductDatabase({ initialCatRef }) {
         <div className="base-toolbar">
           <div className="search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Szukaj: nazwa, marka, SKU, np. „silikon sanitarny"…" />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder={'Szukaj: nazwa, marka, SKU, np. „silikon sanitarny"…'} />
             {q && <button className="search-x" onClick={() => setQ('')} aria-label="Wyczyść"><IX s={18}/></button>}
           </div>
           <div className="sortbox">
