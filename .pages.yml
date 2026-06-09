@@ -1,0 +1,58 @@
+content:
+  - name: produkty
+    label: Produkty
+    type: file
+    path: data/products.json
+    format: json
+    list: true
+    view:
+      fields: [brand, name, sku]
+    fields:
+      - name: sku
+        label: SKU
+        type: string
+        required: true
+      - name: name
+        label: Nazwa produktu
+        type: string
+        required: true
+      - name: brand
+        label: Marka
+        type: select
+        options:
+          values: [Soudal, Tytan, Penosil, Langer, "Den Braven"]
+        required: true
+      - name: category
+        label: Kategoria
+        type: select
+        options:
+          values:
+            - { label: "Piany montażowe", value: piany }
+            - { label: "Silikony",        value: silikony }
+            - { label: "Akryle",          value: akryle }
+            - { label: "Kleje",           value: kleje }
+            - { label: "Akcesoria",       value: akcesoria }
+        required: true
+      - name: variant
+        label: Wariant / pojemność
+        type: string
+        description: 'np. "Pistoletowa · 750 ml"'
+      - name: pack
+        label: Jednostka sprzedaży
+        type: string
+        description: 'np. "12 szt. / karton"'
+      - name: role
+        label: Oznaczenie na karcie
+        type: select
+        options:
+          values:
+            - { label: "Bestseller",      value: magnet }
+            - { label: "Marka własna",    value: margin }
+            - { label: "Premium",         value: premium }
+            - { label: "Bez oznaczenia",  value: neutral }
+        default: neutral
+      - name: tags
+        label: Tagi
+        type: string
+        list: true
+        description: 'np. Pistoletowa, Całoroczna'
