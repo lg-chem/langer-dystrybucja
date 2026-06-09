@@ -1,0 +1,120 @@
+/* ===========================================================================
+   Langer Dystrybucja — brand tokens (from identity book)
+   Flame / Cobalt / Deep Blue / greys.  Uniwars→Space Grotesk, Forma/Helvetica→Hanken.
+   Hex values are tuned to the brand-book names; swap if you have exact codes.
+   =========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* BRAND */
+  --flame:        #F04E23;   /* FLAME — primary, attention */
+  --flame-600:    #D63F18;   /* hover */
+  --flame-700:    #B63411;   /* press */
+  --flame-tint:   #FBE7DF;
+  --flame-glow:   #FF6A3D;
+
+  --cobalt:       #1E3FB5;   /* COBALT — trust accent, contrast to flame */
+  --cobalt-600:   #182F95;
+  --cobalt-tint:  #E5E9F8;
+
+  --navy:         #0E1533;   /* DEEP BLUE — replaces black */
+  --navy-800:    #161E45;
+  --navy-700:    #232C5E;
+  --navy-900:    #080C22;
+
+  --ash:          #8B9199;   /* ASH GREY */
+  --ash-700:      #565D67;
+
+  --light:        #EEF0F3;   /* LIGHT GREY — bg */
+  --paper:        #F6F7F9;   /* page canvas */
+  --white:        #FFFFFF;
+  --line:         #E2E5EA;
+  --line-2:       #CFD4DC;
+
+  /* TYPE */
+  --font-display: 'Space Grotesk', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-text:    'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+  /* SPACING (4px grid) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px; --s10:128px;
+
+  /* RADII */
+  --r-sm:6px; --r-md:10px; --r-lg:16px; --r-xl:24px; --r-full:999px;
+
+  /* SHADOW */
+  --e1: 0 1px 2px rgb(14 21 51 / 0.06), 0 1px 1px rgb(14 21 51 / 0.04);
+  --e2: 0 18px 48px -16px rgb(14 21 51 / 0.22), 0 6px 16px -8px rgb(14 21 51 / 0.10);
+  --e-flame: 0 16px 40px -12px rgb(240 78 35 / 0.45);
+
+  --max: 1240px;
+  --header-h: 76px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--navy);
+  font-family: var(--font-text);
+  font-size: 17px;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+::selection { background: var(--flame); color: #fff; }
+
+/* ----- shared layout ----- */
+.wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding-inline: 32px; }
+@media (max-width: 760px){ .wrap { padding-inline: 20px; } }
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--flame);
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.eyebrow::before { content:''; width: 22px; height: 2px; background: var(--flame); display:inline-block; }
+.eyebrow.on-dark { color: var(--flame-glow); }
+
+h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; letter-spacing: -0.03em; font-weight: 700; }
+.display { font-size: clamp(44px, 7vw, 92px); line-height: 0.94; letter-spacing: -0.04em; }
+.h-sec   { font-size: clamp(32px, 4.4vw, 56px); letter-spacing: -0.035em; }
+.lead { font-size: clamp(17px, 2vw, 21px); line-height: 1.55; color: var(--ash-700); font-weight: 400; }
+
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ----- buttons ----- */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing:-0.01em;
+  padding: 15px 26px; border-radius: var(--r-sm); transition: transform .12s, background .15s, box-shadow .15s, color .15s;
+  white-space: nowrap; }
+.btn svg { width: 18px; height: 18px; }
+.btn-flame { background: var(--flame); color:#fff; box-shadow: var(--e-flame); }
+.btn-flame:hover { background: var(--flame-600); transform: translateY(-2px); }
+.btn-flame:active { background: var(--flame-700); transform: translateY(0); }
+.btn-dark { background: var(--navy); color:#fff; }
+.btn-dark:hover { background: var(--navy-800); transform: translateY(-2px); }
+.btn-ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--line-2); }
+.btn-ghost:hover { border-color: var(--navy); background: var(--white); }
+.btn-ghost.on-dark { color:#fff; border-color: rgb(255 255 255 / 0.28); }
+.btn-ghost.on-dark:hover { border-color:#fff; background: rgb(255 255 255 / 0.08); }
+
+/* ----- pill / chip ----- */
+.chip { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+  padding: 7px 14px; border-radius: var(--r-full); border:1px solid var(--line-2); color: var(--ash-700);
+  background: var(--white); transition: all .12s; cursor:pointer; }
+.chip:hover { border-color: var(--navy); color: var(--navy); }
+.chip.active { background: var(--navy); color:#fff; border-color: var(--navy); }
+
+/* reveal on scroll */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease, cubic-bezier(.2,0,0,1)), transform .7s cubic-bezier(.2,0,0,1); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce){ .reveal { opacity:1; transform:none; transition:none; } html{scroll-behavior:auto;} }
