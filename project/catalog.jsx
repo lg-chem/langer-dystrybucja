@@ -17,8 +17,10 @@ function ProductTile({ p }) {
   return (
     <article className="pcard">
       <div className="pcard-img" style={{ background: tint, color: fg }}>
-        <Icon name={cat.icon} size={64} style={{ opacity:.9 }} />
-        <span className="pcard-imgtag">Zdjęcie wkrótce</span>
+        {p.image
+          ? <img src={p.image} alt={p.name} className="pcard-photo" loading="lazy" />
+          : (<><Icon name={cat.icon} size={64} style={{ opacity:.9 }} /><span className="pcard-imgtag">Zdjęcie wkrótce</span></>)
+        }
         {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
       </div>
       <div className="pcard-body">
