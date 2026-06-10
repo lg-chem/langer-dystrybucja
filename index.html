@@ -953,8 +953,8 @@ function LangerShowcase({ products }) {
               return (
                 <article className="lcard" key={p.sku}>
                   <div className="lcard-img" style={{ background: tint, color: fg }}>
-                    {p.image
-                      ? <img src={p.image} alt={p.name} className="lcard-photo" loading="lazy" />
+                    {(p.image || p.image_url)
+                      ? <img src={p.image || p.image_url} alt={p.name} className="lcard-photo" loading="lazy" />
                       : (<>{cat && <CatIcon name={cat.icon} size={72} />}<span className="lcard-imgtag">Zdjęcie wkrótce</span></>)
                     }
                     {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
@@ -1089,8 +1089,8 @@ function ProductTile({ p }) {
   return (
     <article className="pcard">
       <div className="pcard-img" style={{ background: tint, color: fg }}>
-        {p.image
-          ? <img src={p.image} alt={p.name} className="pcard-photo" loading="lazy" />
+        {(p.image || p.image_url)
+          ? <img src={p.image || p.image_url} alt={p.name} className="pcard-photo" loading="lazy" />
           : (<><CatIcon name={cat.icon} size={64} /><span className="pcard-imgtag">Zdjęcie wkrótce</span></>)
         }
         {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}

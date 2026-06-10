@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Langer Dystrybucja</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  --flame: #F04E23; --flame-600: #D63F18; --flame-tint: #FBE7DF;
+  --navy: #0E1533; --navy-800: #161E45; --navy-900: #080C22;
+  --cobalt: #1E3FB5; --ash: #8B9199; --ash-700: #565D67;
+  --light: #EEF0F3; --paper: #F6F7F9; --white: #FFFFFF;
+  --line: #E2E5EA; --line-2: #CFD4DC;
+  --green: #16A34A; --green-tint: #DCFCE7;
+  --red: #DC2626; --red-tint: #FEE2E2;
+  --amber: #D97706; --amber-tint: #FEF3C7;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-text: 'Hanken Grotesk', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
+  --e1: 0 1px 2px rgb(14 21 51 / 0.06);
+  --e2: 0 4px 16px -4px rgb(14 21 51 / 0.12), 0 2px 4px -1px rgb(14 21 51 / 0.06);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; min-height: 100vh; }
+body { background: var(--paper); color: var(--navy); font-family: var(--font-text); font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, select, textarea { font-family: inherit; }
+a { color: inherit; }
+
+/* HEADER */
+.adm-hdr { background: var(--navy); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+.adm-hdr-l { display: flex; align-items: center; gap: 16px; }
+.adm-hdr-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+.adm-hdr-sub { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: rgba(255,255,255,.55); text-transform: uppercase; }
+.adm-hdr-btn { padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.18); display: inline-flex; align-items: center; gap: 6px; }
+.adm-hdr-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.4); }
+
+/* TABS */
+.adm-tabs { background: var(--white); border-bottom: 1px solid var(--line); padding: 0 24px; display: flex; gap: 4px; }
+.adm-tab { padding: 16px 18px; font-size: 14px; font-weight: 600; color: var(--ash-700); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 8px; }
+.adm-tab:hover { color: var(--navy); }
+.adm-tab.active { color: var(--navy); border-bottom-color: var(--flame); }
+
+/* MAIN */
+.adm-main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
+.adm-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; }
+.adm-card + .adm-card { margin-top: 20px; }
+.adm-card-h { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin: 0 0 8px; }
+.adm-card-d { color: var(--ash-700); font-size: 14px; margin: 0 0 20px; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-display); font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: var(--r-sm); transition: background .12s, transform .12s; white-space: nowrap; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-flame { background: var(--flame); color: #fff; }
+.btn-flame:hover:not(:disabled) { background: var(--flame-600); }
+.btn-dark { background: var(--navy); color: #fff; }
+.btn-dark:hover:not(:disabled) { background: var(--navy-800); }
+.btn-ghost { background: var(--white); color: var(--navy); border: 1.5px solid var(--line-2); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--navy); }
+.btn-danger { background: var(--red); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: #B91C1C; }
+.btn-icon { width: 32px; height: 32px; padding: 0; border-radius: var(--r-sm); color: var(--ash); }
+.btn-icon:hover:not(:disabled) { color: var(--red); background: var(--red-tint); }
+
+/* FIELDS */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--ash-700); letter-spacing: 0.04em; text-transform: uppercase; }
+.field input, .field select, .field textarea { font-size: 15px; padding: 10px 12px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--white); color: var(--navy); transition: border-color .15s, box-shadow .15s; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* LOGIN */
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(180deg, var(--navy) 0%, var(--navy-900) 100%); }
+.login-card { background: var(--white); border-radius: var(--r-lg); padding: 36px; max-width: 420px; width: 100%; box-shadow: 0 24px 48px -16px rgba(0,0,0,.4); }
+.login-h { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: -0.02em; margin: 8px 0 6px; }
+.login-d { color: var(--ash-700); font-size: 14.5px; margin: 0 0 24px; }
+.login-help { font-size: 12.5px; color: var(--ash); margin: 6px 0 0; line-height: 1.4; }
+.login-help a { color: var(--cobalt); text-decoration: underline; }
+.login-err { background: var(--red-tint); color: var(--red); padding: 10px 14px; border-radius: var(--r-sm); font-size: 13.5px; margin-bottom: 16px; }
+
+/* DROPZONE */
+.drop { border: 2px dashed var(--line-2); border-radius: var(--r-lg); padding: 40px 24px; text-align: center; transition: background .15s, border-color .15s; }
+.drop.over { background: var(--flame-tint); border-color: var(--flame); }
+.drop-i { width: 56px; height: 56px; border-radius: 50%; background: var(--light); color: var(--ash-700); display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.drop-h { font-weight: 600; font-size: 16px; margin: 0 0 6px; }
+.drop-d { color: var(--ash-700); font-size: 13.5px; margin: 0 0 16px; }
+
+/* PREVIEW TABLE */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 16px; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.tbl th { background: var(--light); padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ash-700); border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.tbl td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.tbl tr:last-child td { border-bottom: none; }
+table.tbl tr.invalid td { background: var(--red-tint); }
+.tag-bad { display: inline-block; background: var(--red-tint); color: var(--red); font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-left: 4px; }
+.tag-ok  { display: inline-block; background: var(--green-tint); color: var(--green); font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+
+/* PROGRESS */
+.progress { margin-top: 16px; padding: 16px; background: var(--light); border-radius: var(--r-md); font-size: 13.5px; }
+.progress-bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 8px 0 12px; }
+.progress-bar-i { height: 100%; background: var(--flame); transition: width .3s; }
+.progress-log { font-family: var(--font-mono); font-size: 12px; color: var(--ash-700); max-height: 200px; overflow-y: auto; background: var(--white); padding: 10px; border-radius: var(--r-sm); border: 1px solid var(--line); }
+.progress-log .ok { color: var(--green); }
+.progress-log .err { color: var(--red); }
+
+/* PRODUCT IMG */
+.p-img { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--light); object-fit: cover; }
+
+/* ALERTS */
+.alert { padding: 12px 16px; border-radius: var(--r-sm); font-size: 13.5px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
+.alert-info { background: var(--cobalt); background: #E5E9F8; color: #1E3FB5; }
+.alert-warn { background: var(--amber-tint); color: var(--amber); }
+.alert-ok { background: var(--green-tint); color: var(--green); }
+
+/* MISC */
+.muted { color: var(--ash); font-size: 13px; }
+.mono { font-family: var(--font-mono); font-size: 12.5px; }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gap-2 { display: flex; gap: 8px; }
+.gap-3 { display: flex; gap: 12px; }
+.gap-4 { display: flex; gap: 16px; }
+
+@media (max-width: 720px) {
+  .field-row { grid-template-columns: 1fr; }
+  .adm-tab { padding: 14px 12px; font-size: 13px; }
+}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <script type="text/babel">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+/* ============================================================
+   KONFIGURACJA — zmień hasło tutaj jeśli chcesz
+   ============================================================ */
+const PANEL_PASSWORD = 'LangerAdmin2026';
+
+const REPO_OWNER = 'lg-chem';
+const REPO_NAME  = 'langer-dystrybucja';
+const PRODUCTS_PATH = 'data/products';
+
+const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
+const CATEGORIES = [
+  { id: 'piany',     label: 'Piany montażowe' },
+  { id: 'silikony',  label: 'Silikony' },
+  { id: 'akryle',    label: 'Akryle' },
+  { id: 'kleje',     label: 'Kleje' },
+  { id: 'akcesoria', label: 'Akcesoria' },
+];
+const CAT_IDS = CATEGORIES.map(c => c.id);
+const ROLES = [
+  { id: 'magnet',  label: 'Bestseller' },
+  { id: 'margin',  label: 'Marka własna' },
+  { id: 'premium', label: 'Premium' },
+  { id: 'neutral', label: 'Bez oznaczenia' },
+];
+const ROLE_IDS = ROLES.map(r => r.id);
+
+/* ============================================================
+   GITHUB API HELPERS
+   ============================================================ */
+function getToken() { return localStorage.getItem('gh_token') || ''; }
+
+async function ghApi(path, options = {}) {
+  const token = getToken();
+  if (!token) throw new Error('Brak tokena GitHub');
+  const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}${path}`, {
+    ...options,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(options.headers || {})
+    }
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`GitHub API ${res.status}: ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+async function listProductFiles() {
+  const list = await ghApi(`/contents/${PRODUCTS_PATH}`);
+  if (!Array.isArray(list)) return [];
+  return list.filter(f => f.name.endsWith('.json'));
+}
+
+async function fetchProductJson(file) {
+  const res = await fetch(file.download_url);
+  if (!res.ok) throw new Error(`Nie udało się pobrać ${file.name}`);
+  return res.json();
+}
+
+function utf8ToBase64(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+async function upsertProduct(slug, productData) {
+  const filename = `${slug}.json`;
+  const fullPath = `${PRODUCTS_PATH}/${filename}`;
+  const existing = await ghApi(`/contents/${fullPath}`);
+  const sha = existing && existing.sha;
+  const content = utf8ToBase64(JSON.stringify(productData, null, 2) + '\n');
+  const body = {
+    message: sha ? `Update ${productData.sku} (panel)` : `Add ${productData.sku} (panel)`,
+    content,
+  };
+  if (sha) body.sha = sha;
+  return await ghApi(`/contents/${fullPath}`, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+}
+
+async function deleteProductFile(file) {
+  return await ghApi(`/contents/${file.path}`, {
+    method: 'DELETE',
+    body: JSON.stringify({
+      message: `Delete ${file.name} (panel)`,
+      sha: file.sha,
+    }),
+  });
+}
+
+/* ============================================================
+   ICONS
+   ============================================================ */
+const Svg = ({ s = 18, children, style }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={style}>{children}</svg>
+);
+const IUpload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></Svg>;
+const ITrash  = (p) => <Svg {...p}><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></Svg>;
+const IList   = (p) => <Svg {...p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></Svg>;
+const ILogout = (p) => <Svg {...p}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></Svg>;
+const ICheck  = (p) => <Svg {...p}><path d="M20 6L9 17l-5-5"/></Svg>;
+const IX      = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
+const IRefresh = (p) => <Svg {...p}><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></Svg>;
+const IDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></Svg>;
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function Login({ onLogin }) {
+  const [password, setPassword] = useState('');
+  const [token, setToken] = useState(getToken());
+  const [err, setErr] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    setErr('');
+    if (password !== PANEL_PASSWORD) { setErr('Niepoprawne hasło.'); return; }
+    if (!token || !token.startsWith('github_pat_')) { setErr('Token musi zaczynać się od github_pat_'); return; }
+    setLoading(true);
+    try {
+      localStorage.setItem('gh_token', token);
+      const repo = await ghApi('');
+      if (!repo || !repo.full_name) throw new Error('Nie mogę odczytać repo. Token brak uprawnień?');
+      localStorage.setItem('panel_unlocked', '1');
+      onLogin();
+    } catch (e) {
+      setErr(e.message);
+      localStorage.removeItem('gh_token');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="login-wrap">
+      <form className="login-card" onSubmit={submit}>
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+          <rect x="13" y="7" width="11" height="35" rx="5.5" fill="var(--navy)" />
+          <rect x="18.5" y="38" width="6" height="10" rx="3" fill="var(--navy)" />
+          <rect x="13" y="46" width="42" height="13" rx="6.5" fill="var(--flame)" />
+        </svg>
+        <h1 className="login-h">Panel admina</h1>
+        <p className="login-d">Langer Dystrybucja — strefa wewnętrzna</p>
+
+        {err && <div className="login-err">{err}</div>}
+
+        <div className="field">
+          <label>Hasło panelu</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoFocus />
+        </div>
+
+        <div className="field">
+          <label>GitHub Personal Access Token</label>
+          <input type="password" value={token} onChange={e => setToken(e.target.value)} placeholder="github_pat_..." required />
+          <p className="login-help">
+            Wygeneruj fine-grained token z uprawnieniem <strong>Contents: Read and write</strong> dla repo <strong>langer-dystrybucja</strong>:{' '}
+            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">otwórz w GitHub →</a>
+          </p>
+        </div>
+
+        <button type="submit" className="btn btn-flame" style={{ width: '100%', padding: 14 }} disabled={loading}>
+          {loading ? <><span className="spinner"/> Sprawdzam...</> : 'Zaloguj się'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+/* ============================================================
+   CSV IMPORT
+   ============================================================ */
+function slugifySku(sku) {
+  return String(sku).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
+function parseTags(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  return String(raw).split(/[|;]/).map(s => s.trim()).filter(Boolean);
+}
+
+function validateRow(row) {
+  const errors = [];
+  if (!row.sku || !String(row.sku).trim()) errors.push('brak SKU');
+  if (!row.name || !String(row.name).trim()) errors.push('brak nazwy');
+  if (!row.brand || !BRANDS.includes(String(row.brand).trim())) errors.push(`marka musi być jedną z: ${BRANDS.join(', ')}`);
+  if (!row.category || !CAT_IDS.includes(String(row.category).trim().toLowerCase())) errors.push(`kategoria: ${CAT_IDS.join(', ')}`);
+  if (row.role && !ROLE_IDS.includes(String(row.role).trim().toLowerCase())) errors.push(`role: ${ROLE_IDS.join(', ')}`);
+  return errors;
+}
+
+function normalizeRow(row) {
+  return {
+    sku: String(row.sku || '').trim(),
+    name: String(row.name || '').trim(),
+    brand: String(row.brand || '').trim(),
+    category: String(row.category || '').trim().toLowerCase(),
+    variant: String(row.variant || '').trim(),
+    pack: String(row.pack || '').trim(),
+    role: String(row.role || 'neutral').trim().toLowerCase() || 'neutral',
+    tags: parseTags(row.tags),
+    image_url: String(row.image_url || row.image || '').trim() || undefined,
+  };
+}
+
+function CsvImport() {
+  const [rows, setRows] = useState([]);
+  const [filename, setFilename] = useState('');
+  const [over, setOver] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [log, setLog] = useState([]);
+  const fileRef = useRef(null);
+
+  function pushLog(msg, kind = '') { setLog(l => [...l, { msg, kind }]); }
+
+  function handleFile(file) {
+    if (!file) return;
+    setFilename(file.name);
+    setLog([]);
+    setDone(0);
+    setTotal(0);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: h => h.trim().toLowerCase(),
+      complete: (results) => {
+        const parsed = results.data.map((row, i) => {
+          const normalized = normalizeRow(row);
+          const errors = validateRow(normalized);
+          return { ...normalized, _idx: i + 1, _errors: errors };
+        });
+        setRows(parsed);
+      },
+      error: (err) => alert('Błąd parsowania CSV: ' + err.message)
+    });
+  }
+
+  function onDrop(e) {
+    e.preventDefault(); setOver(false);
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  }
+
+  async function importAll() {
+    const valid = rows.filter(r => r._errors.length === 0);
+    if (!valid.length) { alert('Brak prawidłowych wierszy do importu.'); return; }
+    setRunning(true);
+    setTotal(valid.length);
+    setDone(0);
+    setLog([]);
+    for (let i = 0; i < valid.length; i++) {
+      const r = valid[i];
+      const slug = slugifySku(r.sku);
+      const data = { sku: r.sku, name: r.name, brand: r.brand, category: r.category };
+      if (r.variant) data.variant = r.variant;
+      if (r.pack) data.pack = r.pack;
+      data.role = r.role;
+      data.tags = r.tags;
+      if (r.image_url) data.image_url = r.image_url;
+      try {
+        await upsertProduct(slug, data);
+        pushLog(`✓ ${r.sku} — ${r.name}`, 'ok');
+      } catch (e) {
+        pushLog(`✗ ${r.sku} — ${e.message}`, 'err');
+      }
+      setDone(i + 1);
+    }
+    setRunning(false);
+    pushLog(`Gotowe. Strona zaktualizuje się za 30-60 sek.`, '');
+  }
+
+  const validCount = rows.filter(r => r._errors.length === 0).length;
+  const invalidCount = rows.length - validCount;
+
+  return (
+    <div className="adm-card">
+      <h2 className="adm-card-h">Import produktów z CSV</h2>
+      <p className="adm-card-d">
+        Wgraj plik CSV. Wymagane kolumny: <span className="mono">sku, name, brand, category</span>. Opcjonalne: <span className="mono">variant, pack, role, tags, image_url</span>.
+        Tagi dziel pionową kreską <span className="mono">|</span>, np. <span className="mono">Pistoletowa|Całoroczna</span>.
+      </p>
+
+      <div className="gap-3" style={{ marginBottom: 14 }}>
+        <button className="btn btn-ghost" onClick={() => downloadCsvTemplate()}>
+          <IDownload s={16}/> Pobierz szablon CSV
+        </button>
+      </div>
+
+      <div
+        className={'drop' + (over ? ' over' : '')}
+        onDragOver={e => { e.preventDefault(); setOver(true); }}
+        onDragLeave={() => setOver(false)}
+        onDrop={onDrop}
+        onClick={() => fileRef.current && fileRef.current.click()}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className="drop-i"><IUpload s={26}/></div>
+        <p className="drop-h">{filename ? filename : 'Przeciągnij CSV tutaj lub kliknij'}</p>
+        <p className="drop-d">obsługujemy .csv (oddzielony przecinkami, UTF-8)</p>
+        <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+      </div>
+
+      {rows.length > 0 && (
+        <>
+          <div className="flex-between" style={{ marginTop: 24 }}>
+            <div>
+              <strong>{rows.length}</strong> wierszy ·{' '}
+              <span style={{ color: 'var(--green)' }}>{validCount} OK</span>
+              {invalidCount > 0 && <> · <span style={{ color: 'var(--red)' }}>{invalidCount} z błędami</span></>}
+            </div>
+            <button className="btn btn-flame" onClick={importAll} disabled={running || !validCount}>
+              {running ? <><span className="spinner"/> Importuję {done}/{total}...</> : `Importuj ${validCount} produktów →`}
+            </button>
+          </div>
+
+          <div className="tbl-wrap">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>SKU</th>
+                  <th>Nazwa</th>
+                  <th>Marka</th>
+                  <th>Kategoria</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.slice(0, 50).map(r => (
+                  <tr key={r._idx} className={r._errors.length ? 'invalid' : ''}>
+                    <td className="mono">{r._idx}</td>
+                    <td className="mono">{r.sku || '—'}</td>
+                    <td>{r.name || '—'}</td>
+                    <td>{r.brand || '—'}</td>
+                    <td>{r.category || '—'}</td>
+                    <td>
+                      {r._errors.length === 0
+                        ? <span className="tag-ok">OK</span>
+                        : <span className="tag-bad" title={r._errors.join('; ')}>błąd: {r._errors[0]}</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {rows.length > 50 && <p className="muted" style={{ padding: '10px 14px' }}>(podgląd pierwszych 50, importujemy wszystkie {rows.length})</p>}
+          </div>
+        </>
+      )}
+
+      {(running || log.length > 0) && (
+        <div className="progress">
+          {running && <>
+            <strong>{done} / {total}</strong>
+            <div className="progress-bar"><div className="progress-bar-i" style={{ width: `${(done / Math.max(total, 1)) * 100}%` }} /></div>
+          </>}
+          <div className="progress-log">
+            {log.map((l, i) => <div key={i} className={l.kind}>{l.msg}</div>)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function downloadCsvTemplate() {
+  const csv = [
+    'sku,name,brand,category,variant,pack,role,tags,image_url',
+    'TEST-001,Soudal Classic Premium 870 ml,Soudal,piany,Pistoletowa · 870 ml,12 szt. / karton,magnet,Pistoletowa|Premium,https://przyklad.pl/zdjecie1.jpg',
+    'TEST-002,Langer Akryl Pro 300 ml,Langer,akryle,Malarski · 300 ml,24 szt. / karton,margin,Marka własna|Malarski,',
+  ].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'szablon-produkty.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
+   PRODUCT LIST + DELETE
+   ============================================================ */
+function ProductList() {
+  const [files, setFiles] = useState([]);
+  const [products, setProducts] = useState({});  // path -> product
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+  const [q, setQ] = useState('');
+  const [deleting, setDeleting] = useState(null);
+
+  async function reload() {
+    setLoading(true); setErr('');
+    try {
+      const list = await listProductFiles();
+      setFiles(list);
+      const productMap = {};
+      await Promise.all(list.map(async f => {
+        try { productMap[f.path] = await fetchProductJson(f); }
+        catch (e) { productMap[f.path] = { _error: e.message }; }
+      }));
+      setProducts(productMap);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { reload(); }, []);
+
+  async function handleDelete(file) {
+    const p = products[file.path] || {};
+    if (!confirm(`Usunąć produkt "${p.name || file.name}"?\nTo akcja nieodwracalna.`)) return;
+    setDeleting(file.path);
+    try {
+      await deleteProductFile(file);
+      setFiles(files.filter(f => f.path !== file.path));
+    } catch (e) {
+      alert('Błąd: ' + e.message);
+    } finally {
+      setDeleting(null);
+    }
+  }
+
+  const filtered = useMemo(() => {
+    if (!q.trim()) return files;
+    const term = q.trim().toLowerCase();
+    return files.filter(f => {
+      const p = products[f.path] || {};
+      return (p.sku + ' ' + p.name + ' ' + p.brand).toLowerCase().includes(term);
+    });
+  }, [files, products, q]);
+
+  return (
+    <div className="adm-card">
+      <div className="flex-between">
+        <div>
+          <h2 className="adm-card-h">Lista produktów ({files.length})</h2>
+          <p className="adm-card-d">Tutaj usuwasz produkty. Pojedynczą edycję rób w Pages CMS.</p>
+        </div>
+        <button className="btn btn-ghost" onClick={reload} disabled={loading}>
+          <IRefresh s={16}/> {loading ? 'Ładuję...' : 'Odśwież'}
+        </button>
+      </div>
+
+      {err && <div className="login-err">{err}</div>}
+
+      <input
+        className="field"
+        value={q}
+        onChange={e => setQ(e.target.value)}
+        placeholder="Szukaj: SKU, nazwa, marka..."
+        style={{ width: '100%', padding: '10px 14px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15, marginBottom: 14 }}
+      />
+
+      {loading ? (
+        <p className="muted">Pobieram dane z GitHuba...</p>
+      ) : (
+        <div className="tbl-wrap">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th></th>
+                <th>SKU</th>
+                <th>Nazwa</th>
+                <th>Marka</th>
+                <th>Kategoria</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(f => {
+                const p = products[f.path] || {};
+                return (
+                  <tr key={f.path}>
+                    <td>
+                      {p.image_url
+                        ? <img src={p.image_url} alt="" className="p-img" onError={e => e.target.style.display = 'none'} />
+                        : <div className="p-img"/>}
+                    </td>
+                    <td className="mono">{p.sku || '—'}</td>
+                    <td>{p.name || f.name}</td>
+                    <td>{p.brand || '—'}</td>
+                    <td>{p.category || '—'}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        className="btn-icon"
+                        onClick={() => handleDelete(f)}
+                        disabled={deleting === f.path}
+                        title="Usuń"
+                      >
+                        {deleting === f.path ? <span className="spinner"/> : <ITrash s={18}/>}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr><td colSpan="6" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
+                  {q ? 'Brak wyników wyszukiwania' : 'Brak produktów'}
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+   APP
+   ============================================================ */
+function App() {
+  const [authed, setAuthed] = useState(
+    localStorage.getItem('panel_unlocked') === '1' && !!localStorage.getItem('gh_token')
+  );
+  const [tab, setTab] = useState('import');
+
+  function logout() {
+    if (!confirm('Wylogować się? Token zostanie usunięty z przeglądarki.')) return;
+    localStorage.removeItem('panel_unlocked');
+    localStorage.removeItem('gh_token');
+    setAuthed(false);
+  }
+
+  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+
+  return (
+    <>
+      <header className="adm-hdr">
+        <div className="adm-hdr-l">
+          <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+            <rect x="13" y="7" width="11" height="35" rx="5.5" fill="#fff" />
+            <rect x="18.5" y="38" width="6" height="10" rx="3" fill="#fff" />
+            <rect x="13" y="46" width="42" height="13" rx="6.5" fill="var(--flame)" />
+          </svg>
+          <div>
+            <div className="adm-hdr-title">Panel admina</div>
+            <div className="adm-hdr-sub">Langer Dystrybucja</div>
+          </div>
+        </div>
+        <div className="gap-2">
+          <a className="adm-hdr-btn" href="/" target="_blank" rel="noopener">Zobacz stronę →</a>
+          <button className="adm-hdr-btn" onClick={logout}><ILogout s={14}/> Wyloguj</button>
+        </div>
+      </header>
+
+      <nav className="adm-tabs">
+        <button className={'adm-tab' + (tab === 'import' ? ' active' : '')} onClick={() => setTab('import')}>
+          <IUpload s={16}/> Import CSV
+        </button>
+        <button className={'adm-tab' + (tab === 'list' ? ' active' : '')} onClick={() => setTab('list')}>
+          <IList s={16}/> Lista produktów
+        </button>
+      </nav>
+
+      <main className="adm-main">
+        {tab === 'import' && <CsvImport/>}
+        {tab === 'list' && <ProductList/>}
+      </main>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
