@@ -201,6 +201,46 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .cat-card-all { flex-direction: column; justify-content: space-between; gap: 24px; background: var(--navy); border-color: var(--navy); min-height: 180px; }
 .cat-card-all:hover { box-shadow: var(--e2); }
 
+/* ===== LANGER SHOWCASE (karuzela marki własnej) ===== */
+.sec-langer { background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
+.sec-langer::before { content:''; position:absolute; top:-180px; left:-120px; width:520px; height:520px; border-radius:50%;
+  background: radial-gradient(circle, rgba(240,78,35,.10), transparent 65%); pointer-events:none; }
+.sec-langer::after { content:''; position:absolute; bottom:-200px; right:-160px; width:540px; height:540px; border-radius:50%;
+  background: radial-gradient(circle, rgba(30,63,181,.08), transparent 65%); pointer-events:none; }
+.lshow-head { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: end; margin-bottom: 48px; position: relative; z-index: 2; }
+.lshow-head .h-sec { margin-top: 20px; }
+.lshow-lead { max-width: 480px; margin: 0; }
+.lcarousel { position: relative; z-index: 2; }
+.lcar-nav { position: absolute; top: 40%; transform: translateY(-50%); z-index: 3;
+  width: 52px; height: 52px; border-radius: 50%; background: var(--white); color: var(--navy);
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--line); box-shadow: var(--e2); transition: background .15s, color .15s, transform .15s, opacity .15s; }
+.lcar-nav:hover { background: var(--flame); color: #fff; border-color: var(--flame); }
+.lcar-nav.disabled { opacity: .35; pointer-events: none; }
+.lcar-prev { left: -22px; }
+.lcar-next { right: -22px; }
+.lcar-track { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(280px, 300px);
+  gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: 8px 4px 24px; margin: -8px -4px 0;
+  scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
+.lcar-track::-webkit-scrollbar { height: 8px; }
+.lcar-track::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 999px; }
+.lcar-track::-webkit-scrollbar-track { background: transparent; }
+.lcard { scroll-snap-align: start; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg);
+  overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.lcard:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
+.lcard-img { position: relative; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+.lcard-imgtag { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: currentColor; opacity: .55; }
+.lcard-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.lcard-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--flame); font-weight: 600; }
+.lcard-name { font-size: 18px; line-height: 1.2; letter-spacing: -0.02em; }
+.lcard-variant { font-size: 13.5px; color: var(--ash-700); margin-top: -2px; }
+.lcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.lcard-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lcard-pack { font-size: 13px; font-weight: 600; color: var(--navy); }
+.lshow-foot { display: flex; align-items: center; gap: 20px; margin-top: 36px; position: relative; z-index: 2; flex-wrap: wrap; }
+.lshow-count { color: var(--ash-700); font-size: 14px; font-weight: 600; }
+
 /* ===== CONTACT ===== */
 .sec-contact { background: var(--white); border-top: 1px solid var(--line); }
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
@@ -280,6 +320,9 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .why-grid, .cat-grid { grid-template-columns: repeat(2, 1fr); }
   .proc-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 24px; }
   .pgrid { grid-template-columns: repeat(3, 1fr); }
+  .lshow-head { grid-template-columns: 1fr; gap: 20px; align-items: start; }
+  .lcar-prev { left: 8px; }
+  .lcar-next { right: 8px; }
 }
 @media (max-width: 900px){
   .hdr-nav, .hdr-cta { display: none; }
@@ -293,6 +336,8 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 @media (max-width: 680px){
   .sec { padding: 72px 0; }
   .why-grid, .cat-grid, .proc-grid, .pgrid { grid-template-columns: 1fr; }
+  .lcar-track { grid-auto-columns: 78%; }
+  .lcar-nav { display: none; }
   .form-row { grid-template-columns: 1fr; }
   .base-toolbar { flex-direction: column; align-items: stretch; }
   .filter-line { flex-direction: column; gap: 8px; }
@@ -842,6 +887,106 @@ function Categories({ onPick }) {
   );
 }
 
+/* ===== LANGER SHOWCASE (karuzela marki własnej) ===== */
+function LangerShowcase({ products }) {
+  const trackRef = useRef(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(true);
+
+  const items = (products || []).filter(p => p.brand === 'Langer');
+
+  const updateNav = () => {
+    const t = trackRef.current;
+    if (!t) return;
+    setCanPrev(t.scrollLeft > 4);
+    setCanNext(t.scrollLeft + t.clientWidth < t.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    const t = trackRef.current;
+    if (!t) return;
+    updateNav();
+    t.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav);
+    return () => {
+      t.removeEventListener('scroll', updateNav);
+      window.removeEventListener('resize', updateNav);
+    };
+  }, [items.length]);
+
+  const scrollByStep = (dir) => {
+    const t = trackRef.current;
+    if (!t) return;
+    const card = t.querySelector('.lcard');
+    const step = card ? card.offsetWidth + 20 : 320;
+    t.scrollBy({ left: dir * step, behavior: 'smooth' });
+  };
+
+  if (!items.length) return null;
+
+  return (
+    <section className="sec sec-langer">
+      <div className="wrap">
+        <div className="lshow-head reveal">
+          <div>
+            <span className="eyebrow">Marka własna</span>
+            <h2 className="h-sec">Linia Langer —<br/>marża, która zarabia.</h2>
+          </div>
+          <p className="lead lshow-lead">
+            Pełna gama pian, klejów, silikonów i akcesoriów pod naszą marką. Premium jakość, hurtowa cena i marża, której nie zaoferuje Ci żadna inna hurtownia.
+          </p>
+        </div>
+
+        <div className="lcarousel reveal">
+          <button className={'lcar-nav lcar-prev' + (canPrev ? '' : ' disabled')}
+                  onClick={() => scrollByStep(-1)} aria-label="Poprzednie">
+            <IArrow s={20} style={{ transform: 'rotate(180deg)' }} />
+          </button>
+
+          <div className="lcar-track" ref={trackRef}>
+            {items.map(p => {
+              const cat = CATEGORIES.find(c => c.id === p.category);
+              const [tint, fg] = CAT_TINT[p.category] || ['#eee', '#333'];
+              const role = ROLE_LABEL[p.role];
+              return (
+                <article className="lcard" key={p.sku}>
+                  <div className="lcard-img" style={{ background: tint, color: fg }}>
+                    {cat && <CatIcon name={cat.icon} size={72} />}
+                    <span className="lcard-imgtag">Zdjęcie wkrótce</span>
+                    {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
+                  </div>
+                  <div className="lcard-body">
+                    <div className="lcard-brand">Langer · {cat ? cat.label : ''}</div>
+                    <h3 className="lcard-name">{p.name}</h3>
+                    <div className="lcard-variant">{p.variant}</div>
+                    <div className="lcard-tags">
+                      {p.tags.map(t => <span className="ptag" key={t}>{t}</span>)}
+                    </div>
+                    <div className="lcard-foot">
+                      <div className="lcard-pack">{p.pack}</div>
+                      <a href="#kontakt" className="pcard-ask">Zapytaj o cenę <IArrow s={16}/></a>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <button className={'lcar-nav lcar-next' + (canNext ? '' : ' disabled')}
+                  onClick={() => scrollByStep(1)} aria-label="Następne">
+            <IArrow s={20} />
+          </button>
+        </div>
+
+        <div className="lshow-foot reveal">
+          <a href="#baza" className="btn btn-dark">Zobacz całą linię Langer <IArrow/></a>
+          <span className="lshow-count num">{items.length} produktów</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ===== CONTACT ===== */
 function Contact() {
   const [sent, setSent] = useState(false);
@@ -1110,6 +1255,7 @@ function App() {
       <WhyUs />
       <Process />
       <Categories onPick={pickCat} />
+      <LangerShowcase products={products} />
       <ProductDatabase products={products} initialCatRef={catRef} />
       <Contact />
       <Footer />
