@@ -21,7 +21,6 @@
   --font-text: 'Hanken Grotesk', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --r-sm: 6px; --r-md: 10px; --r-lg: 16px;
-  --e1: 0 1px 2px rgb(14 21 51 / 0.06);
   --e2: 0 4px 16px -4px rgb(14 21 51 / 0.12), 0 2px 4px -1px rgb(14 21 51 / 0.06);
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -31,7 +30,6 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 input, select, textarea { font-family: inherit; }
 a { color: inherit; }
 
-/* HEADER */
 .adm-hdr { background: var(--navy); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
 .adm-hdr-l { display: flex; align-items: center; gap: 16px; }
 .adm-hdr-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
@@ -39,57 +37,44 @@ a { color: inherit; }
 .adm-hdr-btn { padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); border: 1px solid rgba(255,255,255,.18); display: inline-flex; align-items: center; gap: 6px; }
 .adm-hdr-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.4); }
 
-/* TABS */
 .adm-tabs { background: var(--white); border-bottom: 1px solid var(--line); padding: 0 24px; display: flex; gap: 4px; }
 .adm-tab { padding: 16px 18px; font-size: 14px; font-weight: 600; color: var(--ash-700); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; gap: 8px; }
 .adm-tab:hover { color: var(--navy); }
 .adm-tab.active { color: var(--navy); border-bottom-color: var(--flame); }
 
-/* MAIN */
 .adm-main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; }
 .adm-card { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; }
 .adm-card + .adm-card { margin-top: 20px; }
 .adm-card-h { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: -0.02em; margin: 0 0 8px; }
 .adm-card-d { color: var(--ash-700); font-size: 14px; margin: 0 0 20px; }
 
-/* BUTTONS */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-display); font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: var(--r-sm); transition: background .12s, transform .12s; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-display); font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: var(--r-sm); transition: background .12s; white-space: nowrap; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 .btn-flame { background: var(--flame); color: #fff; }
 .btn-flame:hover:not(:disabled) { background: var(--flame-600); }
-.btn-dark { background: var(--navy); color: #fff; }
-.btn-dark:hover:not(:disabled) { background: var(--navy-800); }
 .btn-ghost { background: var(--white); color: var(--navy); border: 1.5px solid var(--line-2); }
 .btn-ghost:hover:not(:disabled) { border-color: var(--navy); }
-.btn-danger { background: var(--red); color: #fff; }
-.btn-danger:hover:not(:disabled) { background: #B91C1C; }
 .btn-icon { width: 32px; height: 32px; padding: 0; border-radius: var(--r-sm); color: var(--ash); }
 .btn-icon:hover:not(:disabled) { color: var(--red); background: var(--red-tint); }
 
-/* FIELDS */
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .field label { font-size: 12px; font-weight: 600; color: var(--ash-700); letter-spacing: 0.04em; text-transform: uppercase; }
-.field input, .field select, .field textarea { font-size: 15px; padding: 10px 12px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--white); color: var(--navy); transition: border-color .15s, box-shadow .15s; }
-.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field input, .field select { font-size: 15px; padding: 10px 12px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--white); color: var(--navy); transition: border-color .15s, box-shadow .15s; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
 
-/* LOGIN */
 .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(180deg, var(--navy) 0%, var(--navy-900) 100%); }
 .login-card { background: var(--white); border-radius: var(--r-lg); padding: 36px; max-width: 420px; width: 100%; box-shadow: 0 24px 48px -16px rgba(0,0,0,.4); }
 .login-h { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: -0.02em; margin: 8px 0 6px; }
 .login-d { color: var(--ash-700); font-size: 14.5px; margin: 0 0 24px; }
 .login-help { font-size: 12.5px; color: var(--ash); margin: 6px 0 0; line-height: 1.4; }
-.login-help a { color: var(--cobalt); text-decoration: underline; }
 .login-err { background: var(--red-tint); color: var(--red); padding: 10px 14px; border-radius: var(--r-sm); font-size: 13.5px; margin-bottom: 16px; }
 
-/* DROPZONE */
 .drop { border: 2px dashed var(--line-2); border-radius: var(--r-lg); padding: 40px 24px; text-align: center; transition: background .15s, border-color .15s; }
 .drop.over { background: var(--flame-tint); border-color: var(--flame); }
 .drop-i { width: 56px; height: 56px; border-radius: 50%; background: var(--light); color: var(--ash-700); display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
 .drop-h { font-weight: 600; font-size: 16px; margin: 0 0 6px; }
 .drop-d { color: var(--ash-700); font-size: 13.5px; margin: 0 0 16px; }
 
-/* PREVIEW TABLE */
 .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 16px; }
 table.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 table.tbl th { background: var(--light); padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ash-700); border-bottom: 1px solid var(--line); white-space: nowrap; }
@@ -99,7 +84,6 @@ table.tbl tr.invalid td { background: var(--red-tint); }
 .tag-bad { display: inline-block; background: var(--red-tint); color: var(--red); font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-left: 4px; }
 .tag-ok  { display: inline-block; background: var(--green-tint); color: var(--green); font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
 
-/* PROGRESS */
 .progress { margin-top: 16px; padding: 16px; background: var(--light); border-radius: var(--r-md); font-size: 13.5px; }
 .progress-bar { height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; margin: 8px 0 12px; }
 .progress-bar-i { height: 100%; background: var(--flame); transition: width .3s; }
@@ -107,16 +91,12 @@ table.tbl tr.invalid td { background: var(--red-tint); }
 .progress-log .ok { color: var(--green); }
 .progress-log .err { color: var(--red); }
 
-/* PRODUCT IMG */
 .p-img { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--light); object-fit: cover; }
 
-/* ALERTS */
-.alert { padding: 12px 16px; border-radius: var(--r-sm); font-size: 13.5px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; }
-.alert-info { background: var(--cobalt); background: #E5E9F8; color: #1E3FB5; }
-.alert-warn { background: var(--amber-tint); color: var(--amber); }
+.alert { padding: 12px 16px; border-radius: var(--r-sm); font-size: 13.5px; margin-bottom: 16px; }
+.alert-info { background: #E5E9F8; color: #1E3FB5; }
 .alert-ok { background: var(--green-tint); color: var(--green); }
 
-/* MISC */
 .muted { color: var(--ash); font-size: 13px; }
 .mono { font-family: var(--font-mono); font-size: 12.5px; }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
@@ -124,10 +104,12 @@ table.tbl tr.invalid td { background: var(--red-tint); }
 .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .gap-2 { display: flex; gap: 8px; }
 .gap-3 { display: flex; gap: 12px; }
-.gap-4 { display: flex; gap: 16px; }
+
+.modal-bg { position: fixed; inset: 0; background: rgba(8,12,34,.6); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: var(--white); border-radius: var(--r-lg); padding: 28px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal-h { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 0 0 16px; }
 
 @media (max-width: 720px) {
-  .field-row { grid-template-columns: 1fr; }
   .adm-tab { padding: 14px 12px; font-size: 13px; }
 }
   </style>
@@ -141,17 +123,11 @@ table.tbl tr.invalid td { background: var(--red-tint); }
   <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 
   <script type="text/babel">
-const { useState, useEffect, useRef, useMemo, useCallback } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
 /* ============================================================
-   KONFIGURACJA — zmień hasło tutaj jeśli chcesz
+   KONFIGURACJA
    ============================================================ */
-const PANEL_PASSWORD = 'LangerAdmin2026';
-
-const REPO_OWNER = 'lg-chem';
-const REPO_NAME  = 'langer-dystrybucja';
-const PRODUCTS_PATH = 'data/products';
-
 const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
 const CATEGORIES = [
   { id: 'piany',     label: 'Piany montażowe' },
@@ -170,72 +146,30 @@ const ROLES = [
 const ROLE_IDS = ROLES.map(r => r.id);
 
 /* ============================================================
-   GITHUB API HELPERS
+   API HELPERS
    ============================================================ */
-function getToken() { return localStorage.getItem('gh_token') || ''; }
+function getSecret() { return localStorage.getItem('admin_secret') || ''; }
 
-async function ghApi(path, options = {}) {
-  const token = getToken();
-  if (!token) throw new Error('Brak tokena GitHub');
-  const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}${path}`, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/vnd.github+json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...(options.headers || {})
-    }
-  });
-  if (res.status === 404) return null;
+async function apiCall(path, options = {}) {
+  const secret = getSecret();
+  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  if (secret) headers.Authorization = `Bearer ${secret}`;
+  const res = await fetch(path, { ...options, headers });
+  const text = await res.text();
+  let data;
+  try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text }; }
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`GitHub API ${res.status}: ${text.slice(0, 200)}`);
+    const err = new Error(data.error || `Błąd ${res.status}`);
+    err.status = res.status;
+    throw err;
   }
-  return res.json();
+  return data;
 }
 
-async function listProductFiles() {
-  const list = await ghApi(`/contents/${PRODUCTS_PATH}`);
-  if (!Array.isArray(list)) return [];
-  return list.filter(f => f.name.endsWith('.json'));
-}
-
-async function fetchProductJson(file) {
-  const res = await fetch(file.download_url);
-  if (!res.ok) throw new Error(`Nie udało się pobrać ${file.name}`);
-  return res.json();
-}
-
-function utf8ToBase64(str) {
-  return btoa(unescape(encodeURIComponent(str)));
-}
-
-async function upsertProduct(slug, productData) {
-  const filename = `${slug}.json`;
-  const fullPath = `${PRODUCTS_PATH}/${filename}`;
-  const existing = await ghApi(`/contents/${fullPath}`);
-  const sha = existing && existing.sha;
-  const content = utf8ToBase64(JSON.stringify(productData, null, 2) + '\n');
-  const body = {
-    message: sha ? `Update ${productData.sku} (panel)` : `Add ${productData.sku} (panel)`,
-    content,
-  };
-  if (sha) body.sha = sha;
-  return await ghApi(`/contents/${fullPath}`, {
-    method: 'PUT',
-    body: JSON.stringify(body),
-  });
-}
-
-async function deleteProductFile(file) {
-  return await ghApi(`/contents/${file.path}`, {
-    method: 'DELETE',
-    body: JSON.stringify({
-      message: `Delete ${file.name} (panel)`,
-      sha: file.sha,
-    }),
-  });
-}
+async function apiList()                  { return apiCall('/api/products'); }
+async function apiCreate(p)               { return apiCall('/api/products', { method: 'POST', body: JSON.stringify(p) }); }
+async function apiUpdate(sku, p)          { return apiCall(`/api/products/${encodeURIComponent(sku)}`, { method: 'PUT', body: JSON.stringify(p) }); }
+async function apiDelete(sku)             { return apiCall(`/api/products/${encodeURIComponent(sku)}`, { method: 'DELETE' }); }
 
 /* ============================================================
    ICONS
@@ -246,36 +180,42 @@ const Svg = ({ s = 18, children, style }) => (
 const IUpload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></Svg>;
 const ITrash  = (p) => <Svg {...p}><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></Svg>;
 const IList   = (p) => <Svg {...p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></Svg>;
+const IPlus   = (p) => <Svg {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></Svg>;
 const ILogout = (p) => <Svg {...p}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></Svg>;
-const ICheck  = (p) => <Svg {...p}><path d="M20 6L9 17l-5-5"/></Svg>;
-const IX      = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
 const IRefresh = (p) => <Svg {...p}><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></Svg>;
 const IDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></Svg>;
+const IEdit = (p) => <Svg {...p}><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>;
+const IX = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
 
 /* ============================================================
-   LOGIN
+   LOGIN — wpisujesz tylko ADMIN_SECRET (env var z Vercela)
    ============================================================ */
 function Login({ onLogin }) {
-  const [password, setPassword] = useState('');
-  const [token, setToken] = useState(getToken());
+  const [secret, setSecret] = useState(getSecret());
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function submit(e) {
     e.preventDefault();
     setErr('');
-    if (password !== PANEL_PASSWORD) { setErr('Niepoprawne hasło.'); return; }
-    if (!token || !token.startsWith('github_pat_')) { setErr('Token musi zaczynać się od github_pat_'); return; }
+    if (!secret) { setErr('Wpisz ADMIN_SECRET'); return; }
     setLoading(true);
+    localStorage.setItem('admin_secret', secret);
     try {
-      localStorage.setItem('gh_token', token);
-      const repo = await ghApi('');
-      if (!repo || !repo.full_name) throw new Error('Nie mogę odczytać repo. Token brak uprawnień?');
-      localStorage.setItem('panel_unlocked', '1');
+      // test: spróbuj utworzyć fałszywy "ping" POST z bad body — jeśli 400 to autoryzacja OK,
+      // jeśli 401 to zły secret.
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${secret}` },
+        body: JSON.stringify({})  // brak wymaganych pól -> 400 jeśli secret OK
+      });
+      if (res.status === 401) {
+        localStorage.removeItem('admin_secret');
+        throw new Error('Niepoprawny ADMIN_SECRET');
+      }
       onLogin();
     } catch (e) {
       setErr(e.message);
-      localStorage.removeItem('gh_token');
     } finally {
       setLoading(false);
     }
@@ -295,16 +235,10 @@ function Login({ onLogin }) {
         {err && <div className="login-err">{err}</div>}
 
         <div className="field">
-          <label>Hasło panelu</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required autoFocus />
-        </div>
-
-        <div className="field">
-          <label>GitHub Personal Access Token</label>
-          <input type="password" value={token} onChange={e => setToken(e.target.value)} placeholder="github_pat_..." required />
+          <label>ADMIN_SECRET</label>
+          <input type="password" value={secret} onChange={e => setSecret(e.target.value)} required autoFocus />
           <p className="login-help">
-            Wygeneruj fine-grained token z uprawnieniem <strong>Contents: Read and write</strong> dla repo <strong>langer-dystrybucja</strong>:{' '}
-            <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">otwórz w GitHub →</a>
+            Ten sam ciąg co w Vercel Environment Variables → <code>ADMIN_SECRET</code>.
           </p>
         </div>
 
@@ -317,12 +251,8 @@ function Login({ onLogin }) {
 }
 
 /* ============================================================
-   CSV IMPORT
+   POMOCNICZE — walidacja i normalizacja produktu
    ============================================================ */
-function slugifySku(sku) {
-  return String(sku).toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-}
-
 function parseTags(raw) {
   if (!raw) return [];
   if (Array.isArray(raw)) return raw;
@@ -333,7 +263,7 @@ function validateRow(row) {
   const errors = [];
   if (!row.sku || !String(row.sku).trim()) errors.push('brak SKU');
   if (!row.name || !String(row.name).trim()) errors.push('brak nazwy');
-  if (!row.brand || !BRANDS.includes(String(row.brand).trim())) errors.push(`marka musi być jedną z: ${BRANDS.join(', ')}`);
+  if (!row.brand || !BRANDS.includes(String(row.brand).trim())) errors.push(`marka: ${BRANDS.join(', ')}`);
   if (!row.category || !CAT_IDS.includes(String(row.category).trim().toLowerCase())) errors.push(`kategoria: ${CAT_IDS.join(', ')}`);
   if (row.role && !ROLE_IDS.includes(String(row.role).trim().toLowerCase())) errors.push(`role: ${ROLE_IDS.join(', ')}`);
   return errors;
@@ -345,15 +275,18 @@ function normalizeRow(row) {
     name: String(row.name || '').trim(),
     brand: String(row.brand || '').trim(),
     category: String(row.category || '').trim().toLowerCase(),
-    variant: String(row.variant || '').trim(),
-    pack: String(row.pack || '').trim(),
+    variant: String(row.variant || '').trim() || null,
+    pack: String(row.pack || '').trim() || null,
     role: String(row.role || 'neutral').trim().toLowerCase() || 'neutral',
     tags: parseTags(row.tags),
-    image_url: String(row.image_url || row.image || '').trim() || undefined,
+    image_url: String(row.image_url || row.image || '').trim() || null,
   };
 }
 
-function CsvImport() {
+/* ============================================================
+   CSV IMPORT
+   ============================================================ */
+function CsvImport({ onDone }) {
   const [rows, setRows] = useState([]);
   const [filename, setFilename] = useState('');
   const [over, setOver] = useState(false);
@@ -368,9 +301,7 @@ function CsvImport() {
   function handleFile(file) {
     if (!file) return;
     setFilename(file.name);
-    setLog([]);
-    setDone(0);
-    setTotal(0);
+    setLog([]); setDone(0); setTotal(0);
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
@@ -397,20 +328,15 @@ function CsvImport() {
     const valid = rows.filter(r => r._errors.length === 0);
     if (!valid.length) { alert('Brak prawidłowych wierszy do importu.'); return; }
     setRunning(true);
-    setTotal(valid.length);
-    setDone(0);
-    setLog([]);
+    setTotal(valid.length); setDone(0); setLog([]);
     for (let i = 0; i < valid.length; i++) {
       const r = valid[i];
-      const slug = slugifySku(r.sku);
-      const data = { sku: r.sku, name: r.name, brand: r.brand, category: r.category };
-      if (r.variant) data.variant = r.variant;
-      if (r.pack) data.pack = r.pack;
-      data.role = r.role;
-      data.tags = r.tags;
-      if (r.image_url) data.image_url = r.image_url;
+      const data = {
+        sku: r.sku, name: r.name, brand: r.brand, category: r.category,
+        variant: r.variant, pack: r.pack, role: r.role, tags: r.tags, image_url: r.image_url
+      };
       try {
-        await upsertProduct(slug, data);
+        await apiCreate(data);
         pushLog(`✓ ${r.sku} — ${r.name}`, 'ok');
       } catch (e) {
         pushLog(`✗ ${r.sku} — ${e.message}`, 'err');
@@ -418,7 +344,8 @@ function CsvImport() {
       setDone(i + 1);
     }
     setRunning(false);
-    pushLog(`Gotowe. Strona zaktualizuje się za 30-60 sek.`, '');
+    pushLog(`Gotowe. Strona aktualna natychmiast.`, '');
+    if (onDone) onDone();
   }
 
   const validCount = rows.filter(r => r._errors.length === 0).length;
@@ -430,6 +357,7 @@ function CsvImport() {
       <p className="adm-card-d">
         Wgraj plik CSV. Wymagane kolumny: <span className="mono">sku, name, brand, category</span>. Opcjonalne: <span className="mono">variant, pack, role, tags, image_url</span>.
         Tagi dziel pionową kreską <span className="mono">|</span>, np. <span className="mono">Pistoletowa|Całoroczna</span>.
+        Jeśli SKU już istnieje — produkt zostanie nadpisany.
       </p>
 
       <div className="gap-3" style={{ marginBottom: 14 }}>
@@ -467,16 +395,7 @@ function CsvImport() {
 
           <div className="tbl-wrap">
             <table className="tbl">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>SKU</th>
-                  <th>Nazwa</th>
-                  <th>Marka</th>
-                  <th>Kategoria</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
+              <thead><tr><th>#</th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Status</th></tr></thead>
               <tbody>
                 {rows.slice(0, 50).map(r => (
                   <tr key={r._idx} className={r._errors.length ? 'invalid' : ''}>
@@ -528,123 +447,221 @@ function downloadCsvTemplate() {
 }
 
 /* ============================================================
-   PRODUCT LIST + DELETE
+   FORMULARZ POJEDYNCZEGO PRODUKTU (dodanie / edycja)
    ============================================================ */
-function ProductList() {
-  const [files, setFiles] = useState([]);
-  const [products, setProducts] = useState({});  // path -> product
+function ProductForm({ initial, onSave, onCancel }) {
+  const isEdit = !!initial;
+  const [p, setP] = useState(initial || {
+    sku: '', name: '', brand: 'Soudal', category: 'piany',
+    variant: '', pack: '', role: 'neutral', tags: [], image_url: ''
+  });
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+
+  function set(k, v) { setP({ ...p, [k]: v }); }
+
+  async function submit(e) {
+    e.preventDefault();
+    setErr('');
+    if (!p.sku || !p.name) { setErr('SKU i nazwa są wymagane.'); return; }
+    setSaving(true);
+    try {
+      const body = {
+        ...p,
+        sku: p.sku.trim(),
+        name: p.name.trim(),
+        variant: p.variant || null,
+        pack: p.pack || null,
+        image_url: p.image_url || null,
+        tags: Array.isArray(p.tags) ? p.tags : parseTags(p.tags),
+      };
+      if (isEdit) {
+        await apiUpdate(initial.sku, body);
+      } else {
+        await apiCreate(body);
+      }
+      onSave();
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="modal-bg" onClick={onCancel}>
+      <form className="modal" onClick={e => e.stopPropagation()} onSubmit={submit}>
+        <h3 className="modal-h">{isEdit ? `Edytuj: ${initial.sku}` : 'Nowy produkt'}</h3>
+
+        {err && <div className="login-err">{err}</div>}
+
+        <div className="field">
+          <label>SKU *</label>
+          <input value={p.sku} onChange={e => set('sku', e.target.value)} disabled={isEdit} required style={{ fontFamily: 'var(--font-mono)' }} />
+        </div>
+        <div className="field">
+          <label>Nazwa *</label>
+          <input value={p.name} onChange={e => set('name', e.target.value)} required />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="field">
+            <label>Marka *</label>
+            <select value={p.brand} onChange={e => set('brand', e.target.value)} required>
+              {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Kategoria *</label>
+            <select value={p.category} onChange={e => set('category', e.target.value)} required>
+              {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="field">
+          <label>Wariant / pojemność</label>
+          <input value={p.variant || ''} onChange={e => set('variant', e.target.value)} placeholder="np. Pistoletowa · 750 ml" />
+        </div>
+        <div className="field">
+          <label>Jednostka sprzedaży</label>
+          <input value={p.pack || ''} onChange={e => set('pack', e.target.value)} placeholder="np. 12 szt. / karton" />
+        </div>
+
+        <div className="field">
+          <label>Oznaczenie</label>
+          <select value={p.role || 'neutral'} onChange={e => set('role', e.target.value)}>
+            {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+          </select>
+        </div>
+
+        <div className="field">
+          <label>Tagi (oddziel pionowymi kreskami)</label>
+          <input
+            value={Array.isArray(p.tags) ? p.tags.join('|') : (p.tags || '')}
+            onChange={e => set('tags', e.target.value.split('|').map(s => s.trim()).filter(Boolean))}
+            placeholder="np. Pistoletowa|Całoroczna"
+          />
+        </div>
+
+        <div className="field">
+          <label>URL zdjęcia (opcjonalne)</label>
+          <input value={p.image_url || ''} onChange={e => set('image_url', e.target.value)} placeholder="https://..." />
+        </div>
+
+        <div className="gap-2" style={{ marginTop: 20, justifyContent: 'flex-end' }}>
+          <button type="button" className="btn btn-ghost" onClick={onCancel} disabled={saving}>Anuluj</button>
+          <button type="submit" className="btn btn-flame" disabled={saving}>
+            {saving ? <><span className="spinner"/> Zapisuję...</> : 'Zapisz'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* ============================================================
+   LISTA PRODUKTÓW + USUWANIE + EDYCJA
+   ============================================================ */
+function ProductList({ refreshTrigger }) {
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [q, setQ] = useState('');
-  const [deleting, setDeleting] = useState(null);
+  const [busy, setBusy] = useState(null);
+  const [editing, setEditing] = useState(null);
+  const [adding, setAdding] = useState(false);
 
   async function reload() {
     setLoading(true); setErr('');
     try {
-      const list = await listProductFiles();
-      setFiles(list);
-      const productMap = {};
-      await Promise.all(list.map(async f => {
-        try { productMap[f.path] = await fetchProductJson(f); }
-        catch (e) { productMap[f.path] = { _error: e.message }; }
-      }));
-      setProducts(productMap);
-    } catch (e) {
-      setErr(e.message);
-    } finally {
-      setLoading(false);
-    }
+      const list = await apiList();
+      setProducts(list);
+    } catch (e) { setErr(e.message); }
+    finally { setLoading(false); }
   }
 
-  useEffect(() => { reload(); }, []);
+  useEffect(() => { reload(); }, [refreshTrigger]);
 
-  async function handleDelete(file) {
-    const p = products[file.path] || {};
-    if (!confirm(`Usunąć produkt "${p.name || file.name}"?\nTo akcja nieodwracalna.`)) return;
-    setDeleting(file.path);
+  async function handleDelete(p) {
+    if (!confirm(`Usunąć produkt "${p.name}"?\nTo akcja nieodwracalna.`)) return;
+    setBusy(p.sku);
     try {
-      await deleteProductFile(file);
-      setFiles(files.filter(f => f.path !== file.path));
+      await apiDelete(p.sku);
+      setProducts(products.filter(x => x.sku !== p.sku));
     } catch (e) {
       alert('Błąd: ' + e.message);
     } finally {
-      setDeleting(null);
+      setBusy(null);
     }
   }
 
   const filtered = useMemo(() => {
-    if (!q.trim()) return files;
+    if (!q.trim()) return products;
     const term = q.trim().toLowerCase();
-    return files.filter(f => {
-      const p = products[f.path] || {};
-      return (p.sku + ' ' + p.name + ' ' + p.brand).toLowerCase().includes(term);
-    });
-  }, [files, products, q]);
+    return products.filter(p =>
+      (p.sku + ' ' + p.name + ' ' + p.brand + ' ' + p.category).toLowerCase().includes(term)
+    );
+  }, [products, q]);
 
   return (
     <div className="adm-card">
       <div className="flex-between">
         <div>
-          <h2 className="adm-card-h">Lista produktów ({files.length})</h2>
-          <p className="adm-card-d">Tutaj usuwasz produkty. Pojedynczą edycję rób w Pages CMS.</p>
+          <h2 className="adm-card-h">Lista produktów ({products.length})</h2>
+          <p className="adm-card-d">Edytuj, usuwaj, dodawaj pojedyncze produkty. Zmiany natychmiast widoczne na stronie.</p>
         </div>
-        <button className="btn btn-ghost" onClick={reload} disabled={loading}>
-          <IRefresh s={16}/> {loading ? 'Ładuję...' : 'Odśwież'}
-        </button>
+        <div className="gap-2">
+          <button className="btn btn-ghost" onClick={reload} disabled={loading}>
+            <IRefresh s={16}/> {loading ? 'Ładuję...' : 'Odśwież'}
+          </button>
+          <button className="btn btn-flame" onClick={() => setAdding(true)}>
+            <IPlus s={16}/> Nowy produkt
+          </button>
+        </div>
       </div>
 
       {err && <div className="login-err">{err}</div>}
 
       <input
-        className="field"
         value={q}
         onChange={e => setQ(e.target.value)}
-        placeholder="Szukaj: SKU, nazwa, marka..."
+        placeholder="Szukaj: SKU, nazwa, marka, kategoria..."
         style={{ width: '100%', padding: '10px 14px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15, marginBottom: 14 }}
       />
 
       {loading ? (
-        <p className="muted">Pobieram dane z GitHuba...</p>
+        <p className="muted">Pobieram dane z Neon...</p>
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
             <thead>
-              <tr>
-                <th></th>
-                <th>SKU</th>
-                <th>Nazwa</th>
-                <th>Marka</th>
-                <th>Kategoria</th>
-                <th></th>
-              </tr>
+              <tr><th></th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th></th></tr>
             </thead>
             <tbody>
-              {filtered.map(f => {
-                const p = products[f.path] || {};
-                return (
-                  <tr key={f.path}>
-                    <td>
-                      {p.image_url
-                        ? <img src={p.image_url} alt="" className="p-img" onError={e => e.target.style.display = 'none'} />
-                        : <div className="p-img"/>}
-                    </td>
-                    <td className="mono">{p.sku || '—'}</td>
-                    <td>{p.name || f.name}</td>
-                    <td>{p.brand || '—'}</td>
-                    <td>{p.category || '—'}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      <button
-                        className="btn-icon"
-                        onClick={() => handleDelete(f)}
-                        disabled={deleting === f.path}
-                        title="Usuń"
-                      >
-                        {deleting === f.path ? <span className="spinner"/> : <ITrash s={18}/>}
+              {filtered.map(p => (
+                <tr key={p.sku}>
+                  <td>
+                    {p.image_url
+                      ? <img src={p.image_url} alt="" className="p-img" onError={e => e.target.style.display = 'none'} />
+                      : <div className="p-img"/>}
+                  </td>
+                  <td className="mono">{p.sku}</td>
+                  <td>{p.name}</td>
+                  <td>{p.brand}</td>
+                  <td>{p.category}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div className="gap-2" style={{ justifyContent: 'flex-end' }}>
+                      <button className="btn-icon" onClick={() => setEditing(p)} title="Edytuj" style={{ color: 'var(--cobalt)' }}>
+                        <IEdit s={18}/>
                       </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      <button className="btn-icon" onClick={() => handleDelete(p)} disabled={busy === p.sku} title="Usuń">
+                        {busy === p.sku ? <span className="spinner"/> : <ITrash s={18}/>}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
               {filtered.length === 0 && (
                 <tr><td colSpan="6" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
                   {q ? 'Brak wyników wyszukiwania' : 'Brak produktów'}
@@ -654,6 +671,9 @@ function ProductList() {
           </table>
         </div>
       )}
+
+      {editing && <ProductForm initial={editing} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
+      {adding && <ProductForm onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
     </div>
   );
 }
@@ -662,15 +682,13 @@ function ProductList() {
    APP
    ============================================================ */
 function App() {
-  const [authed, setAuthed] = useState(
-    localStorage.getItem('panel_unlocked') === '1' && !!localStorage.getItem('gh_token')
-  );
-  const [tab, setTab] = useState('import');
+  const [authed, setAuthed] = useState(!!getSecret());
+  const [tab, setTab] = useState('list');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   function logout() {
     if (!confirm('Wylogować się? Token zostanie usunięty z przeglądarki.')) return;
-    localStorage.removeItem('panel_unlocked');
-    localStorage.removeItem('gh_token');
+    localStorage.removeItem('admin_secret');
     setAuthed(false);
   }
 
@@ -687,7 +705,7 @@ function App() {
           </svg>
           <div>
             <div className="adm-hdr-title">Panel admina</div>
-            <div className="adm-hdr-sub">Langer Dystrybucja</div>
+            <div className="adm-hdr-sub">Langer Dystrybucja · Neon DB</div>
           </div>
         </div>
         <div className="gap-2">
@@ -697,17 +715,17 @@ function App() {
       </header>
 
       <nav className="adm-tabs">
+        <button className={'adm-tab' + (tab === 'list' ? ' active' : '')} onClick={() => setTab('list')}>
+          <IList s={16}/> Produkty
+        </button>
         <button className={'adm-tab' + (tab === 'import' ? ' active' : '')} onClick={() => setTab('import')}>
           <IUpload s={16}/> Import CSV
-        </button>
-        <button className={'adm-tab' + (tab === 'list' ? ' active' : '')} onClick={() => setTab('list')}>
-          <IList s={16}/> Lista produktów
         </button>
       </nav>
 
       <main className="adm-main">
-        {tab === 'import' && <CsvImport/>}
-        {tab === 'list' && <ProductList/>}
+        {tab === 'list' && <ProductList refreshTrigger={refreshKey}/>}
+        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)}/>}
       </main>
     </>
   );

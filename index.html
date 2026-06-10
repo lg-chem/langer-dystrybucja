@@ -1232,7 +1232,7 @@ function App() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch('./data/products.json', { cache: 'no-store' })
+    fetch('/api/products', { cache: 'no-store' })
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(setProducts)
       .catch(err => console.error('Nie udało się załadować produktów:', err));
