@@ -1,10 +1,10 @@
 content:
   - name: produkty
     label: Produkty
-    type: file
-    path: data/products.json
+    type: collection
+    path: data/products
     format: json
-    list: true
+    filename: '{fields.sku | lower}.json'
     view:
       fields: [brand, name, sku]
     fields:
@@ -12,6 +12,8 @@ content:
         label: SKU
         type: string
         required: true
+        pattern: '^[A-Z0-9-]+$'
+        description: 'Identyfikator produktu — wielkie litery, cyfry, myślniki. Np. PU-SDL-CL750'
       - name: name
         label: Nazwa produktu
         type: string
