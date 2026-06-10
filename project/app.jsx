@@ -49,6 +49,7 @@ function App() {
       <WhyUs />
       <Process />
       <Categories onPick={pickCat} />
+      <LangerShowcase />
       <ProductDatabase initialCatRef={catRef} />
       <Contact />
       <Footer />

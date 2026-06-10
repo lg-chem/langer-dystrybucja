@@ -208,6 +208,113 @@ function Categories({ onPick }) {
   );
 }
 
+/* LANGER SHOWCASE — karuzela produktów marki własnej */
+function LangerShowcase() {
+  const { IArrow } = window.Icons;
+  const trackRef = useR2(null);
+  const [canPrev, setCanPrev] = useS2(false);
+  const [canNext, setCanNext] = useS2(true);
+
+  const products = (window.PRODUCTS || []).filter(p => p.brand === 'Langer');
+
+  const updateNav = () => {
+    const t = trackRef.current;
+    if (!t) return;
+    setCanPrev(t.scrollLeft > 4);
+    setCanNext(t.scrollLeft + t.clientWidth < t.scrollWidth - 4);
+  };
+
+  useE2(() => {
+    const t = trackRef.current;
+    if (!t) return;
+    updateNav();
+    t.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav);
+    return () => {
+      t.removeEventListener('scroll', updateNav);
+      window.removeEventListener('resize', updateNav);
+    };
+  }, []);
+
+  const scrollBy = (dir) => {
+    const t = trackRef.current;
+    if (!t) return;
+    const card = t.querySelector('.lcard');
+    const step = card ? card.offsetWidth + 20 : 320;
+    t.scrollBy({ left: dir * step, behavior: 'smooth' });
+  };
+
+  const CAT_TINT = {
+    piany: ['#FBE7DF', 'var(--flame)'],
+    silikony: ['#E5E9F8', 'var(--cobalt)'],
+    akryle: ['#E7EAEF', 'var(--ash-700)'],
+    kleje: ['#FEF1D9', '#B97A0A'],
+    akcesoria: ['#E4E7EA', 'var(--navy)'],
+  };
+
+  return (
+    <section className="sec sec-langer">
+      <div className="wrap">
+        <div className="lshow-head reveal">
+          <div>
+            <span className="eyebrow">Marka własna</span>
+            <h2 className="h-sec">Linia Langer —<br/>marża, która zarabia.</h2>
+          </div>
+          <p className="lead lshow-lead">
+            Pełna gama pian, klejów, silikonów i akcesoriów pod naszą marką. Premium jakość, hurtowa cena i marża, której nie zaoferuje Ci żadna inna hurtownia.
+          </p>
+        </div>
+
+        <div className="lcarousel reveal">
+          <button className={'lcar-nav lcar-prev' + (canPrev ? '' : ' disabled')}
+                  onClick={() => scrollBy(-1)} aria-label="Poprzednie">
+            <IArrow s={20} style={{ transform: 'rotate(180deg)' }} />
+          </button>
+
+          <div className="lcar-track" ref={trackRef}>
+            {products.map(p => {
+              const cat = window.CATEGORIES.find(c => c.id === p.category);
+              const [tint, fg] = CAT_TINT[p.category] || ['#eee', '#333'];
+              const role = window.ROLE_LABEL[p.role];
+              return (
+                <article className="lcard" key={p.sku}>
+                  <div className="lcard-img" style={{ background: tint, color: fg }}>
+                    {cat && <Icon name={cat.icon} size={72} style={{ opacity: .9 }} />}
+                    <span className="lcard-imgtag">Zdjęcie wkrótce</span>
+                    {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
+                  </div>
+                  <div className="lcard-body">
+                    <div className="lcard-brand">Langer · {cat ? cat.label : ''}</div>
+                    <h3 className="lcard-name">{p.name}</h3>
+                    <div className="lcard-variant">{p.variant}</div>
+                    <div className="lcard-tags">
+                      {p.tags.map(t => <span className="ptag" key={t}>{t}</span>)}
+                    </div>
+                    <div className="lcard-foot">
+                      <div className="lcard-pack">{p.pack}</div>
+                      <a href="#kontakt" className="pcard-ask">Zapytaj o cenę <IArrow s={16}/></a>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <button className={'lcar-nav lcar-next' + (canNext ? '' : ' disabled')}
+                  onClick={() => scrollBy(1)} aria-label="Następne">
+            <IArrow s={20} />
+          </button>
+        </div>
+
+        <div className="lshow-foot reveal">
+          <a href="#baza" className="btn btn-dark">Zobacz całą linię Langer <IArrow/></a>
+          <span className="lshow-count num">{products.length} produktów</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* CONTACT */
 function Contact() {
   const { IPhone, IMail, IPin, ICheck, IArrow } = window.Icons;
@@ -290,4 +397,4 @@ function Footer() {
   );
 }
 
-Object.assign(window, { Hero, Marquee, WhyUs, Process, Categories, Contact, Footer });
+Object.assign(window, { Hero, Marquee, WhyUs, Process, Categories, LangerShowcase, Contact, Footer });
