@@ -279,8 +279,10 @@ function LangerShowcase() {
               return (
                 <article className="lcard" key={p.sku}>
                   <div className="lcard-img" style={{ background: tint, color: fg }}>
-                    {cat && <Icon name={cat.icon} size={72} style={{ opacity: .9 }} />}
-                    <span className="lcard-imgtag">Zdjęcie wkrótce</span>
+                    {p.image
+                      ? <img src={p.image} alt={p.name} className="lcard-photo" loading="lazy" />
+                      : (<>{cat && <Icon name={cat.icon} size={72} style={{ opacity: .9 }} />}<span className="lcard-imgtag">Zdjęcie wkrótce</span></>)
+                    }
                     {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
                   </div>
                   <div className="lcard-body">
