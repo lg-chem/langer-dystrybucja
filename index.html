@@ -360,8 +360,11 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   <script type="text/babel">
 const { useState, useEffect, useRef, useMemo } = React;
 
-/* ===== DATA ===== */
-const CATEGORIES = [
+/* ===== DATA =====
+   Domyślne wartości = fallback. Rzeczywiste marki/kategorie pobieramy z bazy
+   (/api/brands, /api/categories) w bootstrapie na końcu skryptu — zanim
+   wyrenderujemy stronę. Zarządza nimi panel → zakładka „Ustawienia". */
+let CATEGORIES = [
   { id: 'piany',     label: 'Piany montażowe', icon: 'piany',     blurb: 'Niskoprężne, pistoletowe, wężykowe, zimowe i ogniochronne.' },
   { id: 'silikony',  label: 'Silikony',        icon: 'silikony',  blurb: 'Sanitarne, uniwersalne, budowlane i wysokotemperaturowe.' },
   { id: 'akryle',    label: 'Akryle',          icon: 'akryle',    blurb: 'Malarskie, elastyczne i dekarskie — gotowe pod malowanie.' },
@@ -369,7 +372,7 @@ const CATEGORIES = [
   { id: 'akcesoria', label: 'Akcesoria',       icon: 'akcesoria', blurb: 'Pistolety, czyściki, taśmy i wszystko wokół chemii.' },
 ];
 
-const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
+let BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
 
 // PRODUCTS ładowane z data/products.json przez Pages CMS — patrz App.
 
@@ -630,7 +633,14 @@ function CatIcon({ name, size = 48 }) {
       <line x1="12" y1="13" x2="12" y2="8"/>
     </svg>
   );
-  return null;
+  // fallback dla nowych kategorii bez własnej ikony
+  return (
+    <svg {...props}>
+      <rect x="12" y="12" width="20" height="28" rx="2"/>
+      <rect x="15" y="7" width="14" height="5" rx="1.5"/>
+      <line x1="12" y1="20" x2="32" y2="20"/>
+    </svg>
+  );
 }
 
 /* ===== BRAND MARK ===== */
@@ -1276,7 +1286,22 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+// Bootstrap: pobierz marki/kategorie z bazy (z krótkim timeoutem), potem renderuj.
+// Gdy API nie odpowie na czas albo zwróci błąd — renderujemy z wartościami domyślnymi.
+(async function bootstrap() {
+  const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+  try {
+    const [cats, brs] = await withTimeout(Promise.all([
+      fetch('/api/categories', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status)),
+      fetch('/api/brands',     { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status)),
+    ]), 3000);
+    if (Array.isArray(cats) && cats.length) CATEGORIES = cats;
+    if (Array.isArray(brs)  && brs.length)  BRANDS = brs;
+  } catch (e) {
+    console.warn('Konfiguracja z API niedostępna — używam wartości domyślnych.', e);
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+})();
   </script>
 </body>
 </html>

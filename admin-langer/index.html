@@ -91,6 +91,36 @@ table.tbl tr.invalid td { background: var(--red-tint); }
 .progress-log .ok { color: var(--green); }
 .progress-log .err { color: var(--red); }
 
+.map-grid { display: grid; grid-template-columns: 210px 1fr; gap: 10px 16px; align-items: center; margin-top: 4px; }
+.map-grid label { font-size: 13.5px; font-weight: 600; color: var(--navy); }
+.map-grid .req { color: var(--flame); }
+.map-grid select { width: 100%; padding: 8px 10px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); font-size: 14px; background: var(--white); color: var(--navy); }
+.map-grid select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+.imp-sec { margin-top: 26px; }
+.imp-sec-h { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 16px; margin: 0 0 4px; }
+.imp-sec-d { color: var(--ash-700); font-size: 13px; margin: 0 0 10px; }
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+.pill-new { background: var(--green-tint); color: var(--green); }
+.pill-dup { background: var(--amber-tint); color: var(--amber); }
+.pill-err { background: var(--red-tint); color: var(--red); }
+table.tbl td.chkcell, table.tbl th.chkcell { width: 36px; text-align: center; }
+table.tbl input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--flame); cursor: pointer; }
+.tag-warn { display: inline-block; background: var(--amber-tint); color: var(--amber); font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-right: 4px; }
+.linkish { background: none; color: var(--cobalt); font-weight: 600; font-size: 13.5px; padding: 0; text-decoration: underline; }
+.chkline { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+.chk-inline { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ash-700); cursor: pointer; }
+.chkline input[type="checkbox"], .chk-inline input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--flame); cursor: pointer; }
+.prefix-grid { display: grid; grid-template-columns: 170px 1fr; gap: 8px 14px; align-items: center; margin-top: 12px; max-height: 340px; overflow-y: auto; padding: 2px 4px 2px 0; }
+.prefix-key { font-size: 13.5px; }
+.prefix-grid select { width: 100%; padding: 7px 10px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); font-size: 14px; background: var(--white); color: var(--navy); }
+.prefix-grid select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+@media (max-width: 720px) { .prefix-grid { grid-template-columns: 110px 1fr; } }
+.chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-item { display: inline-flex; align-items: center; gap: 6px; background: var(--light); border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px 6px 14px; font-size: 14px; font-weight: 600; color: var(--navy); }
+.chip-x { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; color: var(--ash); }
+.chip-x:hover:not(:disabled) { background: var(--red-tint); color: var(--red); }
+.chip-x:disabled { opacity: .6; cursor: not-allowed; }
+
 .p-img { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--light); object-fit: cover; }
 
 .alert { padding: 12px 16px; border-radius: var(--r-sm); font-size: 13.5px; margin-bottom: 16px; }
@@ -128,15 +158,18 @@ const { useState, useEffect, useRef, useMemo } = React;
 /* ============================================================
    KONFIGURACJA
    ============================================================ */
-const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
-const CATEGORIES = [
+/* Domyślne marki/kategorie — używane jako fallback, zanim panel pobierze
+   aktualną listę z bazy (/api/brands, /api/categories). Zarządzasz nimi
+   w panelu → zakładka „Ustawienia". */
+const DEFAULT_BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven', 'Ofo', 'Champion'];
+const DEFAULT_CATEGORIES = [
   { id: 'piany',     label: 'Piany montażowe' },
   { id: 'silikony',  label: 'Silikony' },
   { id: 'akryle',    label: 'Akryle' },
   { id: 'kleje',     label: 'Kleje' },
   { id: 'akcesoria', label: 'Akcesoria' },
 ];
-const CAT_IDS = CATEGORIES.map(c => c.id);
+const DEFAULT_CAT_IDS = DEFAULT_CATEGORIES.map(c => c.id);
 const ROLES = [
   { id: 'magnet',  label: 'Bestseller' },
   { id: 'margin',  label: 'Marka własna' },
@@ -144,6 +177,18 @@ const ROLES = [
   { id: 'neutral', label: 'Bez oznaczenia' },
 ];
 const ROLE_IDS = ROLES.map(r => r.id);
+
+/* Domyślne podpowiedzi: przedrostek nazwy (pierwsze słowo, WIELKIMI) -> marka.
+   Używane tylko do auto-dopasowania — każdą pozycję można ręcznie zmienić. */
+const BRAND_PREFIX_GUESS = {
+  S: 'Soudal', SOUDAL: 'Soudal', SDL: 'Soudal',
+  OF: 'Ofo', OFO: 'Ofo',
+  LANGER: 'Langer', LNG: 'Langer', LG: 'Langer',
+  CH: 'Champion',
+  DEN: 'Den Braven', DB: 'Den Braven',
+  TYTAN: 'Tytan', TYT: 'Tytan',
+  PENOSIL: 'Penosil', PEN: 'Penosil',
+};
 
 /* ============================================================
    API HELPERS
@@ -171,6 +216,18 @@ async function apiCreate(p)               { return apiCall('/api/products', { me
 async function apiUpdate(sku, p)          { return apiCall(`/api/products/${encodeURIComponent(sku)}`, { method: 'PUT', body: JSON.stringify(p) }); }
 async function apiDelete(sku)             { return apiCall(`/api/products/${encodeURIComponent(sku)}`, { method: 'DELETE' }); }
 
+async function apiBrands()                { return apiCall('/api/brands'); }
+async function apiBrandAdd(name)          { return apiCall('/api/brands', { method: 'POST', body: JSON.stringify({ name }) }); }
+async function apiBrandDel(name)          { return apiCall(`/api/brands?name=${encodeURIComponent(name)}`, { method: 'DELETE' }); }
+async function apiCategories()            { return apiCall('/api/categories'); }
+async function apiCategoryAdd(c)          { return apiCall('/api/categories', { method: 'POST', body: JSON.stringify(c) }); }
+async function apiCategoryDel(id)         { return apiCall(`/api/categories?id=${encodeURIComponent(id)}`, { method: 'DELETE' }); }
+
+/* slug: „Taśmy izolacyjne" -> „tasmyizolacyjne" (id kategorii, tylko [a-z0-9]) */
+function slugify(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
+}
+
 /* ============================================================
    ICONS
    ============================================================ */
@@ -186,6 +243,7 @@ const IRefresh = (p) => <Svg {...p}><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0
 const IDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></Svg>;
 const IEdit = (p) => <Svg {...p}><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>;
 const IX = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
+const ISettings = (p) => <Svg {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></Svg>;
 
 /* ============================================================
    LOGIN — wpisujesz tylko ADMIN_SECRET (env var z Vercela)
@@ -259,37 +317,127 @@ function parseTags(raw) {
   return String(raw).split(/[|;]/).map(s => s.trim()).filter(Boolean);
 }
 
-function validateRow(row) {
-  const errors = [];
-  if (!row.sku || !String(row.sku).trim()) errors.push('brak SKU');
-  if (!row.name || !String(row.name).trim()) errors.push('brak nazwy');
-  if (!row.brand || !BRANDS.includes(String(row.brand).trim())) errors.push(`marka: ${BRANDS.join(', ')}`);
-  if (!row.category || !CAT_IDS.includes(String(row.category).trim().toLowerCase())) errors.push(`kategoria: ${CAT_IDS.join(', ')}`);
-  if (row.role && !ROLE_IDS.includes(String(row.role).trim().toLowerCase())) errors.push(`role: ${ROLE_IDS.join(', ')}`);
-  return errors;
+/* Pola docelowe + podpowiedzi do automatycznego dopasowania nagłówków CSV */
+const FIELD_DEFS = [
+  { key: 'sku',       label: 'SKU',                 required: true,  hints: ['sku', 'kod', 'indeks', 'index', 'symbol', 'ean'] },
+  { key: 'name',      label: 'Nazwa',               required: true,  hints: ['name', 'nazwa', 'produkt', 'towar', 'opis'] },
+  { key: 'brand',     label: 'Marka',               required: false, hints: ['brand', 'marka', 'producent'] },
+  { key: 'category',  label: 'Kategoria',           required: false, hints: ['category', 'kategoria', 'grupa', 'kat'] },
+  { key: 'variant',   label: 'Wariant / pojemność', required: false, hints: ['variant', 'wariant', 'pojemnosc'] },
+  { key: 'pack',      label: 'Jednostka sprzedaży', required: false, hints: ['pack', 'opakowanie', 'jednostka', 'karton'] },
+  { key: 'role',      label: 'Oznaczenie',          required: false, hints: ['role', 'oznaczenie'] },
+  { key: 'tags',      label: 'Tagi',                required: false, hints: ['tags', 'tagi'] },
+  { key: 'image_url', label: 'URL zdjęcia',         required: false, hints: ['imageurl', 'image', 'zdjecie', 'foto', 'grafika'] },
+];
+
+function normHeader(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
 }
 
-function normalizeRow(row) {
+/* Zgadnij mapowanie: pole -> nagłówek kolumny w pliku */
+function guessMapping(headers) {
+  const used = new Set();
+  const m = {};
+  for (const f of FIELD_DEFS) {
+    let found = '';
+    for (const h of headers) {
+      if (used.has(h)) continue;
+      const nh = normHeader(h);
+      if (!nh) continue;
+      if (f.hints.some(hint => { const n = normHeader(hint); return nh === n || nh.includes(n) || n.includes(nh); })) {
+        found = h; break;
+      }
+    }
+    m[f.key] = found;
+    if (found) used.add(found);
+  }
+  return m;
+}
+
+/* Pierwsze słowo tekstu (przedrostek), np. "S" z "S Pianka pistoletowa 750ml" */
+function firstWord(s) {
+  const m = String(s || '').trim().match(/^\S+/);
+  return m ? m[0] : '';
+}
+
+/* Zbuduj znormalizowany produkt z surowego wiersza CSV wg mapowania kolumn.
+   opts:
+     brandFromName  – rozpoznaj markę z pierwszego słowa nazwy
+     prefixMap      – { PRZEDROSTEK(WIELKIMI): marka }
+     stripPrefix    – usuń rozpoznany przedrostek z nazwy
+     catMap         – { wartość_kolumny(małymi): id_kategorii }
+   Marka, kategoria i oznaczenie przyjmują TYLKO wartości ze zdefiniowanych list
+   (BRANDS / CATEGORIES / ROLES). Cokolwiek spoza list -> puste (uzupełnisz później). */
+function mapRow(raw, mapping, opts = {}) {
+  const brands = opts.brands || DEFAULT_BRANDS;
+  const catIds = opts.catIds || DEFAULT_CAT_IDS;
+  const get = (key) => {
+    const col = mapping[key];
+    if (!col || raw[col] == null) return '';
+    return String(raw[col]).trim();
+  };
+
+  let name = get('name');
+
+  // MARKA: najpierw z kolumny (jeśli ze zdefiniowanej listy), potem z przedrostka nazwy
+  let brand = get('brand');
+  if (brand && !brands.includes(brand)) brand = '';
+  if (!brand && opts.brandFromName && name) {
+    const fw = firstWord(name);
+    const mapped = fw && opts.prefixMap ? opts.prefixMap[fw.toUpperCase()] : '';
+    if (mapped && brands.includes(mapped)) {
+      brand = mapped;
+      if (opts.stripPrefix) name = name.slice(fw.length).trim();
+    }
+  }
+
+  // KATEGORIA: z kolumny, opcjonalnie przez mapę wartości; tylko ze zdefiniowanej listy
+  let category = get('category').toLowerCase();
+  if (category) {
+    if (opts.catMap && opts.catMap[category]) category = opts.catMap[category];
+    else if (!catIds.includes(category)) category = '';
+  }
+
+  // OZNACZENIE: tylko ze zdefiniowanej listy
+  let role = get('role').toLowerCase();
+  if (role && !ROLE_IDS.includes(role)) role = '';
+
   return {
-    sku: String(row.sku || '').trim(),
-    name: String(row.name || '').trim(),
-    brand: String(row.brand || '').trim(),
-    category: String(row.category || '').trim().toLowerCase(),
-    variant: String(row.variant || '').trim() || null,
-    pack: String(row.pack || '').trim() || null,
-    role: String(row.role || 'neutral').trim().toLowerCase() || 'neutral',
-    tags: parseTags(row.tags),
-    image_url: String(row.image_url || row.image || '').trim() || null,
+    sku: get('sku'),
+    name,
+    brand: brand || null,
+    category: category || null,
+    variant: get('variant') || null,
+    pack: get('pack') || null,
+    role: role || null,
+    tags: parseTags(mapping.tags ? raw[mapping.tags] : ''),
+    image_url: get('image_url') || null,
   };
 }
 
 /* ============================================================
    CSV IMPORT
    ============================================================ */
-function CsvImport({ onDone }) {
-  const [rows, setRows] = useState([]);
+function CsvImport({ onDone, brands, categories }) {
+  const catIds = categories.map(c => c.id);
+  const [step, setStep] = useState('upload');      // upload | map | review
   const [filename, setFilename] = useState('');
+  const [headers, setHeaders] = useState([]);
+  const [rawRows, setRawRows] = useState([]);
+  const [mapping, setMapping] = useState({});
   const [over, setOver] = useState(false);
+
+  const [brandFromName, setBrandFromName] = useState(false); // marka z pierwszego słowa nazwy
+  const [stripPrefix, setStripPrefix] = useState(false);     // usuń przedrostek z nazwy
+  const [prefixMap, setPrefixMap] = useState({});            // { PRZEDROSTEK: marka }
+  const [catMap, setCatMap] = useState({});                 // { wartość_kolumny: id_kategorii }
+
+  const [existing, setExisting] = useState(new Map());   // SKU (uppercase) -> produkt z bazy
+  const [existLoaded, setExistLoaded] = useState(false);
+
+  const [selNew, setSelNew] = useState(new Set());
+  const [selDup, setSelDup] = useState(new Set());
+
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(0);
   const [total, setTotal] = useState(0);
@@ -298,21 +446,42 @@ function CsvImport({ onDone }) {
 
   function pushLog(msg, kind = '') { setLog(l => [...l, { msg, kind }]); }
 
+  // Pobierz istniejące produkty, żeby wykryć duplikaty po SKU
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const list = await apiList();
+        if (!alive) return;
+        const m = new Map();
+        list.forEach(p => m.set(String(p.sku).toUpperCase(), p));
+        setExisting(m);
+      } catch (e) { /* brak listy — potraktujemy wszystko jako nowe */ }
+      finally { if (alive) setExistLoaded(true); }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  function resetFile() {
+    setStep('upload'); setFilename(''); setHeaders([]); setRawRows([]);
+    setMapping({}); setLog([]); setDone(0); setTotal(0);
+    setSelNew(new Set()); setSelDup(new Set());
+    setBrandFromName(false); setStripPrefix(false); setPrefixMap({}); setCatMap({});
+  }
+
   function handleFile(file) {
     if (!file) return;
     setFilename(file.name);
     setLog([]); setDone(0); setTotal(0);
     Papa.parse(file, {
       header: true,
-      skipEmptyLines: true,
-      transformHeader: h => h.trim().toLowerCase(),
+      skipEmptyLines: 'greedy',
       complete: (results) => {
-        const parsed = results.data.map((row, i) => {
-          const normalized = normalizeRow(row);
-          const errors = validateRow(normalized);
-          return { ...normalized, _idx: i + 1, _errors: errors };
-        });
-        setRows(parsed);
+        const hdrs = (results.meta.fields || []).filter(h => h != null && String(h).trim() !== '');
+        setHeaders(hdrs);
+        setRawRows(results.data || []);
+        setMapping(guessMapping(hdrs));
+        setStep('map');
       },
       error: (err) => alert('Błąd parsowania CSV: ' + err.message)
     });
@@ -324,98 +493,365 @@ function CsvImport({ onDone }) {
     if (f) handleFile(f);
   }
 
-  async function importAll() {
-    const valid = rows.filter(r => r._errors.length === 0);
-    if (!valid.length) { alert('Brak prawidłowych wierszy do importu.'); return; }
-    setRunning(true);
-    setTotal(valid.length); setDone(0); setLog([]);
-    for (let i = 0; i < valid.length; i++) {
-      const r = valid[i];
-      const data = {
-        sku: r.sku, name: r.name, brand: r.brand, category: r.category,
-        variant: r.variant, pack: r.pack, role: r.role, tags: r.tags, image_url: r.image_url
-      };
-      try {
-        await apiCreate(data);
-        pushLog(`✓ ${r.sku} — ${r.name}`, 'ok');
-      } catch (e) {
-        pushLog(`✗ ${r.sku} — ${e.message}`, 'err');
+  // Rozkład przedrostków (pierwszych słów nazwy) — do mapowania na markę
+  const prefixCounts = useMemo(() => {
+    if (!mapping.name) return [];
+    const counts = new Map();
+    for (const raw of rawRows) {
+      const fw = firstWord(raw[mapping.name]);
+      if (!fw) continue;
+      const k = fw.toUpperCase();
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+    return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
+  }, [rawRows, mapping.name]);
+
+  // Rozkład wartości kolumny kategorii — do mapowania na zdefiniowane kategorie
+  const catCounts = useMemo(() => {
+    if (!mapping.category) return [];
+    const counts = new Map();
+    for (const raw of rawRows) {
+      const v = String(raw[mapping.category] || '').trim().toLowerCase();
+      if (!v) continue;
+      counts.set(v, (counts.get(v) || 0) + 1);
+    }
+    return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
+  }, [rawRows, mapping.category]);
+
+  // Auto-dopasowanie przedrostków do marek (force = nadpisz też już ustawione)
+  function autoGuessPrefixes(force) {
+    const m = { ...prefixMap };
+    for (const { value } of prefixCounts) {
+      if (force || !m[value]) {
+        const g = BRAND_PREFIX_GUESS[value.toUpperCase()];
+        m[value] = (g && brands.includes(g)) ? g : '';
       }
-      setDone(i + 1);
+    }
+    setPrefixMap(m);
+  }
+  function toggleBrandFromName(v) {
+    setBrandFromName(v);
+    if (v) autoGuessPrefixes(false);
+  }
+
+  const rowOpts = { brandFromName, prefixMap, stripPrefix, catMap, brands, catIds };
+
+  // Znormalizowane wiersze wg aktualnego mapowania. Twarde błędy (brak SKU/nazwy)
+  // blokują import; ostrzeżenia informują o wartościach spoza zdefiniowanych list.
+  const normalized = useMemo(() =>
+    rawRows.map((raw, i) => {
+      const r = mapRow(raw, mapping, rowOpts);
+      const errors = [], warnings = [];
+      if (!r.sku) errors.push('brak SKU');
+      if (!r.name) errors.push('brak nazwy');
+      const rawBrand = mapping.brand && raw[mapping.brand] ? String(raw[mapping.brand]).trim() : '';
+      if (rawBrand && !r.brand) warnings.push('marka spoza listy');
+      const rawCat = mapping.category && raw[mapping.category] ? String(raw[mapping.category]).trim() : '';
+      if (rawCat && !r.category) warnings.push('kategoria spoza listy');
+      return { ...r, _idx: i + 1, _errors: errors, _warnings: warnings };
+    }), [rawRows, mapping, brandFromName, prefixMap, stripPrefix, catMap, brands, categories]);
+
+  // Klasyfikacja: błędne / nowe / duplikaty (dedup po SKU w obrębie pliku — ostatni wygrywa)
+  const { invalid, news, dups, mergedCount } = useMemo(() => {
+    const invalid = [];
+    const byKey = new Map();
+    for (const r of normalized) {
+      if (r._errors.length) { invalid.push(r); continue; }
+      byKey.set(r.sku.toUpperCase(), r);
+    }
+    const validCount = normalized.length - invalid.length;
+    const news = [], dups = [];
+    for (const r of byKey.values()) {
+      if (existing.has(r.sku.toUpperCase())) dups.push(r); else news.push(r);
+    }
+    return { invalid, news, dups, mergedCount: validCount - byKey.size };
+  }, [normalized, existing]);
+
+  const mapReady = mapping.sku && mapping.name;
+
+  function goReview() {
+    setSelNew(new Set(news.map(r => r.sku)));   // nowe domyślnie zaznaczone
+    setSelDup(new Set());                       // duplikaty domyślnie odznaczone
+    setStep('review');
+  }
+
+  function toggle(set, setFn, key) {
+    const n = new Set(set);
+    n.has(key) ? n.delete(key) : n.add(key);
+    setFn(n);
+  }
+  function toggleAll(list, set, setFn) {
+    const all = list.length > 0 && list.every(r => set.has(r.sku));
+    setFn(all ? new Set() : new Set(list.map(r => r.sku)));
+  }
+
+  function bodyOf(r) {
+    return { sku: r.sku, name: r.name, brand: r.brand, category: r.category,
+             variant: r.variant, pack: r.pack, role: r.role, tags: r.tags, image_url: r.image_url };
+  }
+  // Aktualizacja duplikatu: puste pola z pliku NIE nadpisują tego, co już jest w bazie
+  function mergeForUpdate(ex, r) {
+    const keep = (v, cur) => (v === null || v === undefined || v === '') ? cur : v;
+    return {
+      name: keep(r.name, ex.name),
+      brand: keep(r.brand, ex.brand),
+      category: keep(r.category, ex.category),
+      variant: keep(r.variant, ex.variant),
+      pack: keep(r.pack, ex.pack),
+      role: keep(r.role, ex.role),
+      tags: (r.tags && r.tags.length) ? r.tags : ex.tags,
+      image_url: keep(r.image_url, ex.image_url),
+    };
+  }
+
+  async function runImport() {
+    const toCreate = news.filter(r => selNew.has(r.sku));
+    const toUpdate = dups.filter(r => selDup.has(r.sku));
+    const n = toCreate.length + toUpdate.length;
+    if (!n) { alert('Nic nie zaznaczono do importu.'); return; }
+    setRunning(true); setTotal(n); setDone(0); setLog([]);
+    let d = 0;
+    for (const r of toCreate) {
+      try { await apiCreate(bodyOf(r)); pushLog(`✓ dodano ${r.sku} — ${r.name}`, 'ok'); }
+      catch (e) { pushLog(`✗ ${r.sku} — ${e.message}`, 'err'); }
+      setDone(++d);
+    }
+    for (const r of toUpdate) {
+      const ex = existing.get(r.sku.toUpperCase());
+      try { await apiUpdate(r.sku, mergeForUpdate(ex, r)); pushLog(`✎ zaktualizowano ${r.sku} — ${r.name}`, 'ok'); }
+      catch (e) { pushLog(`✗ ${r.sku} — ${e.message}`, 'err'); }
+      setDone(++d);
     }
     setRunning(false);
-    pushLog(`Gotowe. Strona aktualna natychmiast.`, '');
+    pushLog('Gotowe. Zmiany widoczne na stronie od razu.', '');
     if (onDone) onDone();
   }
 
-  const validCount = rows.filter(r => r._errors.length === 0).length;
-  const invalidCount = rows.length - validCount;
+  const selNewCount = news.filter(r => selNew.has(r.sku)).length;
+  const selDupCount = dups.filter(r => selDup.has(r.sku)).length;
 
   return (
     <div className="adm-card">
-      <h2 className="adm-card-h">Import produktów z CSV</h2>
-      <p className="adm-card-d">
-        Wgraj plik CSV. Wymagane kolumny: <span className="mono">sku, name, brand, category</span>. Opcjonalne: <span className="mono">variant, pack, role, tags, image_url</span>.
-        Tagi dziel pionową kreską <span className="mono">|</span>, np. <span className="mono">Pistoletowa|Całoroczna</span>.
-        Jeśli SKU już istnieje — produkt zostanie nadpisany.
-      </p>
-
-      <div className="gap-3" style={{ marginBottom: 14 }}>
-        <button className="btn btn-ghost" onClick={() => downloadCsvTemplate()}>
-          <IDownload s={16}/> Pobierz szablon CSV
-        </button>
+      <div className="flex-between">
+        <div>
+          <h2 className="adm-card-h">Import produktów z CSV</h2>
+          <p className="adm-card-d" style={{ margin: 0 }}>
+            Wymagane tylko <span className="mono">SKU</span> i <span className="mono">nazwa</span> — markę i kategorię możesz uzupełnić później.
+            Nagłówki dopasujesz ręcznie w kroku 2. Tagi dziel pionową kreską <span className="mono">|</span>.
+          </p>
+        </div>
+        <div className="gap-2">
+          <button className="btn btn-ghost" onClick={downloadCsvTemplate}><IDownload s={16}/> Szablon</button>
+          {step !== 'upload' && <button className="btn btn-ghost" onClick={resetFile}>Inny plik</button>}
+        </div>
       </div>
 
-      <div
-        className={'drop' + (over ? ' over' : '')}
-        onDragOver={e => { e.preventDefault(); setOver(true); }}
-        onDragLeave={() => setOver(false)}
-        onDrop={onDrop}
-        onClick={() => fileRef.current && fileRef.current.click()}
-        style={{ cursor: 'pointer' }}
-      >
-        <div className="drop-i"><IUpload s={26}/></div>
-        <p className="drop-h">{filename ? filename : 'Przeciągnij CSV tutaj lub kliknij'}</p>
-        <p className="drop-d">obsługujemy .csv (oddzielony przecinkami, UTF-8)</p>
-        <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
-      </div>
+      {/* KROK 1 — wgranie pliku */}
+      {step === 'upload' && (
+        <div
+          className={'drop' + (over ? ' over' : '')}
+          onDragOver={e => { e.preventDefault(); setOver(true); }}
+          onDragLeave={() => setOver(false)}
+          onDrop={onDrop}
+          onClick={() => fileRef.current && fileRef.current.click()}
+          style={{ cursor: 'pointer', marginTop: 20 }}
+        >
+          <div className="drop-i"><IUpload s={26}/></div>
+          <p className="drop-h">Przeciągnij CSV tutaj lub kliknij</p>
+          <p className="drop-d">obsługujemy .csv (oddzielony przecinkami, UTF-8)</p>
+          <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+        </div>
+      )}
 
-      {rows.length > 0 && (
-        <>
-          <div className="flex-between" style={{ marginTop: 24 }}>
-            <div>
-              <strong>{rows.length}</strong> wierszy ·{' '}
-              <span style={{ color: 'var(--green)' }}>{validCount} OK</span>
-              {invalidCount > 0 && <> · <span style={{ color: 'var(--red)' }}>{invalidCount} z błędami</span></>}
+      {/* KROK 2 — mapowanie nagłówków */}
+      {step === 'map' && (
+        <div style={{ marginTop: 20 }}>
+          <div className="alert alert-info">
+            <strong>{filename}</strong> — wczytano {rawRows.length} wierszy, {headers.length} kolumn. Dopasuj kolumny z pliku do pól produktu (część zgadliśmy automatycznie).
+          </div>
+          <div className="map-grid">
+            {FIELD_DEFS.map(f => (
+              <React.Fragment key={f.key}>
+                <label>{f.label} {f.required && <span className="req">*</span>}</label>
+                <select value={mapping[f.key] || ''} onChange={e => setMapping({ ...mapping, [f.key]: e.target.value })}>
+                  <option value="">— nie mapuj —</option>
+                  {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                </select>
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Marka z pierwszego słowa nazwy */}
+          <div className="imp-sec">
+            <label className="chkline">
+              <input type="checkbox" checked={brandFromName} onChange={e => toggleBrandFromName(e.target.checked)} />
+              Rozpoznaj markę z pierwszego słowa nazwy
+            </label>
+            {brandFromName && (
+              <>
+                <div className="flex-between" style={{ marginTop: 8, flexWrap: 'wrap', gap: 8 }}>
+                  <p className="imp-sec-d" style={{ margin: 0, maxWidth: 560 }}>
+                    Przypisz przedrostki do zdefiniowanych marek. Nie musisz mapować wszystkich —
+                    czego nie zmapujesz (np. <span className="mono">DISTYK</span>), zostanie bez marki i dodasz ją później ręcznie.
+                  </p>
+                  <div className="gap-3" style={{ alignItems: 'center' }}>
+                    <label className="chk-inline">
+                      <input type="checkbox" checked={stripPrefix} onChange={e => setStripPrefix(e.target.checked)} />
+                      usuń przedrostek z nazwy
+                    </label>
+                    <button type="button" className="linkish" onClick={() => autoGuessPrefixes(true)}>Auto-dopasuj</button>
+                  </div>
+                </div>
+                {prefixCounts.length === 0
+                  ? <p className="muted" style={{ marginTop: 10 }}>Najpierw zmapuj kolumnę Nazwa.</p>
+                  : (
+                    <div className="prefix-grid">
+                      {prefixCounts.map(({ value, count }) => (
+                        <React.Fragment key={value}>
+                          <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
+                          <select value={prefixMap[value] || ''} onChange={e => setPrefixMap({ ...prefixMap, [value]: e.target.value })}>
+                            <option value="">— nie mapuj —</option>
+                            {brands.map(b => <option key={b} value={b}>{b}</option>)}
+                          </select>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )}
+              </>
+            )}
+          </div>
+
+          {/* Mapowanie wartości kolumny kategorii na zdefiniowane kategorie */}
+          {catCounts.length > 0 && (
+            <div className="imp-sec">
+              <div className="imp-sec-h">Dopasuj kategorie</div>
+              <p className="imp-sec-d">Wartości z kolumny kategorii przypisz do zdefiniowanych kategorii. Niedopasowane zostaną bez kategorii.</p>
+              <div className="prefix-grid">
+                {catCounts.map(({ value, count }) => (
+                  <React.Fragment key={value}>
+                    <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
+                    <select value={catMap[value] || (catIds.includes(value) ? value : '')} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
+                      <option value="">— nie mapuj —</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                    </select>
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
-            <button className="btn btn-flame" onClick={importAll} disabled={running || !validCount}>
-              {running ? <><span className="spinner"/> Importuję {done}/{total}...</> : `Importuj ${validCount} produktów →`}
+          )}
+
+          <div className="flex-between" style={{ marginTop: 20 }}>
+            {!mapReady
+              ? <span className="muted">Zmapuj przynajmniej SKU i Nazwę.</span>
+              : <span className="muted">Gotowe do podglądu.</span>}
+            <button className="btn btn-flame" onClick={goReview} disabled={!mapReady || !existLoaded}>
+              {existLoaded ? 'Dalej — podgląd →' : <><span className="spinner"/> Wczytuję bazę...</>}
             </button>
           </div>
+        </div>
+      )}
 
-          <div className="tbl-wrap">
-            <table className="tbl">
-              <thead><tr><th>#</th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Status</th></tr></thead>
-              <tbody>
-                {rows.slice(0, 50).map(r => (
-                  <tr key={r._idx} className={r._errors.length ? 'invalid' : ''}>
-                    <td className="mono">{r._idx}</td>
-                    <td className="mono">{r.sku || '—'}</td>
-                    <td>{r.name || '—'}</td>
-                    <td>{r.brand || '—'}</td>
-                    <td>{r.category || '—'}</td>
-                    <td>
-                      {r._errors.length === 0
-                        ? <span className="tag-ok">OK</span>
-                        : <span className="tag-bad" title={r._errors.join('; ')}>błąd: {r._errors[0]}</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {rows.length > 50 && <p className="muted" style={{ padding: '10px 14px' }}>(podgląd pierwszych 50, importujemy wszystkie {rows.length})</p>}
+      {/* KROK 3 — podgląd i wybór */}
+      {step === 'review' && (
+        <div style={{ marginTop: 20 }}>
+          <div className="alert alert-info" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+            <span><span className="pill pill-new">{news.length}</span> nowych</span>
+            <span><span className="pill pill-dup">{dups.length}</span> duplikatów (już w bazie)</span>
+            {invalid.length > 0 && <span><span className="pill pill-err">{invalid.length}</span> z błędami — pominięte</span>}
+            {mergedCount > 0 && <span className="muted">· {mergedCount} scalono (ten sam SKU w pliku)</span>}
           </div>
-        </>
+
+          {/* NOWE */}
+          <div className="imp-sec">
+            <div className="imp-sec-h">Nowe produkty <span className="pill pill-new">{news.length}</span></div>
+            <p className="imp-sec-d">Zaznaczone zostaną dodane. Brakującą markę i kategorię uzupełnisz później na liście produktów.</p>
+            {news.length === 0 ? <p className="muted">Brak nowych produktów.</p> : (
+              <div className="tbl-wrap">
+                <table className="tbl">
+                  <thead><tr>
+                    <th className="chkcell"><input type="checkbox" checked={news.every(r => selNew.has(r.sku))} onChange={() => toggleAll(news, selNew, setSelNew)} /></th>
+                    <th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Uwagi</th>
+                  </tr></thead>
+                  <tbody>
+                    {news.slice(0, 300).map(r => (
+                      <tr key={r.sku}>
+                        <td className="chkcell"><input type="checkbox" checked={selNew.has(r.sku)} onChange={() => toggle(selNew, setSelNew, r.sku)} /></td>
+                        <td className="mono">{r.sku}</td>
+                        <td>{r.name}</td>
+                        <td>{r.brand || <span className="muted">—</span>}</td>
+                        <td>{r.category || <span className="muted">—</span>}</td>
+                        <td>{r._warnings.map((w, i) => <span key={i} className="tag-warn">{w}</span>)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {news.length > 300 && <p className="muted" style={{ padding: '10px 14px' }}>(podgląd 300 z {news.length}, zaimportujemy wszystkie zaznaczone)</p>}
+              </div>
+            )}
+          </div>
+
+          {/* DUPLIKATY */}
+          <div className="imp-sec">
+            <div className="imp-sec-h">Duplikaty — już w bazie <span className="pill pill-dup">{dups.length}</span></div>
+            <p className="imp-sec-d">Zaznaczone zostaną <strong>zaktualizowane po SKU</strong> (puste pola z pliku nie nadpisują istniejących). Odznaczone — pominięte.</p>
+            {dups.length === 0 ? <p className="muted">Brak duplikatów.</p> : (
+              <div className="tbl-wrap">
+                <table className="tbl">
+                  <thead><tr>
+                    <th className="chkcell"><input type="checkbox" checked={dups.every(r => selDup.has(r.sku))} onChange={() => toggleAll(dups, selDup, setSelDup)} /></th>
+                    <th>SKU</th><th>Nazwa (z pliku)</th><th>Obecnie w bazie</th><th>Uwagi</th>
+                  </tr></thead>
+                  <tbody>
+                    {dups.slice(0, 300).map(r => {
+                      const ex = existing.get(r.sku.toUpperCase()) || {};
+                      return (
+                        <tr key={r.sku}>
+                          <td className="chkcell"><input type="checkbox" checked={selDup.has(r.sku)} onChange={() => toggle(selDup, setSelDup, r.sku)} /></td>
+                          <td className="mono">{r.sku}</td>
+                          <td>{r.name}</td>
+                          <td className="muted">{ex.name || '—'}</td>
+                          <td>{r._warnings.map((w, i) => <span key={i} className="tag-warn">{w}</span>)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {dups.length > 300 && <p className="muted" style={{ padding: '10px 14px' }}>(podgląd 300 z {dups.length})</p>}
+              </div>
+            )}
+          </div>
+
+          {/* BŁĘDNE */}
+          {invalid.length > 0 && (
+            <div className="imp-sec">
+              <div className="imp-sec-h">Pominięte — brak wymaganych pól <span className="pill pill-err">{invalid.length}</span></div>
+              <p className="imp-sec-d">Te wiersze nie mają SKU lub nazwy. Popraw mapowanie w kroku 2 albo popraw plik.</p>
+              <div className="tbl-wrap">
+                <table className="tbl">
+                  <thead><tr><th>#</th><th>SKU</th><th>Nazwa</th><th>Powód</th></tr></thead>
+                  <tbody>
+                    {invalid.slice(0, 100).map(r => (
+                      <tr key={r._idx} className="invalid">
+                        <td className="mono">{r._idx}</td>
+                        <td className="mono">{r.sku || '—'}</td>
+                        <td>{r.name || '—'}</td>
+                        <td><span className="tag-bad">{r._errors.join(', ')}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {invalid.length > 100 && <p className="muted" style={{ padding: '10px 14px' }}>(podgląd 100 z {invalid.length})</p>}
+              </div>
+            </div>
+          )}
+
+          <div className="flex-between" style={{ marginTop: 24 }}>
+            <button className="linkish" onClick={() => setStep('map')}>← Zmień mapowanie</button>
+            <button className="btn btn-flame" onClick={runImport} disabled={running || (selNewCount + selDupCount === 0)}>
+              {running ? <><span className="spinner"/> Importuję {done}/{total}...</> : `Importuj — dodaj ${selNewCount}, zaktualizuj ${selDupCount}`}
+            </button>
+          </div>
+        </div>
       )}
 
       {(running || log.length > 0) && (
@@ -437,7 +873,7 @@ function downloadCsvTemplate() {
   const csv = [
     'sku,name,brand,category,variant,pack,role,tags,image_url',
     'TEST-001,Soudal Classic Premium 870 ml,Soudal,piany,Pistoletowa · 870 ml,12 szt. / karton,magnet,Pistoletowa|Premium,https://przyklad.pl/zdjecie1.jpg',
-    'TEST-002,Langer Akryl Pro 300 ml,Langer,akryle,Malarski · 300 ml,24 szt. / karton,margin,Marka własna|Malarski,',
+    'TEST-002,Langer Akryl Pro 300 ml,,,,,,,',
   ].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -449,10 +885,10 @@ function downloadCsvTemplate() {
 /* ============================================================
    FORMULARZ POJEDYNCZEGO PRODUKTU (dodanie / edycja)
    ============================================================ */
-function ProductForm({ initial, onSave, onCancel }) {
+function ProductForm({ initial, onSave, onCancel, brands, categories }) {
   const isEdit = !!initial;
   const [p, setP] = useState(initial || {
-    sku: '', name: '', brand: 'Soudal', category: 'piany',
+    sku: '', name: '', brand: '', category: '',
     variant: '', pack: '', role: 'neutral', tags: [], image_url: ''
   });
   const [saving, setSaving] = useState(false);
@@ -470,6 +906,8 @@ function ProductForm({ initial, onSave, onCancel }) {
         ...p,
         sku: p.sku.trim(),
         name: p.name.trim(),
+        brand: p.brand || null,
+        category: p.category || null,
         variant: p.variant || null,
         pack: p.pack || null,
         image_url: p.image_url || null,
@@ -506,15 +944,19 @@ function ProductForm({ initial, onSave, onCancel }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div className="field">
-            <label>Marka *</label>
-            <select value={p.brand} onChange={e => set('brand', e.target.value)} required>
-              {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+            <label>Marka</label>
+            <select value={p.brand || ''} onChange={e => set('brand', e.target.value)}>
+              <option value="">— brak (uzupełnię później) —</option>
+              {p.brand && !brands.includes(p.brand) && <option value={p.brand}>{p.brand} (spoza listy)</option>}
+              {brands.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
           </div>
           <div className="field">
-            <label>Kategoria *</label>
-            <select value={p.category} onChange={e => set('category', e.target.value)} required>
-              {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            <label>Kategoria</label>
+            <select value={p.category || ''} onChange={e => set('category', e.target.value)}>
+              <option value="">— brak (uzupełnię później) —</option>
+              {p.category && !categories.some(c => c.id === p.category) && <option value={p.category}>{p.category} (spoza listy)</option>}
+              {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
         </div>
@@ -563,7 +1005,7 @@ function ProductForm({ initial, onSave, onCancel }) {
 /* ============================================================
    LISTA PRODUKTÓW + USUWANIE + EDYCJA
    ============================================================ */
-function ProductList({ refreshTrigger }) {
+function ProductList({ refreshTrigger, brands, categories }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -672,9 +1114,119 @@ function ProductList({ refreshTrigger }) {
         </div>
       )}
 
-      {editing && <ProductForm initial={editing} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
-      {adding && <ProductForm onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
+      {editing && <ProductForm initial={editing} brands={brands} categories={categories} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
+      {adding && <ProductForm brands={brands} categories={categories} onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
     </div>
+  );
+}
+
+/* ============================================================
+   USTAWIENIA — zarządzanie markami i kategoriami (zapis w Neon)
+   ============================================================ */
+function Settings({ brands, categories, onChange }) {
+  const [newBrand, setNewBrand] = useState('');
+  const [newCat, setNewCat] = useState('');
+  const [busy, setBusy] = useState('');
+  const [err, setErr] = useState('');
+
+  async function run(fn, key) {
+    setErr(''); setBusy(key);
+    try { await fn(); await onChange(); }
+    catch (e) { setErr(e.message); }
+    finally { setBusy(''); }
+  }
+
+  function addBrand(e) {
+    e.preventDefault();
+    const name = newBrand.trim();
+    if (!name) return;
+    if (brands.includes(name)) { setErr(`Marka „${name}" już istnieje.`); return; }
+    run(async () => { await apiBrandAdd(name); setNewBrand(''); }, 'brand-add');
+  }
+  function delBrand(name) {
+    if (!confirm(`Usunąć markę „${name}" z listy?\nProdukty z tą marką zostaną, ale marka zniknie z pól wyboru.`)) return;
+    run(() => apiBrandDel(name), 'brand-' + name);
+  }
+
+  const newCatId = slugify(newCat);
+  function addCat(e) {
+    e.preventDefault();
+    const label = newCat.trim();
+    if (!label) return;
+    if (!newCatId) { setErr('Nazwa kategorii musi zawierać litery lub cyfry.'); return; }
+    if (categories.some(c => c.id === newCatId)) { setErr(`Kategoria „${newCatId}" już istnieje.`); return; }
+    run(async () => { await apiCategoryAdd({ id: newCatId, label }); setNewCat(''); }, 'cat-add');
+  }
+  function delCat(c) {
+    if (!confirm(`Usunąć kategorię „${c.label}" z listy?\nProdukty z tą kategorią zostaną, ale kategoria zniknie z pól wyboru.`)) return;
+    run(() => apiCategoryDel(c.id), 'cat-' + c.id);
+  }
+
+  return (
+    <>
+      {err && <div className="adm-card" style={{ padding: 0, border: 'none' }}><div className="login-err" style={{ margin: 0 }}>{err}</div></div>}
+
+      <div className="adm-card">
+        <h2 className="adm-card-h">Marki ({brands.length})</h2>
+        <p className="adm-card-d">Dodawaj i usuwaj marki. Zmiany od razu widać w formularzu produktu, imporcie i na stronie.</p>
+
+        <form className="gap-2" onSubmit={addBrand} style={{ marginBottom: 16 }}>
+          <input value={newBrand} onChange={e => setNewBrand(e.target.value)} placeholder="Nazwa marki, np. Mapei"
+            style={{ flex: 1, padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }} />
+          <button type="submit" className="btn btn-flame" disabled={busy === 'brand-add' || !newBrand.trim()}>
+            {busy === 'brand-add' ? <span className="spinner"/> : <IPlus s={16}/>} Dodaj markę
+          </button>
+        </form>
+
+        <div className="chip-list">
+          {brands.map(b => (
+            <span key={b} className="chip-item">
+              {b}
+              <button className="chip-x" onClick={() => delBrand(b)} disabled={busy === 'brand-' + b} title="Usuń">
+                {busy === 'brand-' + b ? <span className="spinner"/> : <IX s={14}/>}
+              </button>
+            </span>
+          ))}
+          {brands.length === 0 && <span className="muted">Brak marek.</span>}
+        </div>
+      </div>
+
+      <div className="adm-card">
+        <h2 className="adm-card-h">Kategorie ({categories.length})</h2>
+        <p className="adm-card-d">Dodawaj i usuwaj kategorie. Identyfikator (do bazy i filtrów) tworzy się automatycznie z nazwy.</p>
+
+        <form className="gap-2" onSubmit={addCat} style={{ marginBottom: 16, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1 }}>
+            <input value={newCat} onChange={e => setNewCat(e.target.value)} placeholder="Nazwa kategorii, np. Taśmy"
+              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }} />
+            {newCat.trim() && <p className="muted" style={{ marginTop: 6 }}>id: <span className="mono">{newCatId || '(nieprawidłowe)'}</span></p>}
+          </div>
+          <button type="submit" className="btn btn-flame" disabled={busy === 'cat-add' || !newCat.trim()}>
+            {busy === 'cat-add' ? <span className="spinner"/> : <IPlus s={16}/>} Dodaj kategorię
+          </button>
+        </form>
+
+        <div className="tbl-wrap" style={{ marginTop: 0 }}>
+          <table className="tbl">
+            <thead><tr><th>Nazwa</th><th>id</th><th></th></tr></thead>
+            <tbody>
+              {categories.map(c => (
+                <tr key={c.id}>
+                  <td>{c.label}</td>
+                  <td className="mono">{c.id}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button className="btn-icon" onClick={() => delCat(c)} disabled={busy === 'cat-' + c.id} title="Usuń">
+                      {busy === 'cat-' + c.id ? <span className="spinner"/> : <ITrash s={18}/>}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {categories.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', padding: 30, color: 'var(--ash)' }}>Brak kategorii.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -685,6 +1237,19 @@ function App() {
   const [authed, setAuthed] = useState(!!getSecret());
   const [tab, setTab] = useState('list');
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Marki i kategorie z bazy (fallback do domyślnych, gdy brak migracji / błąd)
+  const [brands, setBrands] = useState(DEFAULT_BRANDS);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+
+  async function loadConfig() {
+    try {
+      const [b, c] = await Promise.all([apiBrands(), apiCategories()]);
+      if (Array.isArray(b) && b.length) setBrands(b);
+      if (Array.isArray(c) && c.length) setCategories(c);
+    } catch (e) { /* zostają wartości domyślne */ }
+  }
+  useEffect(() => { if (authed) loadConfig(); }, [authed]);
 
   function logout() {
     if (!confirm('Wylogować się? Token zostanie usunięty z przeglądarki.')) return;
@@ -721,11 +1286,15 @@ function App() {
         <button className={'adm-tab' + (tab === 'import' ? ' active' : '')} onClick={() => setTab('import')}>
           <IUpload s={16}/> Import CSV
         </button>
+        <button className={'adm-tab' + (tab === 'settings' ? ' active' : '')} onClick={() => setTab('settings')}>
+          <ISettings s={16}/> Ustawienia
+        </button>
       </nav>
 
       <main className="adm-main">
-        {tab === 'list' && <ProductList refreshTrigger={refreshKey}/>}
-        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)}/>}
+        {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories}/>}
+        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories}/>}
+        {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig}/>}
       </main>
     </>
   );
