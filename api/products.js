@@ -26,13 +26,13 @@ export default async function handler(req, res) {
 
       const body = req.body || {};
       const { sku, name, brand, category, variant, pack, role, tags, image_url } = body;
-      if (!sku || !name || !brand || !category) {
-        return res.status(400).json({ error: 'Brak wymaganych pól: sku, name, brand, category' });
+      if (!sku || !name) {
+        return res.status(400).json({ error: 'Brak wymaganych pól: sku, name' });
       }
 
       const result = await sql`
         INSERT INTO products (sku, name, brand, category, variant, pack, role, tags, image_url)
-        VALUES (${sku}, ${name}, ${brand}, ${category}, ${variant || null}, ${pack || null},
+        VALUES (${sku}, ${name}, ${brand || null}, ${category || null}, ${variant || null}, ${pack || null},
                 ${role || 'neutral'}, ${tags || []}, ${image_url || null})
         ON CONFLICT (sku) DO UPDATE SET
           name = EXCLUDED.name,
