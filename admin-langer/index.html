@@ -107,6 +107,14 @@ table.tbl td.chkcell, table.tbl th.chkcell { width: 36px; text-align: center; }
 table.tbl input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--flame); cursor: pointer; }
 .tag-warn { display: inline-block; background: var(--amber-tint); color: var(--amber); font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; margin-right: 4px; }
 .linkish { background: none; color: var(--cobalt); font-weight: 600; font-size: 13.5px; padding: 0; text-decoration: underline; }
+.chkline { display: inline-flex; align-items: center; gap: 9px; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+.chk-inline { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ash-700); cursor: pointer; }
+.chkline input[type="checkbox"], .chk-inline input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--flame); cursor: pointer; }
+.prefix-grid { display: grid; grid-template-columns: 170px 1fr; gap: 8px 14px; align-items: center; margin-top: 12px; max-height: 340px; overflow-y: auto; padding: 2px 4px 2px 0; }
+.prefix-key { font-size: 13.5px; }
+.prefix-grid select { width: 100%; padding: 7px 10px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); font-size: 14px; background: var(--white); color: var(--navy); }
+.prefix-grid select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+@media (max-width: 720px) { .prefix-grid { grid-template-columns: 110px 1fr; } }
 
 .p-img { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--light); object-fit: cover; }
 
@@ -145,7 +153,9 @@ const { useState, useEffect, useRef, useMemo } = React;
 /* ============================================================
    KONFIGURACJA
    ============================================================ */
-const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
+/* Zdefiniowane marki — jedyne dozwolone wartości. Dodaj tu nową markę, żeby
+   pojawiła się w formularzach, mapowaniu kolumn i mapowaniu przedrostków. */
+const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven', 'Ofo', 'Champion'];
 const CATEGORIES = [
   { id: 'piany',     label: 'Piany montażowe' },
   { id: 'silikony',  label: 'Silikony' },
@@ -161,6 +171,18 @@ const ROLES = [
   { id: 'neutral', label: 'Bez oznaczenia' },
 ];
 const ROLE_IDS = ROLES.map(r => r.id);
+
+/* Domyślne podpowiedzi: przedrostek nazwy (pierwsze słowo, WIELKIMI) -> marka.
+   Używane tylko do auto-dopasowania — każdą pozycję można ręcznie zmienić. */
+const BRAND_PREFIX_GUESS = {
+  S: 'Soudal', SOUDAL: 'Soudal', SDL: 'Soudal',
+  OF: 'Ofo', OFO: 'Ofo',
+  LANGER: 'Langer', LNG: 'Langer', LG: 'Langer',
+  CH: 'Champion',
+  DEN: 'Den Braven', DB: 'Den Braven',
+  TYTAN: 'Tytan', TYT: 'Tytan',
+  PENOSIL: 'Penosil', PEN: 'Penosil',
+};
 
 /* ============================================================
    API HELPERS
@@ -313,19 +335,55 @@ function guessMapping(headers) {
   return m;
 }
 
-/* Zbuduj znormalizowany produkt z surowego wiersza CSV wg mapowania kolumn */
-function mapRow(raw, mapping) {
+/* Pierwsze słowo tekstu (przedrostek), np. "S" z "S Pianka pistoletowa 750ml" */
+function firstWord(s) {
+  const m = String(s || '').trim().match(/^\S+/);
+  return m ? m[0] : '';
+}
+
+/* Zbuduj znormalizowany produkt z surowego wiersza CSV wg mapowania kolumn.
+   opts:
+     brandFromName  – rozpoznaj markę z pierwszego słowa nazwy
+     prefixMap      – { PRZEDROSTEK(WIELKIMI): marka }
+     stripPrefix    – usuń rozpoznany przedrostek z nazwy
+     catMap         – { wartość_kolumny(małymi): id_kategorii }
+   Marka, kategoria i oznaczenie przyjmują TYLKO wartości ze zdefiniowanych list
+   (BRANDS / CATEGORIES / ROLES). Cokolwiek spoza list -> puste (uzupełnisz później). */
+function mapRow(raw, mapping, opts = {}) {
   const get = (key) => {
     const col = mapping[key];
     if (!col || raw[col] == null) return '';
     return String(raw[col]).trim();
   };
-  const brand = get('brand');
-  const category = get('category').toLowerCase();
-  const role = get('role').toLowerCase();
+
+  let name = get('name');
+
+  // MARKA: najpierw z kolumny (jeśli ze zdefiniowanej listy), potem z przedrostka nazwy
+  let brand = get('brand');
+  if (brand && !BRANDS.includes(brand)) brand = '';
+  if (!brand && opts.brandFromName && name) {
+    const fw = firstWord(name);
+    const mapped = fw && opts.prefixMap ? opts.prefixMap[fw.toUpperCase()] : '';
+    if (mapped && BRANDS.includes(mapped)) {
+      brand = mapped;
+      if (opts.stripPrefix) name = name.slice(fw.length).trim();
+    }
+  }
+
+  // KATEGORIA: z kolumny, opcjonalnie przez mapę wartości; tylko ze zdefiniowanej listy
+  let category = get('category').toLowerCase();
+  if (category) {
+    if (opts.catMap && opts.catMap[category]) category = opts.catMap[category];
+    else if (!CAT_IDS.includes(category)) category = '';
+  }
+
+  // OZNACZENIE: tylko ze zdefiniowanej listy
+  let role = get('role').toLowerCase();
+  if (role && !ROLE_IDS.includes(role)) role = '';
+
   return {
     sku: get('sku'),
-    name: get('name'),
+    name,
     brand: brand || null,
     category: category || null,
     variant: get('variant') || null,
@@ -334,17 +392,6 @@ function mapRow(raw, mapping) {
     tags: parseTags(mapping.tags ? raw[mapping.tags] : ''),
     image_url: get('image_url') || null,
   };
-}
-
-/* Twarde błędy blokują import (SKU + nazwa). Ostrzeżenia nie blokują — resztę uzupełnisz później. */
-function rowIssues(r) {
-  const errors = [], warnings = [];
-  if (!r.sku) errors.push('brak SKU');
-  if (!r.name) errors.push('brak nazwy');
-  if (r.brand && !BRANDS.includes(r.brand)) warnings.push('nieznana marka');
-  if (r.category && !CAT_IDS.includes(r.category)) warnings.push('nieznana kategoria');
-  if (r.role && !ROLE_IDS.includes(r.role)) warnings.push('nieznane oznaczenie');
-  return { errors, warnings };
 }
 
 /* ============================================================
@@ -357,6 +404,11 @@ function CsvImport({ onDone }) {
   const [rawRows, setRawRows] = useState([]);
   const [mapping, setMapping] = useState({});
   const [over, setOver] = useState(false);
+
+  const [brandFromName, setBrandFromName] = useState(false); // marka z pierwszego słowa nazwy
+  const [stripPrefix, setStripPrefix] = useState(false);     // usuń przedrostek z nazwy
+  const [prefixMap, setPrefixMap] = useState({});            // { PRZEDROSTEK: marka }
+  const [catMap, setCatMap] = useState({});                 // { wartość_kolumny: id_kategorii }
 
   const [existing, setExisting] = useState(new Map());   // SKU (uppercase) -> produkt z bazy
   const [existLoaded, setExistLoaded] = useState(false);
@@ -392,6 +444,7 @@ function CsvImport({ onDone }) {
     setStep('upload'); setFilename(''); setHeaders([]); setRawRows([]);
     setMapping({}); setLog([]); setDone(0); setTotal(0);
     setSelNew(new Set()); setSelDup(new Set());
+    setBrandFromName(false); setStripPrefix(false); setPrefixMap({}); setCatMap({});
   }
 
   function handleFile(file) {
@@ -418,13 +471,63 @@ function CsvImport({ onDone }) {
     if (f) handleFile(f);
   }
 
-  // Znormalizowane wiersze wg aktualnego mapowania
+  // Rozkład przedrostków (pierwszych słów nazwy) — do mapowania na markę
+  const prefixCounts = useMemo(() => {
+    if (!mapping.name) return [];
+    const counts = new Map();
+    for (const raw of rawRows) {
+      const fw = firstWord(raw[mapping.name]);
+      if (!fw) continue;
+      const k = fw.toUpperCase();
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+    return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
+  }, [rawRows, mapping.name]);
+
+  // Rozkład wartości kolumny kategorii — do mapowania na zdefiniowane kategorie
+  const catCounts = useMemo(() => {
+    if (!mapping.category) return [];
+    const counts = new Map();
+    for (const raw of rawRows) {
+      const v = String(raw[mapping.category] || '').trim().toLowerCase();
+      if (!v) continue;
+      counts.set(v, (counts.get(v) || 0) + 1);
+    }
+    return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
+  }, [rawRows, mapping.category]);
+
+  // Auto-dopasowanie przedrostków do marek (force = nadpisz też już ustawione)
+  function autoGuessPrefixes(force) {
+    const m = { ...prefixMap };
+    for (const { value } of prefixCounts) {
+      if (force || !m[value]) {
+        const g = BRAND_PREFIX_GUESS[value.toUpperCase()];
+        m[value] = (g && BRANDS.includes(g)) ? g : '';
+      }
+    }
+    setPrefixMap(m);
+  }
+  function toggleBrandFromName(v) {
+    setBrandFromName(v);
+    if (v) autoGuessPrefixes(false);
+  }
+
+  const rowOpts = { brandFromName, prefixMap, stripPrefix, catMap };
+
+  // Znormalizowane wiersze wg aktualnego mapowania. Twarde błędy (brak SKU/nazwy)
+  // blokują import; ostrzeżenia informują o wartościach spoza zdefiniowanych list.
   const normalized = useMemo(() =>
     rawRows.map((raw, i) => {
-      const r = mapRow(raw, mapping);
-      const { errors, warnings } = rowIssues(r);
+      const r = mapRow(raw, mapping, rowOpts);
+      const errors = [], warnings = [];
+      if (!r.sku) errors.push('brak SKU');
+      if (!r.name) errors.push('brak nazwy');
+      const rawBrand = mapping.brand && raw[mapping.brand] ? String(raw[mapping.brand]).trim() : '';
+      if (rawBrand && !r.brand) warnings.push('marka spoza listy');
+      const rawCat = mapping.category && raw[mapping.category] ? String(raw[mapping.category]).trim() : '';
+      if (rawCat && !r.category) warnings.push('kategoria spoza listy');
       return { ...r, _idx: i + 1, _errors: errors, _warnings: warnings };
-    }), [rawRows, mapping]);
+    }), [rawRows, mapping, brandFromName, prefixMap, stripPrefix, catMap]);
 
   // Klasyfikacja: błędne / nowe / duplikaty (dedup po SKU w obrębie pliku — ostatni wygrywa)
   const { invalid, news, dups, mergedCount } = useMemo(() => {
@@ -555,6 +658,66 @@ function CsvImport({ onDone }) {
               </React.Fragment>
             ))}
           </div>
+
+          {/* Marka z pierwszego słowa nazwy */}
+          <div className="imp-sec">
+            <label className="chkline">
+              <input type="checkbox" checked={brandFromName} onChange={e => toggleBrandFromName(e.target.checked)} />
+              Rozpoznaj markę z pierwszego słowa nazwy
+            </label>
+            {brandFromName && (
+              <>
+                <div className="flex-between" style={{ marginTop: 8, flexWrap: 'wrap', gap: 8 }}>
+                  <p className="imp-sec-d" style={{ margin: 0, maxWidth: 560 }}>
+                    Przypisz przedrostki do zdefiniowanych marek. Nie musisz mapować wszystkich —
+                    czego nie zmapujesz (np. <span className="mono">DISTYK</span>), zostanie bez marki i dodasz ją później ręcznie.
+                  </p>
+                  <div className="gap-3" style={{ alignItems: 'center' }}>
+                    <label className="chk-inline">
+                      <input type="checkbox" checked={stripPrefix} onChange={e => setStripPrefix(e.target.checked)} />
+                      usuń przedrostek z nazwy
+                    </label>
+                    <button type="button" className="linkish" onClick={() => autoGuessPrefixes(true)}>Auto-dopasuj</button>
+                  </div>
+                </div>
+                {prefixCounts.length === 0
+                  ? <p className="muted" style={{ marginTop: 10 }}>Najpierw zmapuj kolumnę Nazwa.</p>
+                  : (
+                    <div className="prefix-grid">
+                      {prefixCounts.map(({ value, count }) => (
+                        <React.Fragment key={value}>
+                          <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
+                          <select value={prefixMap[value] || ''} onChange={e => setPrefixMap({ ...prefixMap, [value]: e.target.value })}>
+                            <option value="">— nie mapuj —</option>
+                            {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+                          </select>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )}
+              </>
+            )}
+          </div>
+
+          {/* Mapowanie wartości kolumny kategorii na zdefiniowane kategorie */}
+          {catCounts.length > 0 && (
+            <div className="imp-sec">
+              <div className="imp-sec-h">Dopasuj kategorie</div>
+              <p className="imp-sec-d">Wartości z kolumny kategorii przypisz do zdefiniowanych kategorii. Niedopasowane zostaną bez kategorii.</p>
+              <div className="prefix-grid">
+                {catCounts.map(({ value, count }) => (
+                  <React.Fragment key={value}>
+                    <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
+                    <select value={catMap[value] || (CAT_IDS.includes(value) ? value : '')} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
+                      <option value="">— nie mapuj —</option>
+                      {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                    </select>
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex-between" style={{ marginTop: 20 }}>
             {!mapReady
               ? <span className="muted">Zmapuj przynajmniej SKU i Nazwę.</span>
