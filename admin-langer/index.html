@@ -115,6 +115,11 @@ table.tbl input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(
 .prefix-grid select { width: 100%; padding: 7px 10px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); font-size: 14px; background: var(--white); color: var(--navy); }
 .prefix-grid select:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
 @media (max-width: 720px) { .prefix-grid { grid-template-columns: 110px 1fr; } }
+.chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-item { display: inline-flex; align-items: center; gap: 6px; background: var(--light); border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px 6px 14px; font-size: 14px; font-weight: 600; color: var(--navy); }
+.chip-x { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; color: var(--ash); }
+.chip-x:hover:not(:disabled) { background: var(--red-tint); color: var(--red); }
+.chip-x:disabled { opacity: .6; cursor: not-allowed; }
 
 .p-img { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--light); object-fit: cover; }
 
@@ -153,17 +158,18 @@ const { useState, useEffect, useRef, useMemo } = React;
 /* ============================================================
    KONFIGURACJA
    ============================================================ */
-/* Zdefiniowane marki — jedyne dozwolone wartości. Dodaj tu nową markę, żeby
-   pojawiła się w formularzach, mapowaniu kolumn i mapowaniu przedrostków. */
-const BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven', 'Ofo', 'Champion'];
-const CATEGORIES = [
+/* Domyślne marki/kategorie — używane jako fallback, zanim panel pobierze
+   aktualną listę z bazy (/api/brands, /api/categories). Zarządzasz nimi
+   w panelu → zakładka „Ustawienia". */
+const DEFAULT_BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven', 'Ofo', 'Champion'];
+const DEFAULT_CATEGORIES = [
   { id: 'piany',     label: 'Piany montażowe' },
   { id: 'silikony',  label: 'Silikony' },
   { id: 'akryle',    label: 'Akryle' },
   { id: 'kleje',     label: 'Kleje' },
   { id: 'akcesoria', label: 'Akcesoria' },
 ];
-const CAT_IDS = CATEGORIES.map(c => c.id);
+const DEFAULT_CAT_IDS = DEFAULT_CATEGORIES.map(c => c.id);
 const ROLES = [
   { id: 'magnet',  label: 'Bestseller' },
   { id: 'margin',  label: 'Marka własna' },
@@ -210,6 +216,18 @@ async function apiCreate(p)               { return apiCall('/api/products', { me
 async function apiUpdate(sku, p)          { return apiCall(`/api/products/${encodeURIComponent(sku)}`, { method: 'PUT', body: JSON.stringify(p) }); }
 async function apiDelete(sku)             { return apiCall(`/api/products/${encodeURIComponent(sku)}`, { method: 'DELETE' }); }
 
+async function apiBrands()                { return apiCall('/api/brands'); }
+async function apiBrandAdd(name)          { return apiCall('/api/brands', { method: 'POST', body: JSON.stringify({ name }) }); }
+async function apiBrandDel(name)          { return apiCall(`/api/brands?name=${encodeURIComponent(name)}`, { method: 'DELETE' }); }
+async function apiCategories()            { return apiCall('/api/categories'); }
+async function apiCategoryAdd(c)          { return apiCall('/api/categories', { method: 'POST', body: JSON.stringify(c) }); }
+async function apiCategoryDel(id)         { return apiCall(`/api/categories?id=${encodeURIComponent(id)}`, { method: 'DELETE' }); }
+
+/* slug: „Taśmy izolacyjne" -> „tasmyizolacyjne" (id kategorii, tylko [a-z0-9]) */
+function slugify(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
+}
+
 /* ============================================================
    ICONS
    ============================================================ */
@@ -225,6 +243,7 @@ const IRefresh = (p) => <Svg {...p}><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0
 const IDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></Svg>;
 const IEdit = (p) => <Svg {...p}><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></Svg>;
 const IX = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
+const ISettings = (p) => <Svg {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></Svg>;
 
 /* ============================================================
    LOGIN — wpisujesz tylko ADMIN_SECRET (env var z Vercela)
@@ -350,6 +369,8 @@ function firstWord(s) {
    Marka, kategoria i oznaczenie przyjmują TYLKO wartości ze zdefiniowanych list
    (BRANDS / CATEGORIES / ROLES). Cokolwiek spoza list -> puste (uzupełnisz później). */
 function mapRow(raw, mapping, opts = {}) {
+  const brands = opts.brands || DEFAULT_BRANDS;
+  const catIds = opts.catIds || DEFAULT_CAT_IDS;
   const get = (key) => {
     const col = mapping[key];
     if (!col || raw[col] == null) return '';
@@ -360,11 +381,11 @@ function mapRow(raw, mapping, opts = {}) {
 
   // MARKA: najpierw z kolumny (jeśli ze zdefiniowanej listy), potem z przedrostka nazwy
   let brand = get('brand');
-  if (brand && !BRANDS.includes(brand)) brand = '';
+  if (brand && !brands.includes(brand)) brand = '';
   if (!brand && opts.brandFromName && name) {
     const fw = firstWord(name);
     const mapped = fw && opts.prefixMap ? opts.prefixMap[fw.toUpperCase()] : '';
-    if (mapped && BRANDS.includes(mapped)) {
+    if (mapped && brands.includes(mapped)) {
       brand = mapped;
       if (opts.stripPrefix) name = name.slice(fw.length).trim();
     }
@@ -374,7 +395,7 @@ function mapRow(raw, mapping, opts = {}) {
   let category = get('category').toLowerCase();
   if (category) {
     if (opts.catMap && opts.catMap[category]) category = opts.catMap[category];
-    else if (!CAT_IDS.includes(category)) category = '';
+    else if (!catIds.includes(category)) category = '';
   }
 
   // OZNACZENIE: tylko ze zdefiniowanej listy
@@ -397,7 +418,8 @@ function mapRow(raw, mapping, opts = {}) {
 /* ============================================================
    CSV IMPORT
    ============================================================ */
-function CsvImport({ onDone }) {
+function CsvImport({ onDone, brands, categories }) {
+  const catIds = categories.map(c => c.id);
   const [step, setStep] = useState('upload');      // upload | map | review
   const [filename, setFilename] = useState('');
   const [headers, setHeaders] = useState([]);
@@ -502,7 +524,7 @@ function CsvImport({ onDone }) {
     for (const { value } of prefixCounts) {
       if (force || !m[value]) {
         const g = BRAND_PREFIX_GUESS[value.toUpperCase()];
-        m[value] = (g && BRANDS.includes(g)) ? g : '';
+        m[value] = (g && brands.includes(g)) ? g : '';
       }
     }
     setPrefixMap(m);
@@ -512,7 +534,7 @@ function CsvImport({ onDone }) {
     if (v) autoGuessPrefixes(false);
   }
 
-  const rowOpts = { brandFromName, prefixMap, stripPrefix, catMap };
+  const rowOpts = { brandFromName, prefixMap, stripPrefix, catMap, brands, catIds };
 
   // Znormalizowane wiersze wg aktualnego mapowania. Twarde błędy (brak SKU/nazwy)
   // blokują import; ostrzeżenia informują o wartościach spoza zdefiniowanych list.
@@ -527,7 +549,7 @@ function CsvImport({ onDone }) {
       const rawCat = mapping.category && raw[mapping.category] ? String(raw[mapping.category]).trim() : '';
       if (rawCat && !r.category) warnings.push('kategoria spoza listy');
       return { ...r, _idx: i + 1, _errors: errors, _warnings: warnings };
-    }), [rawRows, mapping, brandFromName, prefixMap, stripPrefix, catMap]);
+    }), [rawRows, mapping, brandFromName, prefixMap, stripPrefix, catMap, brands, categories]);
 
   // Klasyfikacja: błędne / nowe / duplikaty (dedup po SKU w obrębie pliku — ostatni wygrywa)
   const { invalid, news, dups, mergedCount } = useMemo(() => {
@@ -689,7 +711,7 @@ function CsvImport({ onDone }) {
                           <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
                           <select value={prefixMap[value] || ''} onChange={e => setPrefixMap({ ...prefixMap, [value]: e.target.value })}>
                             <option value="">— nie mapuj —</option>
-                            {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+                            {brands.map(b => <option key={b} value={b}>{b}</option>)}
                           </select>
                         </React.Fragment>
                       ))}
@@ -708,9 +730,9 @@ function CsvImport({ onDone }) {
                 {catCounts.map(({ value, count }) => (
                   <React.Fragment key={value}>
                     <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
-                    <select value={catMap[value] || (CAT_IDS.includes(value) ? value : '')} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
+                    <select value={catMap[value] || (catIds.includes(value) ? value : '')} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
                       <option value="">— nie mapuj —</option>
-                      {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
                     </select>
                   </React.Fragment>
                 ))}
@@ -863,10 +885,10 @@ function downloadCsvTemplate() {
 /* ============================================================
    FORMULARZ POJEDYNCZEGO PRODUKTU (dodanie / edycja)
    ============================================================ */
-function ProductForm({ initial, onSave, onCancel }) {
+function ProductForm({ initial, onSave, onCancel, brands, categories }) {
   const isEdit = !!initial;
   const [p, setP] = useState(initial || {
-    sku: '', name: '', brand: 'Soudal', category: 'piany',
+    sku: '', name: '', brand: '', category: '',
     variant: '', pack: '', role: 'neutral', tags: [], image_url: ''
   });
   const [saving, setSaving] = useState(false);
@@ -884,6 +906,8 @@ function ProductForm({ initial, onSave, onCancel }) {
         ...p,
         sku: p.sku.trim(),
         name: p.name.trim(),
+        brand: p.brand || null,
+        category: p.category || null,
         variant: p.variant || null,
         pack: p.pack || null,
         image_url: p.image_url || null,
@@ -920,15 +944,19 @@ function ProductForm({ initial, onSave, onCancel }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div className="field">
-            <label>Marka *</label>
-            <select value={p.brand} onChange={e => set('brand', e.target.value)} required>
-              {BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+            <label>Marka</label>
+            <select value={p.brand || ''} onChange={e => set('brand', e.target.value)}>
+              <option value="">— brak (uzupełnię później) —</option>
+              {p.brand && !brands.includes(p.brand) && <option value={p.brand}>{p.brand} (spoza listy)</option>}
+              {brands.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
           </div>
           <div className="field">
-            <label>Kategoria *</label>
-            <select value={p.category} onChange={e => set('category', e.target.value)} required>
-              {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            <label>Kategoria</label>
+            <select value={p.category || ''} onChange={e => set('category', e.target.value)}>
+              <option value="">— brak (uzupełnię później) —</option>
+              {p.category && !categories.some(c => c.id === p.category) && <option value={p.category}>{p.category} (spoza listy)</option>}
+              {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
         </div>
@@ -977,7 +1005,7 @@ function ProductForm({ initial, onSave, onCancel }) {
 /* ============================================================
    LISTA PRODUKTÓW + USUWANIE + EDYCJA
    ============================================================ */
-function ProductList({ refreshTrigger }) {
+function ProductList({ refreshTrigger, brands, categories }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -1086,9 +1114,119 @@ function ProductList({ refreshTrigger }) {
         </div>
       )}
 
-      {editing && <ProductForm initial={editing} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
-      {adding && <ProductForm onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
+      {editing && <ProductForm initial={editing} brands={brands} categories={categories} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
+      {adding && <ProductForm brands={brands} categories={categories} onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
     </div>
+  );
+}
+
+/* ============================================================
+   USTAWIENIA — zarządzanie markami i kategoriami (zapis w Neon)
+   ============================================================ */
+function Settings({ brands, categories, onChange }) {
+  const [newBrand, setNewBrand] = useState('');
+  const [newCat, setNewCat] = useState('');
+  const [busy, setBusy] = useState('');
+  const [err, setErr] = useState('');
+
+  async function run(fn, key) {
+    setErr(''); setBusy(key);
+    try { await fn(); await onChange(); }
+    catch (e) { setErr(e.message); }
+    finally { setBusy(''); }
+  }
+
+  function addBrand(e) {
+    e.preventDefault();
+    const name = newBrand.trim();
+    if (!name) return;
+    if (brands.includes(name)) { setErr(`Marka „${name}" już istnieje.`); return; }
+    run(async () => { await apiBrandAdd(name); setNewBrand(''); }, 'brand-add');
+  }
+  function delBrand(name) {
+    if (!confirm(`Usunąć markę „${name}" z listy?\nProdukty z tą marką zostaną, ale marka zniknie z pól wyboru.`)) return;
+    run(() => apiBrandDel(name), 'brand-' + name);
+  }
+
+  const newCatId = slugify(newCat);
+  function addCat(e) {
+    e.preventDefault();
+    const label = newCat.trim();
+    if (!label) return;
+    if (!newCatId) { setErr('Nazwa kategorii musi zawierać litery lub cyfry.'); return; }
+    if (categories.some(c => c.id === newCatId)) { setErr(`Kategoria „${newCatId}" już istnieje.`); return; }
+    run(async () => { await apiCategoryAdd({ id: newCatId, label }); setNewCat(''); }, 'cat-add');
+  }
+  function delCat(c) {
+    if (!confirm(`Usunąć kategorię „${c.label}" z listy?\nProdukty z tą kategorią zostaną, ale kategoria zniknie z pól wyboru.`)) return;
+    run(() => apiCategoryDel(c.id), 'cat-' + c.id);
+  }
+
+  return (
+    <>
+      {err && <div className="adm-card" style={{ padding: 0, border: 'none' }}><div className="login-err" style={{ margin: 0 }}>{err}</div></div>}
+
+      <div className="adm-card">
+        <h2 className="adm-card-h">Marki ({brands.length})</h2>
+        <p className="adm-card-d">Dodawaj i usuwaj marki. Zmiany od razu widać w formularzu produktu, imporcie i na stronie.</p>
+
+        <form className="gap-2" onSubmit={addBrand} style={{ marginBottom: 16 }}>
+          <input value={newBrand} onChange={e => setNewBrand(e.target.value)} placeholder="Nazwa marki, np. Mapei"
+            style={{ flex: 1, padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }} />
+          <button type="submit" className="btn btn-flame" disabled={busy === 'brand-add' || !newBrand.trim()}>
+            {busy === 'brand-add' ? <span className="spinner"/> : <IPlus s={16}/>} Dodaj markę
+          </button>
+        </form>
+
+        <div className="chip-list">
+          {brands.map(b => (
+            <span key={b} className="chip-item">
+              {b}
+              <button className="chip-x" onClick={() => delBrand(b)} disabled={busy === 'brand-' + b} title="Usuń">
+                {busy === 'brand-' + b ? <span className="spinner"/> : <IX s={14}/>}
+              </button>
+            </span>
+          ))}
+          {brands.length === 0 && <span className="muted">Brak marek.</span>}
+        </div>
+      </div>
+
+      <div className="adm-card">
+        <h2 className="adm-card-h">Kategorie ({categories.length})</h2>
+        <p className="adm-card-d">Dodawaj i usuwaj kategorie. Identyfikator (do bazy i filtrów) tworzy się automatycznie z nazwy.</p>
+
+        <form className="gap-2" onSubmit={addCat} style={{ marginBottom: 16, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1 }}>
+            <input value={newCat} onChange={e => setNewCat(e.target.value)} placeholder="Nazwa kategorii, np. Taśmy"
+              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }} />
+            {newCat.trim() && <p className="muted" style={{ marginTop: 6 }}>id: <span className="mono">{newCatId || '(nieprawidłowe)'}</span></p>}
+          </div>
+          <button type="submit" className="btn btn-flame" disabled={busy === 'cat-add' || !newCat.trim()}>
+            {busy === 'cat-add' ? <span className="spinner"/> : <IPlus s={16}/>} Dodaj kategorię
+          </button>
+        </form>
+
+        <div className="tbl-wrap" style={{ marginTop: 0 }}>
+          <table className="tbl">
+            <thead><tr><th>Nazwa</th><th>id</th><th></th></tr></thead>
+            <tbody>
+              {categories.map(c => (
+                <tr key={c.id}>
+                  <td>{c.label}</td>
+                  <td className="mono">{c.id}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button className="btn-icon" onClick={() => delCat(c)} disabled={busy === 'cat-' + c.id} title="Usuń">
+                      {busy === 'cat-' + c.id ? <span className="spinner"/> : <ITrash s={18}/>}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {categories.length === 0 && <tr><td colSpan="3" style={{ textAlign: 'center', padding: 30, color: 'var(--ash)' }}>Brak kategorii.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -1099,6 +1237,19 @@ function App() {
   const [authed, setAuthed] = useState(!!getSecret());
   const [tab, setTab] = useState('list');
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Marki i kategorie z bazy (fallback do domyślnych, gdy brak migracji / błąd)
+  const [brands, setBrands] = useState(DEFAULT_BRANDS);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+
+  async function loadConfig() {
+    try {
+      const [b, c] = await Promise.all([apiBrands(), apiCategories()]);
+      if (Array.isArray(b) && b.length) setBrands(b);
+      if (Array.isArray(c) && c.length) setCategories(c);
+    } catch (e) { /* zostają wartości domyślne */ }
+  }
+  useEffect(() => { if (authed) loadConfig(); }, [authed]);
 
   function logout() {
     if (!confirm('Wylogować się? Token zostanie usunięty z przeglądarki.')) return;
@@ -1135,11 +1286,15 @@ function App() {
         <button className={'adm-tab' + (tab === 'import' ? ' active' : '')} onClick={() => setTab('import')}>
           <IUpload s={16}/> Import CSV
         </button>
+        <button className={'adm-tab' + (tab === 'settings' ? ' active' : '')} onClick={() => setTab('settings')}>
+          <ISettings s={16}/> Ustawienia
+        </button>
       </nav>
 
       <main className="adm-main">
-        {tab === 'list' && <ProductList refreshTrigger={refreshKey}/>}
-        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)}/>}
+        {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories}/>}
+        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories}/>}
+        {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig}/>}
       </main>
     </>
   );
