@@ -230,7 +230,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
 .lcard:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
 .lcard-img { position: relative; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; padding: 16px; min-height: 0; overflow: hidden; border-bottom: 1px solid var(--line); }
-.lcard-photo { width: 100%; height: 100%; object-fit: contain; object-position: center; filter: drop-shadow(0 8px 18px rgba(14,21,51,.18)); }
+.lcard-photo { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .lcard-imgtag { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: currentColor; opacity: .55; }
 .lcard-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .lcard-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--flame); font-weight: 600; }
@@ -297,7 +297,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .pcard { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
 .pcard:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
 .pcard-img { position: relative; aspect-ratio: 16/11; display: flex; align-items: center; justify-content: center; padding: 14px; min-height: 0; overflow: hidden; border-bottom: 1px solid var(--line); }
-.pcard-photo { width: 100%; height: 100%; object-fit: contain; object-position: center; filter: drop-shadow(0 6px 14px rgba(14,21,51,.18)); }
+.pcard-photo { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .pcard-imgtag { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: currentColor; opacity: .55; }
 .pbadge { position: absolute; top: 12px; left: 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 5px 9px; border-radius: var(--r-full); color: #fff; }
 .role-magnet { background: var(--flame); }
