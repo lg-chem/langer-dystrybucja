@@ -899,6 +899,38 @@ function Categories({ onPick }) {
   );
 }
 
+/* Pojedyncza karta w karuzeli Langer (własny stan koloru tła kafla) */
+function LangerCard({ p }) {
+  const cat = CATEGORIES.find(c => c.id === p.category);
+  const [tint, fg] = CAT_TINT[p.category] || ['#eee', '#333'];
+  const role = ROLE_LABEL[p.role];
+  const src = p.image || p.image_url;
+  const [imgBg, setImgBg] = useState(null);
+  return (
+    <article className="lcard">
+      <div className="lcard-img" style={{ background: src ? (imgBg || 'var(--white)') : tint, color: fg }}>
+        {src
+          ? <ProductImage src={src} alt={p.name} className="lcard-photo" onBg={setImgBg} />
+          : (<>{cat && <CatIcon name={cat.icon} size={72} />}<span className="lcard-imgtag">Zdjęcie wkrótce</span></>)
+        }
+        {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
+      </div>
+      <div className="lcard-body">
+        <div className="lcard-brand">Langer · {cat ? cat.label : ''}</div>
+        <h3 className="lcard-name">{p.name}</h3>
+        <div className="lcard-variant">{p.variant}</div>
+        <div className="lcard-tags">
+          {(p.tags || []).map(t => <span className="ptag" key={t}>{t}</span>)}
+        </div>
+        <div className="lcard-foot">
+          <div className="lcard-pack">{p.pack}</div>
+          <a href="#kontakt" className="pcard-ask">Zapytaj o cenę <IArrow s={16}/></a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 /* ===== LANGER SHOWCASE (karuzela marki własnej) ===== */
 function LangerShowcase({ products }) {
   const trackRef = useRef(null);
@@ -956,34 +988,7 @@ function LangerShowcase({ products }) {
           </button>
 
           <div className="lcar-track" ref={trackRef}>
-            {items.map(p => {
-              const cat = CATEGORIES.find(c => c.id === p.category);
-              const [tint, fg] = CAT_TINT[p.category] || ['#eee', '#333'];
-              const role = ROLE_LABEL[p.role];
-              return (
-                <article className="lcard" key={p.sku}>
-                  <div className="lcard-img" style={{ background: (p.image || p.image_url) ? 'var(--white)' : tint, color: fg }}>
-                    {(p.image || p.image_url)
-                      ? <img src={p.image || p.image_url} alt={p.name} className="lcard-photo" loading="lazy" />
-                      : (<>{cat && <CatIcon name={cat.icon} size={72} />}<span className="lcard-imgtag">Zdjęcie wkrótce</span></>)
-                    }
-                    {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
-                  </div>
-                  <div className="lcard-body">
-                    <div className="lcard-brand">Langer · {cat ? cat.label : ''}</div>
-                    <h3 className="lcard-name">{p.name}</h3>
-                    <div className="lcard-variant">{p.variant}</div>
-                    <div className="lcard-tags">
-                      {(p.tags || []).map(t => <span className="ptag" key={t}>{t}</span>)}
-                    </div>
-                    <div className="lcard-foot">
-                      <div className="lcard-pack">{p.pack}</div>
-                      <a href="#kontakt" className="pcard-ask">Zapytaj o cenę <IArrow s={16}/></a>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            {items.map(p => <LangerCard key={p.sku} p={p} />)}
           </div>
 
           <button className={'lcar-nav lcar-next' + (canNext ? '' : ' disabled')}
@@ -1092,15 +1097,56 @@ const CAT_TINT = {
   akcesoria: ['#E4E7EA', 'var(--navy)'],
 };
 
+/* Zdjęcie produktu z próbkowaniem koloru tła (rogi obrazka -> tło kafla).
+   Gdy host nie wysyła nagłówków CORS, canvas jest "tainted" i próbkowanie
+   się nie uda — wtedy onBg(null) i kafel zostaje biały (bez regresji). */
+function ProductImage({ src, alt, className, onBg }) {
+  const [cors, setCors] = useState(true);
+
+  function sample(img) {
+    try {
+      const c = document.createElement('canvas');
+      const w = c.width = 16, h = c.height = 16;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const corners = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]];
+      let r = 0, g = 0, b = 0, n = 0;
+      for (const [x, y] of corners) {
+        const d = ctx.getImageData(x, y, 1, 1).data;
+        if (d[3] < 200) continue;             // róg przezroczysty -> pomiń
+        r += d[0]; g += d[1]; b += d[2]; n++;
+      }
+      onBg(n ? `rgb(${Math.round(r / n)},${Math.round(g / n)},${Math.round(b / n)})` : null);
+    } catch (e) {
+      onBg(null);                              // CORS taint -> biały kafel
+    }
+  }
+
+  return (
+    <img
+      key={cors ? 'c' : 'p'}
+      src={src}
+      alt={alt}
+      className={className}
+      loading="lazy"
+      crossOrigin={cors ? 'anonymous' : undefined}
+      onLoad={e => sample(e.target)}
+      onError={e => { if (cors) { setCors(false); onBg(null); } else { e.target.style.visibility = 'hidden'; } }}
+    />
+  );
+}
+
 function ProductTile({ p }) {
   const cat = CATEGORIES.find(c => c.id === p.category);
   const [tint, fg] = CAT_TINT[p.category] || ['#eee','#333'];
   const role = ROLE_LABEL[p.role];
+  const src = p.image || p.image_url;
+  const [imgBg, setImgBg] = useState(null);
   return (
     <article className="pcard">
-      <div className="pcard-img" style={{ background: (p.image || p.image_url) ? 'var(--white)' : tint, color: fg }}>
-        {(p.image || p.image_url)
-          ? <img src={p.image || p.image_url} alt={p.name} className="pcard-photo" loading="lazy" />
+      <div className="pcard-img" style={{ background: src ? (imgBg || 'var(--white)') : tint, color: fg }}>
+        {src
+          ? <ProductImage src={src} alt={p.name} className="pcard-photo" onBg={setImgBg} />
           : (<><CatIcon name={cat ? cat.icon : ''} size={64} /><span className="pcard-imgtag">Zdjęcie wkrótce</span></>)
         }
         {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
