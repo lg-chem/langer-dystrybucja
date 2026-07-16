@@ -120,6 +120,15 @@ table.tbl input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(
 .chip-x { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; color: var(--ash); }
 .chip-x:hover:not(:disabled) { background: var(--red-tint); color: var(--red); }
 .chip-x:disabled { opacity: .6; cursor: not-allowed; }
+.bulk-bar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--navy); color: #fff; border-radius: var(--r-md); padding: 12px 16px; margin-bottom: 14px; }
+.bulk-count { font-size: 14px; }
+.bulk-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bulk-lbl { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: rgba(255,255,255,.6); }
+.bulk-sel { padding: 7px 10px; border: 1.5px solid rgba(255,255,255,.2); border-radius: var(--r-sm); font-size: 14px; background: var(--navy-800); color: #fff; }
+.bulk-sel:focus { outline: none; border-color: var(--flame); }
+.bulk-bar .btn-ghost { background: transparent; color: #fff; }
+.bulk-bar .linkish { color: #fff; }
+table.tbl tr.row-sel td { background: var(--flame-tint); }
 
 .p-img { width: 40px; height: 40px; border-radius: var(--r-sm); background: var(--light); object-fit: cover; }
 
@@ -1013,6 +1022,8 @@ function ProductList({ refreshTrigger, brands, categories }) {
   const [busy, setBusy] = useState(null);
   const [editing, setEditing] = useState(null);
   const [adding, setAdding] = useState(false);
+  const [sel, setSel] = useState(new Set());               // zaznaczone SKU (edycja zbiorcza)
+  const [bulk, setBulk] = useState(null);                  // { done, total } trwającej operacji
 
   async function reload() {
     setLoading(true); setErr('');
@@ -1031,6 +1042,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
     try {
       await apiDelete(p.sku);
       setProducts(products.filter(x => x.sku !== p.sku));
+      setSel(s => { const n = new Set(s); n.delete(p.sku); return n; });
     } catch (e) {
       alert('Błąd: ' + e.message);
     } finally {
@@ -1045,6 +1057,70 @@ function ProductList({ refreshTrigger, brands, categories }) {
       (p.sku + ' ' + p.name + ' ' + p.brand + ' ' + p.category).toLowerCase().includes(term)
     );
   }, [products, q]);
+
+  // --- edycja zbiorcza ---
+  const selProducts = useMemo(() => products.filter(p => sel.has(p.sku)), [products, sel]);
+  const allFilteredSelected = filtered.length > 0 && filtered.every(p => sel.has(p.sku));
+
+  function toggleSel(sku) {
+    setSel(s => { const n = new Set(s); n.has(sku) ? n.delete(sku) : n.add(sku); return n; });
+  }
+  function toggleSelAll() {
+    setSel(allFilteredSelected ? new Set() : new Set(filtered.map(p => p.sku)));
+  }
+
+  // Ciało do PUT. Marka/kategoria idą jako null => COALESCE zachowa obecne;
+  // nadpisujemy tylko pole z `patch`. Pozostałe (variant/pack/tags/image_url)
+  // ustawiane są wprost, więc wysyłamy ich realne wartości, by nic nie wyczyścić.
+  function fullBody(p, patch) {
+    return {
+      name: p.name,
+      brand: null,
+      category: null,
+      variant: p.variant ?? null,
+      pack: p.pack ?? null,
+      role: p.role || null,
+      tags: Array.isArray(p.tags) ? p.tags : parseTags(p.tags),
+      image_url: p.image_url ?? null,
+      ...patch,
+    };
+  }
+
+  async function applyBulk(field, value) {
+    const targets = selProducts;
+    if (!targets.length) return;
+    const label = field === 'brand'
+      ? (value ? `markę „${value}"` : 'pustą markę')
+      : (value ? `kategorię „${value}"` : 'pustą kategorię');
+    if (!confirm(`Ustawić ${label} dla ${targets.length} zaznaczonych produktów?`)) return;
+    setBulk({ done: 0, total: targets.length });
+    let done = 0, failed = 0;
+    for (const p of targets) {
+      try { await apiUpdate(p.sku, fullBody(p, { [field]: value })); }
+      catch (e) { failed++; }
+      setBulk({ done: ++done, total: targets.length });
+    }
+    setBulk(null);
+    if (failed) alert(`Zaktualizowano ${done - failed}/${done}. Błędów: ${failed}.`);
+    await reload();
+  }
+
+  async function bulkDelete() {
+    const targets = selProducts;
+    if (!targets.length) return;
+    if (!confirm(`Usunąć ${targets.length} zaznaczonych produktów?\nTo akcja nieodwracalna.`)) return;
+    setBulk({ done: 0, total: targets.length });
+    let done = 0, failed = 0;
+    for (const p of targets) {
+      try { await apiDelete(p.sku); }
+      catch (e) { failed++; }
+      setBulk({ done: ++done, total: targets.length });
+    }
+    setBulk(null);
+    setSel(new Set());
+    if (failed) alert(`Usunięto ${done - failed}/${done}. Błędów: ${failed}.`);
+    await reload();
+  }
 
   return (
     <div className="adm-card">
@@ -1072,17 +1148,49 @@ function ProductList({ refreshTrigger, brands, categories }) {
         style={{ width: '100%', padding: '10px 14px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15, marginBottom: 14 }}
       />
 
+      {sel.size > 0 && (
+        <div className="bulk-bar">
+          <div className="bulk-count">Zaznaczono <strong>{sel.size}</strong></div>
+          {bulk ? (
+            <div className="bulk-actions"><span className="spinner"/> Przetwarzam {bulk.done}/{bulk.total}...</div>
+          ) : (
+            <div className="bulk-actions">
+              <label className="bulk-lbl">Marka:</label>
+              <select className="bulk-sel" value="__" onChange={e => { if (e.target.value !== '__') applyBulk('brand', e.target.value === '__clear' ? '' : e.target.value); }}>
+                <option value="__">— ustaw —</option>
+                {brands.map(b => <option key={b} value={b}>{b}</option>)}
+                <option value="__clear">(wyczyść markę)</option>
+              </select>
+              <label className="bulk-lbl">Kategoria:</label>
+              <select className="bulk-sel" value="__" onChange={e => { if (e.target.value !== '__') applyBulk('category', e.target.value === '__clear' ? '' : e.target.value); }}>
+                <option value="__">— ustaw —</option>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                <option value="__clear">(wyczyść kategorię)</option>
+              </select>
+              <button className="btn btn-ghost" onClick={bulkDelete} style={{ color: 'var(--red)', borderColor: 'var(--red-tint)' }}>
+                <ITrash s={16}/> Usuń ({sel.size})
+              </button>
+              <button className="linkish" onClick={() => setSel(new Set())}>Wyczyść zaznaczenie</button>
+            </div>
+          )}
+        </div>
+      )}
+
       {loading ? (
         <p className="muted">Pobieram dane z Neon...</p>
       ) : (
         <div className="tbl-wrap">
           <table className="tbl">
             <thead>
-              <tr><th></th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th></th></tr>
+              <tr>
+                <th className="chkcell"><input type="checkbox" checked={allFilteredSelected} onChange={toggleSelAll} title="Zaznacz wszystkie" /></th>
+                <th></th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th></th>
+              </tr>
             </thead>
             <tbody>
               {filtered.map(p => (
-                <tr key={p.sku}>
+                <tr key={p.sku} className={sel.has(p.sku) ? 'row-sel' : ''}>
+                  <td className="chkcell"><input type="checkbox" checked={sel.has(p.sku)} onChange={() => toggleSel(p.sku)} /></td>
                   <td>
                     {p.image_url
                       ? <img src={p.image_url} alt="" className="p-img" onError={e => e.target.style.display = 'none'} />
@@ -1090,8 +1198,8 @@ function ProductList({ refreshTrigger, brands, categories }) {
                   </td>
                   <td className="mono">{p.sku}</td>
                   <td>{p.name}</td>
-                  <td>{p.brand}</td>
-                  <td>{p.category}</td>
+                  <td>{p.brand || <span className="muted">—</span>}</td>
+                  <td>{p.category || <span className="muted">—</span>}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div className="gap-2" style={{ justifyContent: 'flex-end' }}>
                       <button className="btn-icon" onClick={() => setEditing(p)} title="Edytuj" style={{ color: 'var(--cobalt)' }}>
@@ -1105,7 +1213,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan="6" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
+                <tr><td colSpan="7" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
                   {q ? 'Brak wyników wyszukiwania' : 'Brak produktów'}
                 </td></tr>
               )}

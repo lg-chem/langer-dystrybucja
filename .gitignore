@@ -3,3 +3,4 @@ data/products.json
 
 # Zależności npm (serverless functions) — nie commitujemy
 node_modules/
+package-lock.json
