@@ -974,7 +974,7 @@ function LangerShowcase({ products }) {
                     <h3 className="lcard-name">{p.name}</h3>
                     <div className="lcard-variant">{p.variant}</div>
                     <div className="lcard-tags">
-                      {p.tags.map(t => <span className="ptag" key={t}>{t}</span>)}
+                      {(p.tags || []).map(t => <span className="ptag" key={t}>{t}</span>)}
                     </div>
                     <div className="lcard-foot">
                       <div className="lcard-pack">{p.pack}</div>
@@ -1101,7 +1101,7 @@ function ProductTile({ p }) {
       <div className="pcard-img" style={{ background: tint, color: fg }}>
         {(p.image || p.image_url)
           ? <img src={p.image || p.image_url} alt={p.name} className="pcard-photo" loading="lazy" />
-          : (<><CatIcon name={cat.icon} size={64} /><span className="pcard-imgtag">Zdjęcie wkrótce</span></>)
+          : (<><CatIcon name={cat ? cat.icon : ''} size={64} /><span className="pcard-imgtag">Zdjęcie wkrótce</span></>)
         }
         {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
       </div>
@@ -1110,7 +1110,7 @@ function ProductTile({ p }) {
         <h3 className="pcard-name">{p.name}</h3>
         <div className="pcard-variant">{p.variant}</div>
         <div className="pcard-tags">
-          {p.tags.map(t => <span className="ptag" key={t}>{t}</span>)}
+          {(p.tags || []).map(t => <span className="ptag" key={t}>{t}</span>)}
         </div>
         <div className="pcard-foot">
           <div>
@@ -1139,13 +1139,13 @@ function ProductDatabase({ products, initialCatRef }) {
       if (cat !== 'all' && p.category !== cat) return false;
       if (brand !== 'all' && p.brand !== brand) return false;
       if (q.trim()) {
-        const s = (p.name + ' ' + p.brand + ' ' + p.sku + ' ' + p.variant + ' ' + p.tags.join(' ')).toLowerCase();
+        const s = [p.name, p.brand, p.sku, p.variant, (p.tags || []).join(' ')].filter(Boolean).join(' ').toLowerCase();
         if (!s.includes(q.trim().toLowerCase())) return false;
       }
       return true;
     });
-    if (sort === 'name') r = [...r].sort((a,b) => a.name.localeCompare(b.name,'pl'));
-    if (sort === 'brand') r = [...r].sort((a,b) => a.brand.localeCompare(b.brand,'pl') || a.name.localeCompare(b.name,'pl'));
+    if (sort === 'name') r = [...r].sort((a,b) => (a.name || '').localeCompare(b.name || '','pl'));
+    if (sort === 'brand') r = [...r].sort((a,b) => (a.brand || '').localeCompare(b.brand || '','pl') || (a.name || '').localeCompare(b.name || '','pl'));
     return r;
   }, [q, cat, brand, sort, products]);
 
