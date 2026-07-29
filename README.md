@@ -13,6 +13,7 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML — b
 - [Edycja danych kontaktowych](#edycja-danych-kontaktowych)
 - [Dodawanie nowych produktów](#dodawanie-nowych-produktów)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
+- [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
 - [Wdrożenie na Vercel](#wdrożenie)
 - [Struktura plików](#struktura-plików)
 
@@ -112,6 +113,53 @@ Zmień liczby i opisy zgodnie ze swoją rzeczywistością.
 
 ---
 
+## Podstrona dla punktów handlowych
+
+**Adres:** `/dla-punktow/` · **Plik:** `dla-punktow/index.html`
+
+Osobny landing sprzedażowy skierowany do sklepów i hurtowni. Sedno oferty:
+*postaw Langera na półce, a pozostałe marki kupisz taniej.* Podstrona jest
+podlinkowana w nawigacji i stopce strony głównej.
+
+Powstała z projektu z Claude Design (wariant „1b" na desktopie, „1c" na
+telefonie), przepisanego na ten sam stack co reszta serwisu — React 18 z CDN,
+bez build'a — i na tokeny kolorów z `index.html`.
+
+### Co zmienisz z panelu
+
+Liczby w ofercie **nie są zaszyte w kodzie**. Wchodzisz na `/admin-langer/` →
+zakładka **Ustawienia** → karta **Oferta dla punktów handlowych** i zmieniasz:
+
+| Pole | Gdzie się pokazuje |
+|---|---|
+| Kartonów Langera | Nagłówek, kafel „Warunek", sekcja „Dlaczego warto" |
+| Rabat na inne marki (%) | Nagłówek, kafel „Twoja korzyść", sekcja „Dlaczego warto" |
+| Pistolet — próg (kartonów) | Kafel „Gratis", niebieski pasek, pasek na telefonie |
+| Pistolet — cena (zł) | Kafel „Gratis", niebieski pasek, pasek na telefonie |
+| Telefon na podstronie | Sekcja kontakt i przycisk „Zadzwoń" |
+
+Zapisane wartości trafiają do bazy (tabela `settings`) i podstrona pobiera je
+z `/api/settings` przy każdym wejściu. **Wymaga uruchomienia migracji
+`migrations/004_settings_table.sql`** — do tego czasu (albo gdy API nie
+odpowie) strona pokazuje wartości domyślne: 10 kartonów, 15%, pistolet za 1 zł
+do 5 kartonów.
+
+### Co zmienisz w kodzie
+
+Opisy produktów, parametry techniczne i zastosowania siedzą w stałej
+`PRODUCTS` w `dla-punktow/index.html` — to osobny zestaw od bazy produktów na
+stronie głównej, bo tutaj liczą się parametry techniczne, a nie SKU i jednostka
+sprzedaży. Zdjęcia leżą w `dla-punktow/assets/`.
+
+### Czego jeszcze nie ma
+
+- **Formularz nie wysyła danych** — tak jak na stronie głównej jest to wersja
+  demonstracyjna. Podpięcie wysyłki wymaga osobnego endpointu.
+- **Przycisk „Pobierz ulotkę PDF"** z projektu nie został przeniesiony — ulotka
+  nie leży w repo. Gdy wrzucisz plik, dopnie się w minutę.
+
+---
+
 ## Wdrożenie
 
 ### Vercel (zalecane, darmowe)
@@ -132,8 +180,18 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 
 ```
 .
-├── index.html              # ⭐ JEDYNY plik potrzebny do działania strony
+├── index.html              # ⭐ Strona główna
 ├── README.md               # Ten plik
+├── dla-punktow/            # Landing dla punktów handlowych (/dla-punktow/)
+│   ├── index.html          # Cała podstrona w jednym pliku
+│   └── assets/             # Zdjęcia produktów linii Langer (7 szt.)
+├── admin-langer/           # Panel admina (/admin-langer/)
+├── api/                    # Funkcje serverless Vercela (Neon DB)
+│   ├── products.js         # Lista i zapis produktów
+│   ├── brands.js           # Marki
+│   ├── categories.js       # Kategorie
+│   └── settings.js         # Parametry oferty dla /dla-punktow/
+├── migrations/             # Migracje SQL — uruchamiane ręcznie w Neon
 └── project/                # Archiwum — oryginalne pliki źródłowe (rozbite)
     ├── brand.css           # Tokeny kolorów, fonty, spacing
     ├── site.css            # Style sekcji i komponentów

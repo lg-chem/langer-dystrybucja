@@ -676,7 +676,7 @@ function Header() {
     on(); window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
   }, []);
-  const links = [['#proces','Proces'],['#oferta','Oferta'],['#baza','Baza produktów'],['#dlaczego','Dlaczego my'],['#kontakt','Kontakt']];
+  const links = [['#proces','Proces'],['#oferta','Oferta'],['#baza','Baza produktów'],['/dla-punktow/','Dla punktów'],['#dlaczego','Dlaczego my'],['#kontakt','Kontakt']];
   return (
     <header className={'hdr' + (scrolled ? ' hdr-solid' : '')}>
       <div className="wrap hdr-in">
@@ -1066,7 +1066,7 @@ function Footer() {
         <div className="footer-cols">
           <div className="footer-col">
             <div className="footer-h">Nawigacja</div>
-            <a href="#proces">Proces</a><a href="#oferta">Oferta</a><a href="#baza">Baza produktów</a><a href="#dlaczego">Dlaczego my</a><a href="#kontakt">Kontakt</a>
+            <a href="#proces">Proces</a><a href="#oferta">Oferta</a><a href="#baza">Baza produktów</a><a href="/dla-punktow/">Dla punktów handlowych</a><a href="#dlaczego">Dlaczego my</a><a href="#kontakt">Kontakt</a>
           </div>
           <div className="footer-col">
             <div className="footer-h">Oferta</div>

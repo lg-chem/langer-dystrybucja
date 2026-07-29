@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Langer na półce — oferta dla punktów handlowych | Langer Dystrybucja</title>
+  <meta name="description" content="Postaw Langera na półce i kupuj pozostałe marki taniej. Piany, pianokleje i kleje montażowe Langer plus rabat na resztę zamówienia, wsparcie marketingowe i zwroty bez ryzyka." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+/* ===== BRAND TOKENS — te same co w index.html ===== */
+:root {
+  --flame:        #F04E23;
+  --flame-600:    #D63F18;
+  --flame-700:    #B63411;
+  --flame-tint:   #FBE7DF;
+  --flame-glow:   #FF6A3D;
+  --cobalt:       #1E3FB5;
+  --cobalt-600:   #182F95;
+  --cobalt-tint:  #E5E9F8;
+  --navy:         #0E1533;
+  --navy-800:     #161E45;
+  --navy-700:     #232C5E;
+  --navy-900:     #080C22;
+  --ash:          #8B9199;
+  --ash-700:      #565D67;
+  --light:        #EEF0F3;
+  --paper:        #F6F7F9;
+  --white:        #FFFFFF;
+  --line:         #E2E5EA;
+  --line-2:       #CFD4DC;
+  --font-display: 'Space Grotesk', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-text:    'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r-sm:6px; --r-md:10px; --r-lg:16px; --r-xl:24px; --r-full:999px;
+  --e1: 0 1px 2px rgb(14 21 51 / 0.06), 0 1px 1px rgb(14 21 51 / 0.04);
+  --e2: 0 18px 48px -16px rgb(14 21 51 / 0.22), 0 6px 16px -8px rgb(14 21 51 / 0.10);
+  --header-h: 76px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 16px); }
+body {
+  margin: 0; background: var(--white); color: var(--navy);
+  font-family: var(--font-text); font-size: 17px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button, input, textarea { font: inherit; color: inherit; }
+
+.wrap { width: min(1240px, 100% - 96px); margin-inline: auto; }
+@media (max-width: 760px) { .wrap { width: min(1240px, 100% - 40px); } }
+
+.eyebrow {
+  display: inline-block; font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--flame);
+}
+.h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; margin: 0; }
+.h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; margin: 0; font-size: clamp(28px, 3.4vw, 42px); }
+.lead { font-size: 18px; line-height: 1.55; color: var(--ash-700); margin: 0; text-wrap: pretty; }
+.lead-dark { color: rgba(255,255,255,.72); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-text); font-size: 16px; font-weight: 700; cursor: pointer;
+  border: none; padding: 15px 26px; border-radius: var(--r-sm);
+  transition: transform .12s, background .15s, box-shadow .15s, color .15s, border-color .15s;
+}
+.btn-flame { background: var(--flame); color: #fff; }
+.btn-flame:hover { background: var(--flame-600); transform: translateY(-2px); }
+.btn-flame:active { background: var(--flame-700); transform: translateY(0); }
+.btn-dark { background: var(--navy); color: #fff; }
+.btn-dark:hover { background: var(--navy-800); transform: translateY(-2px); }
+.btn-light { background: #fff; color: var(--navy); }
+.btn-light:hover { transform: translateY(-2px); box-shadow: var(--e2); }
+.btn-outline { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,.28); }
+.btn-outline:hover { border-color: #fff; background: rgba(255,255,255,.06); }
+
+/* ===== HEADER ===== */
+.hdr {
+  position: sticky; top: 0; z-index: 60; background: rgba(255,255,255,.92);
+  backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
+}
+.hdr-in { display: flex; align-items: center; gap: var(--s6); height: var(--header-h); }
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--navy); }
+.logo-words { display: flex; flex-direction: column; line-height: 1; }
+.logo-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.logo-sub { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.22em; color: var(--ash-700); margin-top: 3px; }
+.hdr-nav { display: flex; gap: var(--s5); margin-left: auto; }
+.hdr-link { font-size: 15px; font-weight: 600; color: var(--ash-700); transition: color .15s; }
+.hdr-link:hover { color: var(--navy); }
+.hdr-back { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); }
+.hdr-back:hover { color: var(--flame); }
+/* Poniżej 980 px chowamy linki, ale CTA zostaje — bez niego nagłówek
+   na telefonie byłby samym logo i nie prowadziłby nigdzie. */
+@media (max-width: 980px) {
+  .hdr-nav { display: none; }
+  .hdr-in { justify-content: space-between; }
+  .hdr-cta { margin-left: auto; }
+}
+@media (max-width: 420px) { .logo-sub { display: none; } }
+
+/* ===== HERO ===== */
+.hero { padding: var(--s9) 0 var(--s8); text-align: center; border-bottom: 1px solid var(--line); }
+.hero-in { display: flex; flex-direction: column; align-items: center; gap: var(--s5); }
+.hero h1 { font-size: clamp(38px, 6vw, 74px); max-width: 15ch; text-wrap: balance; }
+.hero .lead { max-width: 62ch; font-size: 19px; }
+.hero-cta { display: flex; gap: var(--s3); flex-wrap: wrap; justify-content: center; padding-top: var(--s2); }
+@media (max-width: 560px) { .hero-cta { width: 100%; flex-direction: column; } .hero-cta .btn { width: 100%; } }
+
+/* trzy kafle: warunek → korzyść → gratis */
+.deal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 100%; max-width: 980px; margin-top: var(--s5); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--e2); }
+.deal-cell { padding: 28px 32px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+.deal-k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; }
+.deal-v { font-family: var(--font-display); font-size: clamp(24px, 2.6vw, 32px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.deal-d { font-size: 14.5px; line-height: 1.45; }
+.deal-1 { background: var(--light); color: var(--navy); }
+.deal-1 .deal-k { color: var(--ash); } .deal-1 .deal-d { color: var(--ash-700); }
+.deal-2 { background: var(--flame); color: #fff; }
+.deal-2 .deal-k { color: var(--flame-tint); } .deal-2 .deal-d { color: rgba(255,255,255,.85); }
+.deal-3 { background: var(--cobalt); color: #fff; }
+.deal-3 .deal-k { color: var(--cobalt-tint); } .deal-3 .deal-d { color: rgba(255,255,255,.85); }
+@media (max-width: 860px) { .deal { grid-template-columns: 1fr; } .deal-cell { padding: 20px 22px; } }
+
+/* ===== SEKCJE ===== */
+.sec { padding: var(--s9) 0; }
+.sec-paper { background: var(--paper); }
+.sec-dark { background: var(--navy); color: #fff; }
+.sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s6); margin-bottom: var(--s7); }
+.sec-head-l { display: flex; flex-direction: column; gap: var(--s3); }
+@media (max-width: 760px) { .sec { padding: var(--s8) 0; } .sec-head { flex-direction: column; align-items: flex-start; margin-bottom: var(--s6); } }
+
+/* ===== SLIDER PRODUKTÓW (desktop) ===== */
+.slider-nav { display: flex; gap: var(--s2); }
+.snav {
+  width: 52px; height: 52px; border-radius: 50%; background: var(--white); color: var(--navy);
+  border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--e1); transition: background .15s, color .15s, border-color .15s, transform .15s;
+}
+.snav:hover { background: var(--flame); color: #fff; border-color: var(--flame); transform: translateY(-2px); }
+
+.pshow { display: grid; grid-template-columns: 0.85fr 1.15fr; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--e1); }
+.pshow-img { position: relative; background: var(--navy); display: flex; align-items: center; justify-content: center; padding: var(--s7); min-height: 520px; }
+.pshow-img img { height: 420px; max-height: 46vh; width: auto; object-fit: contain; filter: drop-shadow(0 24px 40px rgb(0 0 0 / .45)); }
+.pshow-badge { position: absolute; top: 24px; left: 24px; background: var(--flame); color: #fff; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; padding: 8px 14px; border-radius: var(--r-sm); }
+.pshow-count { position: absolute; bottom: 24px; right: 24px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; color: rgba(255,255,255,.55); }
+.pshow-body { padding: var(--s7); display: flex; flex-direction: column; gap: var(--s5); }
+.pshow-cat { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--ash); }
+.pshow-name { font-family: var(--font-display); font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin: 0; }
+.pshow-sub { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--flame); margin-top: 8px; }
+.pshow-desc { font-size: 16.5px; line-height: 1.55; color: var(--ash-700); max-width: 60ch; text-wrap: pretty; margin: 0; }
+
+.specs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.spec { background: var(--white); padding: 16px 14px; display: flex; flex-direction: column; gap: 5px; }
+.spec-k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ash); }
+.spec-v { font-size: 19px; font-weight: 700; color: var(--navy); line-height: 1.15; }
+@media (max-width: 1080px) { .specs { grid-template-columns: repeat(2, 1fr); } }
+
+.uses { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.use { border: 1px solid var(--line-2); border-radius: var(--r-full); color: var(--navy); font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 8px 14px; }
+
+.thumbs { display: flex; gap: var(--s2); margin-top: auto; padding-top: var(--s4); border-top: 1px solid var(--line); flex-wrap: wrap; }
+.thumb { width: 70px; height: 84px; border: 1.5px solid var(--line); border-radius: var(--r-sm); background: var(--paper); display: flex; align-items: center; justify-content: center; padding: 7px; cursor: pointer; transition: border-color .15s, opacity .15s, transform .15s; opacity: .55; }
+.thumb:hover { opacity: .85; transform: translateY(-2px); }
+.thumb.on { border-color: var(--flame); opacity: 1; }
+.thumb img { height: 100%; width: auto; object-fit: contain; }
+
+/* ===== KARUZELA PRODUKTÓW (mobile) ===== */
+.pscroll { display: flex; gap: var(--s3); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: var(--s3); margin-inline: calc(-1 * var(--s4)); padding-inline: var(--s4); }
+.pcard { flex: 0 0 254px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; scroll-snap-align: start; display: flex; flex-direction: column; }
+.pcard-img { position: relative; height: 210px; background: var(--light); display: flex; align-items: center; justify-content: center; padding: var(--s4); }
+.pcard-img img { height: 100%; width: auto; object-fit: contain; }
+.pcard-badge { position: absolute; top: 10px; left: 10px; background: var(--flame); color: #fff; font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: 6px 10px; border-radius: var(--r-sm); }
+.pcard-body { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); flex: 1; }
+.pcard-name { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
+.pcard-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-top: var(--s3); border-top: 1px solid var(--line); }
+.pscroll-hint { font-size: 13.5px; color: var(--ash); }
+
+/* ===== DLACZEGO ===== */
+.why { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s5); }
+.why-card { display: flex; flex-direction: column; gap: 10px; border-top: 3px solid var(--navy); padding-top: 22px; }
+.why-card:first-child { border-top-color: var(--flame); }
+.why-n { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .1em; color: var(--flame); }
+.why-t { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+.why-d { font-size: 15.5px; line-height: 1.5; color: var(--ash-700); margin: 0; }
+@media (max-width: 980px) { .why { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) { .why { grid-template-columns: 1fr; gap: var(--s4); } .why-card { border-top-width: 2px; padding-top: 16px; } }
+
+/* ===== PASEK PISTOLETU ===== */
+.pistol { background: var(--cobalt); color: #fff; }
+.pistol-in { display: flex; align-items: center; justify-content: space-between; gap: var(--s6); padding: var(--s6) 0; }
+.pistol-l { display: flex; align-items: center; gap: var(--s5); }
+.pistol-price { font-family: var(--font-display); font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; flex: none; }
+.pistol-d { font-size: 17px; line-height: 1.4; max-width: 60ch; }
+@media (max-width: 860px) { .pistol-in { flex-direction: column; align-items: flex-start; gap: var(--s4); } }
+
+/* ===== KONTAKT ===== */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s8); align-items: start; }
+@media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; gap: var(--s6); } }
+.contact-phone { font-family: var(--font-display); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
+.contact-phone:hover { color: var(--flame-glow); }
+.form { background: var(--navy-800); border: 1px solid var(--navy-700); border-radius: var(--r-lg); padding: var(--s6); display: flex; flex-direction: column; gap: var(--s4); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
+@media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field span { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
+.field input, .field textarea {
+  font-family: var(--font-text); font-size: 16px; color: #fff; background: var(--navy);
+  border: 1.5px solid var(--navy-700); border-radius: var(--r-sm); padding: 13px 15px;
+  transition: border-color .15s, box-shadow .15s; resize: vertical;
+}
+.field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,.35); }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--flame); box-shadow: 0 0 0 3px rgb(240 78 35 / .18); }
+.form-note { font-size: 12.5px; line-height: 1.5; color: var(--ash); margin: 0; }
+.form-done { background: var(--navy-800); border: 1px solid var(--navy-700); border-radius: var(--r-lg); padding: var(--s8) var(--s6); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--s2); }
+.form-done-ic { width: 64px; height: 64px; border-radius: 50%; background: rgb(240 78 35 / .16); color: var(--flame-glow); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--s2); }
+
+/* ===== STOPKA ===== */
+.footer { background: var(--navy-900); color: rgba(255,255,255,.55); padding: var(--s7) 0; }
+.footer-in { display: flex; align-items: center; justify-content: space-between; gap: var(--s5); flex-wrap: wrap; font-size: 14px; }
+.footer a:hover { color: #fff; }
+
+/* ===== PRZYKLEJONY PASEK (mobile) ===== */
+.sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
+  background: var(--cobalt); color: #fff; padding: 10px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+  box-shadow: 0 -8px 28px rgb(14 21 51 / .28);
+}
+.sticky-cta-t { font-size: 13px; line-height: 1.3; }
+.sticky-pad { height: 68px; }
+@media (min-width: 861px) { .sticky-cta, .sticky-pad { display: none; } }
+
+/* ===== ANIMACJA WEJŚCIA ===== */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2,0,0,1), transform .7s cubic-bezier(.2,0,0,1); }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .btn:hover, .snav:hover, .thumb:hover { transform: none; }
+}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+
+  <script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ============================================================
+   PARAMETRY OFERTY
+   ============================================================
+   Wartości domyślne — identyczne z tymi w api/settings.js. Strona pobiera
+   aktualne z /api/settings; gdy API nie odpowie (brak bazy, podgląd z dysku),
+   zostają poniższe. Zmieniasz je w panelu: /admin-langer/ → Ustawienia →
+   „Oferta dla punktów handlowych". */
+const OFFER_DEFAULTS = {
+  landing_cartons:        '10',
+  landing_discount_pct:   '15',
+  landing_pistol_cartons: '5',
+  landing_pistol_price:   '1',
+  landing_phone:          '+48 000 000 000',
+};
+
+/* ============================================================
+   DANE PRODUKTÓW
+   ============================================================
+   Linia własna Langer — treści i zdjęcia z projektu landingu.
+   To osobny zestaw od bazy produktów na stronie głównej: tutaj liczą się
+   parametry techniczne i zastosowania, a nie SKU i jednostka sprzedaży. */
+const CATS = {
+  piany:      'Piana pistoletowa',
+  wezyk:      'Piana wężykowa',
+  pianokleje: 'Pianoklej',
+  kleje:      'Klej montażowy',
+};
+
+const PRODUCTS = [
+  {
+    id: 'l70', cat: 'piany', name: 'Langer 70', sub: '870 ml · niskoprężna', badge: 'Bestseller',
+    img: 'assets/langer-70.png',
+    desc: 'Profesjonalna piana niskoprężna do precyzyjnego montażu. Stabilna struktura i pełna izolacja termiczno-akustyczna. Dostępna też w wersji zimowej od −10 °C.',
+    specs: [{ k: 'Wydajność', v: '70 L' }, { k: 'Czas cięcia', v: '15–30′' }, { k: 'Odporność', v: '−40/+90 °C' }, { k: 'Gęstość', v: '25 kg/m³' }],
+    uses: ['Okna i drzwi', 'Izolacja akustyczna', 'Szczeliny i bruzdy'],
+  },
+  {
+    id: 'xl', cat: 'piany', name: 'Langer XL Fast', sub: '870 ml · szybkowiążąca', badge: 'Nowość',
+    img: 'assets/xl-fast.png',
+    desc: 'Szybkowiążąca piana do montażu stolarki. Niska rozszerzalność wtórna oznacza brak naprężeń na ościeżnicach i montaż bez korekt.',
+    specs: [{ k: 'Wydajność', v: '65 L' }, { k: 'Czas obróbki', v: '20′' }, { k: 'Odporność', v: '−60/+100 °C' }, { k: 'Rozsz. wtórna', v: 'Niska' }],
+    uses: ['Okna i drzwi', 'Złącza G-K', 'Przepusty'],
+  },
+  {
+    id: 'eco', cat: 'piany', name: 'Economy Line', sub: '750 ml · pistoletowa', badge: '',
+    img: 'assets/economy-line.png',
+    desc: 'Jednoskładnikowa piana o kontrolowanym wzroście objętości. Sprawdzona, powtarzalna formuła w codziennym montażu.',
+    specs: [{ k: 'Wydajność', v: '45 L' }, { k: 'Wzrost obj.', v: '30 %' }, { k: 'Czas cięcia', v: '30–40′' }, { k: 'Odporność', v: '−50/+90 °C' }],
+    uses: ['Ościeżnice', 'Okablowanie', 'Szczeliny'],
+  },
+  {
+    id: 'ecow', cat: 'wezyk', name: 'Economy Wężykowa', sub: '700 ml · bez pistoletu', badge: '',
+    img: 'assets/economy-wezykowa.png',
+    desc: 'Ta sama niskoprężna formuła w wersji aplikowanej przez rurkę. Gotowa do pracy od razu — do drobnych prac i szybkich napraw.',
+    specs: [{ k: 'Aplikacja', v: 'Rurka' }, { k: 'Wzrost obj.', v: '30 %' }, { k: 'Odporność', v: '−50/+90 °C' }, { k: 'Opakowanie', v: '700 ml' }],
+    uses: ['Drobne naprawy', 'Okablowanie', 'Małe szczeliny'],
+  },
+  {
+    id: 'exp', cat: 'pianokleje', name: 'Express 60 s', sub: '750 ml · pianoklej', badge: '',
+    img: 'assets/express-60.png',
+    desc: 'Pianoklej poliuretanowy o błyskawicznym utwardzaniu. Chwyt w 60 sekund, bez podpierania elementów. Jedna puszka zastępuje worki kleju cementowego.',
+    specs: [{ k: 'Pocz. utwardz.', v: '60 s' }, { k: 'Czas korekty', v: '2 min' }, { k: 'Odporność', v: '−20/+85 °C' }, { k: 'Gęstość', v: '20–30 kg/m³' }],
+    uses: ['Płyty EPS / XPS', 'Płyty G-K', 'OSB i drewno'],
+  },
+  {
+    id: 'sty', cat: 'pianokleje', name: 'Do styropianu', sub: '750 ml · XPS / EPS', badge: '',
+    img: 'assets/styropian.png',
+    desc: 'Pianka o niskiej ekspansji do mocowania płyt styropianowych na fasadach i fundamentach. Niska wodochłonność i doskonałe parametry cieplne.',
+    specs: [{ k: 'Wydajność', v: '10 m²' }, { k: 'Przewodn.', v: 'λ 0,034' }, { k: 'Odporność', v: '−50/+90 °C' }, { k: 'Izol. akust.', v: '60 dB' }],
+    uses: ['Fasady', 'Fundamenty', 'Parapety i dachówki'],
+  },
+  {
+    id: 'tur', cat: 'kleje', name: 'Langer TUR', sub: '290 ml · MS Polimer', badge: '',
+    img: 'assets/tur.png',
+    desc: 'Klej na bazie MS Polimeru o natychmiastowym mocowaniu i bardzo wysokiej przyczepności początkowej. Bez rozpuszczalników i izocyjanianów.',
+    specs: [{ k: 'Przyczep. pocz.', v: '500 kg/m²' }, { k: 'Wytrzym. końc.', v: '22 kg/cm²' }, { k: 'Odporność', v: '−40/+95 °C' }, { k: 'Elastyczność', v: '±25 %' }],
+    uses: ['Parapety', 'Listwy i panele', 'Lustra'],
+  },
+];
+
+/* ============================================================
+   HOOKI
+   ============================================================ */
+/* Parametry oferty z panelu. Błąd sieci/API nie może wywrócić strony —
+   w najgorszym razie zostają wartości domyślne. */
+function useOffer() {
+  const [offer, setOffer] = useState(OFFER_DEFAULTS);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/settings')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (alive && d && typeof d === 'object') setOffer(o => ({ ...o, ...d })); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return offer;
+}
+
+/* Desktop dostaje duży slider (wariant 1b), telefon — przesuwaną karuzelę
+   kafli (wariant 1c). Renderujemy tylko jeden z nich, żeby nie ładować
+   zdjęć produktów dwa razy. */
+function useIsMobile(query = '(max-width: 860px)') {
+  const [match, setMatch] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = e => setMatch(e.matches);
+    setMatch(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [query]);
+  return match;
+}
+
+/* Odsłanianie sekcji przy przewijaniu. Klasę „in" trzyma stan Reacta, a nie
+   ręczna zmiana classList — inaczej pierwsze przerysowanie (np. gdy dojdą
+   ustawienia z /api/settings) nadpisałoby className i sekcja zostałaby
+   przezroczysta na stałe. */
+function Reveal({ as: Tag = 'div', className = '', children, ...rest }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !('IntersectionObserver' in window)) { setShown(true); return; }
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setShown(true); io.disconnect(); }
+    }, { rootMargin: '0px 0px -10% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  const cls = [className, 'reveal', shown ? 'in' : ''].filter(Boolean).join(' ');
+  return <Tag ref={ref} className={cls} {...rest}>{children}</Tag>;
+}
+
+/* ============================================================
+   IKONY
+   ============================================================ */
+const Svg = ({ s = 18, children }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
+);
+const IArrow = (p) => <Svg {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Svg>;
+const ILeft  = (p) => <Svg {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></Svg>;
+const IPhone = (p) => <Svg {...p}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></Svg>;
+const ICheck = (p) => <Svg {...p}><polyline points="20 6 9 17 4 12"/></Svg>;
+
+function LangerMark({ size = 38 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <rect x="13" y="7" width="11" height="35" rx="5.5" fill="currentColor" />
+      <rect x="18.5" y="38" width="6" height="10" rx="3" fill="currentColor" />
+      <rect x="13" y="46" width="42" height="13" rx="6.5" fill="var(--flame)" />
+      <line x1="13" y1="52.5" x2="55" y2="52.5" stroke="#fff" strokeOpacity="0.35" strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+const NAV = [['#rabat', 'Jak działa rabat'], ['#produkty', 'Produkty'], ['#wsparcie', 'Wsparcie punktu']];
+
+function Header() {
+  return (
+    <header className="hdr">
+      <div className="wrap hdr-in">
+        <a href="#top" className="logo">
+          <LangerMark size={38} />
+          <span className="logo-words">
+            <span className="logo-name">LANGER</span>
+            <span className="logo-sub">DYSTRYBUCJA</span>
+          </span>
+        </a>
+        <nav className="hdr-nav">
+          {NAV.map(([href, label]) => <a key={href} href={href} className="hdr-link">{label}</a>)}
+          <a href="/" className="hdr-link hdr-back">← Strona główna</a>
+        </nav>
+        <div className="hdr-cta">
+          <a href="#kontakt" className="btn btn-dark" style={{ padding: '12px 20px', fontSize: 15 }}>
+            Chcę warunki <IArrow s={17}/>
+          </a>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* ============================================================
+   HERO — mechanizm rabatu na pierwszym planie
+   ============================================================ */
+function Hero({ offer }) {
+  const cartons = offer.landing_cartons;
+  const pct = offer.landing_discount_pct;
+  return (
+    <section className="hero" id="rabat">
+      <Reveal className="wrap hero-in">
+        <span className="eyebrow">Oferta dla punktów handlowych</span>
+        <h1 className="h1">Langer na półce obniża cenę całej reszty zamówienia</h1>
+        <p className="lead">
+          Kup {cartons} kartonów dowolnych produktów Langer w jednym zamówieniu,
+          a pozostałe marki z naszej oferty kupisz {pct}% taniej.
+        </p>
+        <div className="hero-cta">
+          <a href="#kontakt" className="btn btn-flame">Poproś o ofertę dla punktu <IArrow/></a>
+          <a href="#produkty" className="btn btn-dark">Zobacz produkty</a>
+        </div>
+
+        <div className="deal">
+          <div className="deal-cell deal-1">
+            <span className="deal-k">Warunek</span>
+            <span className="deal-v">{cartons} kartonów</span>
+            <span className="deal-d">piany, pianokleju lub kleju Langer</span>
+          </div>
+          <div className="deal-cell deal-2">
+            <span className="deal-k">Twoja korzyść</span>
+            <span className="deal-v">−{pct}% na resztę</span>
+            <span className="deal-d">na wszystkie pozostałe marki w koszyku</span>
+          </div>
+          <div className="deal-cell deal-3">
+            <span className="deal-k">Gratis</span>
+            <span className="deal-v">Pistolet {offer.landing_pistol_price} zł</span>
+            <span className="deal-d">przy zakupie do {offer.landing_pistol_cartons} kartonów</span>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+/* ============================================================
+   PRODUKTY
+   ============================================================ */
+function Spec({ k, v }) {
+  return (
+    <div className="spec">
+      <span className="spec-k">{k}</span>
+      <span className="spec-v">{v}</span>
+    </div>
+  );
+}
+
+/* Desktop: jeden produkt na dużym kadrze + miniatury do przełączania */
+function ProductShowcase() {
+  const [i, setI] = useState(0);
+  const cur = PRODUCTS[i];
+  const prev = () => setI(v => (v - 1 + PRODUCTS.length) % PRODUCTS.length);
+  const next = () => setI(v => (v + 1) % PRODUCTS.length);
+  const pad = n => String(n).padStart(2, '0');
+
+  return (
+    <>
+      <div className="sec-head">
+        <div className="sec-head-l">
+          <span className="eyebrow">Karuzela produktów</span>
+          <h2 className="h2">Co dokładnie stawiasz na półce</h2>
+        </div>
+        <div className="slider-nav">
+          <button className="snav" onClick={prev} aria-label="Poprzedni produkt"><ILeft s={20}/></button>
+          <button className="snav" onClick={next} aria-label="Następny produkt"><IArrow s={20}/></button>
+        </div>
+      </div>
+
+      <Reveal className="pshow">
+        <div className="pshow-img">
+          <img src={cur.img} alt={cur.name} />
+          {cur.badge && <span className="pshow-badge">{cur.badge}</span>}
+          <span className="pshow-count">{pad(i + 1)} / {pad(PRODUCTS.length)}</span>
+        </div>
+        <div className="pshow-body">
+          <span className="pshow-cat">{CATS[cur.cat]}</span>
+          <div>
+            <h3 className="pshow-name">{cur.name}</h3>
+            <div className="pshow-sub">{cur.sub}</div>
+          </div>
+          <p className="pshow-desc">{cur.desc}</p>
+          <div className="specs">
+            {cur.specs.map(s => <Spec key={s.k} k={s.k} v={s.v} />)}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <span className="pshow-cat">Zastosowanie</span>
+            <div className="uses">
+              {cur.uses.map(u => <span key={u} className="use">{u}</span>)}
+            </div>
+          </div>
+          <div className="thumbs">
+            {PRODUCTS.map((p, k) => (
+              <button
+                key={p.id}
+                className={'thumb' + (k === i ? ' on' : '')}
+                onClick={() => setI(k)}
+                aria-label={p.name}
+                aria-current={k === i}
+              >
+                <img src={p.img} alt="" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </Reveal>
+    </>
+  );
+}
+
+/* Mobile: przesuwana taśma kafli — kciukiem, bez strzałek */
+function ProductScroller() {
+  return (
+    <>
+      <div className="sec-head-l" style={{ marginBottom: 'var(--s5)' }}>
+        <span className="eyebrow">Produkty</span>
+        <h2 className="h2">Cała linia Langer</h2>
+        <span className="pscroll-hint">Przesuń, aby zobaczyć wszystkie {PRODUCTS.length} pozycji →</span>
+      </div>
+      <div className="pscroll">
+        {PRODUCTS.map(p => (
+          <article key={p.id} className="pcard">
+            <div className="pcard-img">
+              <img src={p.img} alt={p.name} />
+              {p.badge && <span className="pcard-badge">{p.badge}</span>}
+            </div>
+            <div className="pcard-body">
+              <span className="pshow-cat">{CATS[p.cat]}</span>
+              <div>
+                <h3 className="pcard-name">{p.name}</h3>
+                <div className="pshow-sub">{p.sub}</div>
+              </div>
+              <div className="pcard-specs">
+                {p.specs.map(s => (
+                  <div key={s.k} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span className="spec-k">{s.k}</span>
+                    <span className="spec-v" style={{ fontSize: 15 }}>{s.v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function Products() {
+  const isMobile = useIsMobile();
+  return (
+    <section className="sec sec-paper" id="produkty">
+      <div className="wrap">
+        {isMobile ? <ProductScroller /> : <ProductShowcase />}
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   DLACZEGO WARTO
+   ============================================================ */
+function Why({ offer }) {
+  const items = [
+    ['01', 'Rabat na inne marki', `${offer.landing_cartons} kartonów Langera obniża o ${offer.landing_discount_pct}% ceny pozostałych marek w tym samym zamówieniu.`],
+    ['02', 'Marketing dla punktu', 'Przy większych zamówieniach wspieramy Twój punkt materiałami i promocją w naszych reklamach.'],
+    ['03', `Pistolet za ${offer.landing_pistol_price} zł`, `Przy zakupie do ${offer.landing_pistol_cartons} kartonów piany lub pianoklejów dokładamy pistolet teflonowy.`],
+    ['04', 'Zwroty bez ryzyka', 'Jeśli towar nie schodzi z półek, przyjmiemy zwrot. Pierwsze zamówienie nic nie ryzykuje.'],
+  ];
+  return (
+    <section className="sec" id="wsparcie">
+      <div className="wrap">
+        <div className="sec-head">
+          <div className="sec-head-l">
+            <span className="eyebrow">Program partnerski</span>
+            <h2 className="h2">Dlaczego warto nas trzymać na półce</h2>
+          </div>
+          <p className="lead" style={{ maxWidth: 340, fontSize: 15.5 }}>
+            Marża na Langerze plus rabat na resztę zamówienia — korzyść liczy się dwa razy.
+          </p>
+        </div>
+        <Reveal className="why">
+          {items.map(([n, t, d]) => (
+            <div key={n} className="why-card">
+              <span className="why-n">{n}</span>
+              <h3 className="why-t">{t}</h3>
+              <p className="why-d">{d}</p>
+            </div>
+          ))}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   PASEK PISTOLETU
+   ============================================================ */
+function PistolBand({ offer }) {
+  return (
+    <section className="pistol">
+      <div className="wrap pistol-in">
+        <div className="pistol-l">
+          <span className="pistol-price">{offer.landing_pistol_price} zł</span>
+          <p className="pistol-d" style={{ margin: 0 }}>
+            Pistolet teflonowy za złotówkę przy zakupie do {offer.landing_pistol_cartons} kartonów
+            piany lub pianoklejów. Jeden na zamówienie.
+          </p>
+        </div>
+        <a href="#kontakt" className="btn btn-light" style={{ flex: 'none' }}>Dopisz do zamówienia</a>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   KONTAKT
+   ============================================================ */
+function Contact({ offer }) {
+  const [sent, setSent] = useState(false);
+  const tel = 'tel:' + offer.landing_phone.replace(/[^+\d]/g, '');
+  return (
+    <section className="sec sec-dark" id="kontakt">
+      <div className="wrap contact-grid">
+        <Reveal>
+          <span className="eyebrow">Kontakt</span>
+          <h2 className="h2" style={{ marginTop: 14 }}>Policzmy rabat na Twoim koszyku</h2>
+          <p className="lead lead-dark" style={{ marginTop: 16, maxWidth: '46ch' }}>
+            Zostaw numer — przedstawiciel z Twojego regionu oddzwoni w ciągu jednego dnia
+            roboczego i policzy rabat na Twoim zamówieniu.
+          </p>
+          <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span className="field" style={{ gap: 0 }}>
+              <span>albo od razu</span>
+            </span>
+            <a href={tel} className="contact-phone">{offer.landing_phone}</a>
+          </div>
+        </Reveal>
+
+        <Reveal>
+          {sent ? (
+            <div className="form-done">
+              <span className="form-done-ic"><ICheck s={32}/></span>
+              <h3 className="why-t" style={{ fontSize: 24, color: '#fff' }}>Dziękujemy!</h3>
+              <p className="lead lead-dark" style={{ fontSize: 16 }}>Odezwiemy się w ciągu jednego dnia roboczego.</p>
+              <button className="btn btn-outline" onClick={() => setSent(false)} style={{ marginTop: 12 }}>
+                Wyślij kolejne
+              </button>
+            </div>
+          ) : (
+            <form className="form" onSubmit={e => { e.preventDefault(); setSent(true); }}>
+              <div className="form-row">
+                <label className="field"><span>Nazwa punktu</span><input required placeholder="np. Bud-Mat Kielce"/></label>
+                <label className="field"><span>Telefon</span><input required placeholder="+48 000 000 000" inputMode="tel"/></label>
+              </div>
+              <label className="field">
+                <span>Co Cię interesuje</span>
+                <textarea rows="3" placeholder="Rabat na pozostałe marki, ekspozycja, pierwsze zamówienie…"></textarea>
+              </label>
+              <button className="btn btn-flame" type="submit" style={{ width: '100%' }}>Zamów rozmowę <IArrow/></button>
+              <p className="form-note">
+                Kontakt wyłącznie w sprawie współpracy handlowej.
+                To wersja demonstracyjna — dane nie są nigdzie zapisywane ani wysyłane.
+              </p>
+            </form>
+          )}
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   STOPKA + PRZYKLEJONY PASEK
+   ============================================================ */
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="wrap footer-in">
+        <a href="/" className="logo" style={{ color: '#fff' }}>
+          <LangerMark size={30} />
+          <span className="logo-words">
+            <span className="logo-name" style={{ fontSize: 17 }}>LANGER</span>
+            <span className="logo-sub" style={{ color: 'rgba(255,255,255,.5)' }}>DYSTRYBUCJA</span>
+          </span>
+        </a>
+        <span>Montaż bez kompromisów</span>
+        <a href="/">← Wróć na stronę główną</a>
+      </div>
+    </footer>
+  );
+}
+
+function StickyCta({ offer }) {
+  const tel = 'tel:' + offer.landing_phone.replace(/[^+\d]/g, '');
+  return (
+    <>
+      <div className="sticky-pad" />
+      <div className="sticky-cta">
+        <span className="sticky-cta-t">
+          Pistolet teflonowy<br/>
+          <strong>za {offer.landing_pistol_price} zł</strong> do {offer.landing_pistol_cartons} kartonów
+        </span>
+        <a href={tel} className="btn btn-light" style={{ padding: '12px 18px', fontSize: 15, flex: 'none' }}>
+          <IPhone s={16}/> Zadzwoń
+        </a>
+      </div>
+    </>
+  );
+}
+
+/* ============================================================
+   APP
+   ============================================================ */
+function App() {
+  const offer = useOffer();
+  return (
+    <div id="top">
+      <Header />
+      <main>
+        <Hero offer={offer} />
+        <Products />
+        <Why offer={offer} />
+        <PistolBand offer={offer} />
+        <Contact offer={offer} />
+      </main>
+      <Footer />
+      <StickyCta offer={offer} />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
