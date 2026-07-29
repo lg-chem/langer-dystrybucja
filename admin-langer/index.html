@@ -187,6 +187,26 @@ const DEFAULT_CATEGORIES = [
   { id: 'akcesoria', label: 'Akcesoria' },
 ];
 const DEFAULT_CAT_IDS = DEFAULT_CATEGORIES.map(c => c.id);
+
+/* Parametry oferty z podstrony /dla-punktow/. Te same wartości domyślne
+   siedzą w api/settings.js i w samej podstronie — tu są fallbackiem na czas
+   ładowania i gdy brak migracji 004. */
+const DEFAULT_OFFER = {
+  landing_cartons:        '10',
+  landing_discount_pct:   '15',
+  landing_pistol_cartons: '5',
+  landing_pistol_price:   '1',
+  landing_phone:          '+48 000 000 000',
+};
+
+/* Pola karty „Oferta dla punktów handlowych" — kolejność jak na formularzu. */
+const OFFER_FIELDS = [
+  { key: 'landing_cartons',        label: 'Kartonów Langera',      unit: 'kartonów', type: 'number', min: 1,  hint: 'Ile kartonów trzeba kupić, żeby dostać rabat.' },
+  { key: 'landing_discount_pct',   label: 'Rabat na inne marki',   unit: '%',        type: 'number', min: 0,  hint: 'O tyle taniej klient kupi pozostałe marki w tym samym zamówieniu.' },
+  { key: 'landing_pistol_cartons', label: 'Pistolet — próg',       unit: 'kartonów', type: 'number', min: 1,  hint: 'Do ilu kartonów piany/pianokleju dokładacie pistolet.' },
+  { key: 'landing_pistol_price',   label: 'Pistolet — cena',       unit: 'zł',       type: 'number', min: 0,  hint: 'Cena pistoletu teflonowego przy spełnieniu progu.' },
+  { key: 'landing_phone',          label: 'Telefon na podstronie', unit: '',         type: 'text',            hint: 'Wyświetlany w sekcji kontakt i pod przyciskiem „Zadzwoń".' },
+];
 const ROLES = [
   { id: 'magnet',  label: 'Bestseller' },
   { id: 'margin',  label: 'Marka własna' },
@@ -239,6 +259,9 @@ async function apiBrandDel(name)          { return apiCall(`/api/brands?name=${e
 async function apiCategories()            { return apiCall('/api/categories'); }
 async function apiCategoryAdd(c)          { return apiCall('/api/categories', { method: 'POST', body: JSON.stringify(c) }); }
 async function apiCategoryDel(id)         { return apiCall(`/api/categories?id=${encodeURIComponent(id)}`, { method: 'DELETE' }); }
+
+async function apiSettings()              { return apiCall('/api/settings'); }
+async function apiSettingsSave(values)    { return apiCall('/api/settings', { method: 'POST', body: JSON.stringify(values) }); }
 
 /* slug: „Taśmy izolacyjne" -> „tasmyizolacyjne" (id kategorii, tylko [a-z0-9]) */
 function slugify(s) {
@@ -1323,6 +1346,88 @@ function ProductList({ refreshTrigger, brands, categories }) {
 /* ============================================================
    USTAWIENIA — zarządzanie markami i kategoriami (zapis w Neon)
    ============================================================ */
+/* Parametry oferty pokazywanej na /dla-punktow/. Zmiana tutaj = zmiana
+   liczb w nagłówku, kaflach, sekcji „Dlaczego warto" i pasku pistoletu —
+   podstrona pobiera je z /api/settings przy każdym wejściu. */
+function OfferSettings() {
+  const [values, setValues] = useState(DEFAULT_OFFER);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    apiSettings()
+      .then(d => { if (alive && d) setValues(v => ({ ...v, ...d })); })
+      .catch(e => { if (alive) setErr(e.message); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, []);
+
+  function set(key, val) { setValues(v => ({ ...v, [key]: val })); setSaved(false); }
+
+  async function save(e) {
+    e.preventDefault();
+    setErr(''); setBusy(true);
+    try {
+      const saved = await apiSettingsSave(values);
+      if (saved && typeof saved === 'object') setValues(v => ({ ...v, ...saved }));
+      setSaved(true);
+    } catch (e2) { setErr(e2.message); }
+    finally { setBusy(false); }
+  }
+
+  const cartons = values.landing_cartons || '—';
+  const pct = values.landing_discount_pct || '—';
+
+  return (
+    <div className="adm-card">
+      <h2 className="adm-card-h">Oferta dla punktów handlowych</h2>
+      <p className="adm-card-d">
+        Liczby z podstrony <a href="/dla-punktow/" target="_blank" rel="noopener" className="mono">/dla-punktow/</a>.
+        Zapisane wartości podmieniają się na stronie od razu — bez wgrywania kodu.
+      </p>
+
+      {err && <div className="login-err">{err}</div>}
+
+      <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+          {OFFER_FIELDS.map(f => (
+            <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>
+                {f.label}{f.unit && <span className="muted" style={{ fontWeight: 400 }}> ({f.unit})</span>}
+              </span>
+              <input
+                type={f.type}
+                min={f.min}
+                value={values[f.key] ?? ''}
+                disabled={loading}
+                onChange={e => set(f.key, e.target.value)}
+                style={{ padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }}
+              />
+              <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>{f.hint}</span>
+            </label>
+          ))}
+        </div>
+
+        <p className="muted" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>
+          Podgląd zdania z nagłówka: <em>„Kup {cartons} kartonów dowolnych produktów Langer
+          w jednym zamówieniu, a pozostałe marki z naszej oferty kupisz {pct}% taniej."</em>
+        </p>
+
+        <div className="gap-2" style={{ alignItems: 'center' }}>
+          <button type="submit" className="btn btn-flame" disabled={busy || loading}>
+            {busy ? <span className="spinner"/> : <ISettings s={16}/>} Zapisz ofertę
+          </button>
+          {saved && !busy && <span className="muted">Zapisano.</span>}
+          {loading && <span className="muted">Wczytywanie…</span>}
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function Settings({ brands, categories, onChange }) {
   const [newBrand, setNewBrand] = useState('');
   const [newCat, setNewCat] = useState('');
@@ -1365,6 +1470,8 @@ function Settings({ brands, categories, onChange }) {
   return (
     <>
       {err && <div className="adm-card" style={{ padding: 0, border: 'none' }}><div className="login-err" style={{ margin: 0 }}>{err}</div></div>}
+
+      <OfferSettings />
 
       <div className="adm-card">
         <h2 className="adm-card-h">Marki ({brands.length})</h2>
