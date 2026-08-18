@@ -156,6 +156,33 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
 .modal { background: var(--white); border-radius: var(--r-lg); padding: 28px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
 .modal-h { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 0 0 16px; }
 
+/* --- Logo i kolory marki --- */
+.logo-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.logo-slot { border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.logo-slot-h { font-size: 13.5px; font-weight: 700; }
+.logo-slot-d { font-size: 12.5px; color: var(--ash-700); line-height: 1.45; margin: -8px 0 0; }
+.logo-prev { height: 96px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; padding: 12px; border: 1px dashed var(--line-2); overflow: hidden; }
+.logo-prev.on-dark { background: var(--navy); border-color: var(--navy-800); }
+.logo-prev.on-light { background: var(--white); }
+.logo-prev img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.logo-prev-empty { font-size: 12.5px; color: var(--ash); text-align: center; line-height: 1.4; }
+.logo-prev.on-dark .logo-prev-empty { color: rgba(255,255,255,.5); }
+.logo-slot-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line-2); padding: 0; }
+.swatch.on { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.14); }
+
+.hdr-prev { border-radius: var(--r-md); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; overflow: hidden; }
+.hdr-prev.dark { background: var(--navy); color: #fff; }
+.hdr-prev.light { background: var(--white); color: var(--navy); border: 1px solid var(--line); }
+.prev-logo { display: inline-flex; align-items: center; gap: 12px; min-width: 0; }
+.prev-logo img { display: block; width: auto; }
+.prev-words { display: flex; flex-direction: column; line-height: 1; }
+.prev-name { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; }
+.prev-sub { font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .26em; margin-top: 3px; opacity: .62; }
+.prev-cta { font-family: var(--font-display); font-weight: 600; font-size: 13px; padding: 9px 14px; border-radius: var(--r-sm); color: #fff; white-space: nowrap; }
+
 @media (max-width: 720px) {
   .adm-tab { padding: 14px 12px; font-size: 13px; }
 }
@@ -170,7 +197,7 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
   <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 
   <script type="text/babel">
-const { useState, useEffect, useRef, useMemo } = React;
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
 /* ============================================================
    KONFIGURACJA
@@ -207,6 +234,60 @@ const OFFER_FIELDS = [
   { key: 'landing_pistol_price',   label: 'Pistolet — cena',       unit: 'zł',       type: 'number', min: 0,  hint: 'Cena pistoletu teflonowego przy spełnieniu progu.' },
   { key: 'landing_phone',          label: 'Telefon na podstronie', unit: '',         type: 'text',            hint: 'Wyświetlany w sekcji kontakt i pod przyciskiem „Zadzwoń".' },
 ];
+/* Identyfikacja wizualna + dane kontaktowe. Te same wartości domyślne siedzą
+   w api/settings.js — tu są fallbackiem na czas ładowania i gdy brak migracji. */
+const DEFAULT_BRANDING = {
+  logo_light:     '',
+  logo_dark:      '',
+  logo_mark:      '',
+  logo_height:    '38',
+  logo_show_text: '1',
+  brand_accent:   '#F04E23',
+};
+
+const DEFAULT_CONTACT = {
+  contact_phone:   '+48 000 000 000',
+  contact_email:   'biuro@langerdystrybucja.pl',
+  contact_street:  'ul. Przykładowa 00',
+  contact_city:    '00-000 Miasto',
+  contact_company: 'Langer Dystrybucja',
+};
+
+/* Komplet ustawień trzymanych w tabeli `settings` — jedna wspólna mapa dla
+   wszystkich kart zakładki „Ustawienia". */
+const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT };
+
+/* Trzy sloty logo. `bg` decyduje, na jakim tle rysujemy podgląd — logo na
+   ciemne tło jest zwykle białe, więc na białym kwadracie byłoby niewidoczne. */
+const LOGO_SLOTS = [
+  { key: 'logo_dark',  label: 'Logo na jasne tło',  bg: 'light', hint: 'Wersja kolorowa/ciemna. Header po przewinięciu strony.' },
+  { key: 'logo_light', label: 'Logo na ciemne tło', bg: 'dark',  hint: 'Wersja jasna (biała). Header na samej górze i stopka.' },
+  { key: 'logo_mark',  label: 'Sygnet (kwadrat)',   bg: 'light', hint: 'Sam znak bez napisu — znak wodny w hero. Opcjonalny.' },
+];
+
+/* Gotowe warianty kolorystyczne akcentu (--flame): przyciski, odznaki,
+   podkreślenia. Można też wybrać dowolny kolor próbnikiem. */
+const ACCENT_PRESETS = [
+  { hex: '#F04E23', name: 'Pomarańcz Langer' },
+  { hex: '#D63F18', name: 'Pomarańcz ciemny' },
+  { hex: '#1E3FB5', name: 'Kobalt' },
+  { hex: '#0E1533', name: 'Granat' },
+  { hex: '#DC2626', name: 'Czerwień' },
+  { hex: '#16A34A', name: 'Zieleń' },
+  { hex: '#0F766E', name: 'Morski' },
+  { hex: '#7C3AED', name: 'Fiolet' },
+];
+
+/* Pola karty „Dane kontaktowe" — podmieniają się na stronie głównej
+   (sekcja „Kontakt" i stopka) bez ruszania kodu. */
+const CONTACT_FIELDS = [
+  { key: 'contact_phone',   label: 'Telefon',        type: 'tel',   hint: 'Sekcja „Kontakt" i stopka. Link tel: tworzy się automatycznie.' },
+  { key: 'contact_email',   label: 'E-mail',         type: 'email', hint: 'Sekcja „Kontakt" i stopka. Klikalny link mailto:.' },
+  { key: 'contact_street',  label: 'Ulica i numer',  type: 'text',  hint: 'Pierwsza linia adresu magazynu i biura.' },
+  { key: 'contact_city',    label: 'Kod i miasto',   type: 'text',  hint: 'Druga linia adresu, np. „62-800 Kalisz".' },
+  { key: 'contact_company', label: 'Nazwa firmy',    type: 'text',  hint: 'Nagłówek sekcji „Kontakt" i podpis w stopce.' },
+];
+
 const ROLES = [
   { id: 'magnet',  label: 'Bestseller' },
   { id: 'margin',  label: 'Marka własna' },
@@ -303,6 +384,67 @@ function fileToDataURL(file, maxSize = 640, quality = 0.82) {
     };
     reader.readAsDataURL(file);
   });
+}
+
+/* Wczytuje plik logo i zwraca data URI gotowe do zapisania w `settings`.
+   Różnice względem zdjęć produktów:
+   • SVG idzie 1:1 (wektor — skaluje się bez utraty jakości, waży grosze),
+   • rastry (PNG/WebP) zapisujemy jako PNG BEZ białego tła, żeby zachować
+     przezroczystość — logo musi wejść na granat i na biel,
+   • przy za dużym pliku próbujemy kolejno mniejszych rozmiarów, zamiast
+     od razu odrzucać.
+   Limit `maxBytes` musi zostawać poniżej limitu z api/settings.js. */
+function logoFileToDataURL(file, { sizes = [640, 480, 360, 256], maxBytes = 700000 } = {}) {
+  return new Promise((resolve, reject) => {
+    if (!file || !/^image\//.test(file.type)) {
+      reject(new Error('To nie jest plik graficzny. Wgraj SVG, PNG, JPG lub WebP.')); return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Nie udało się odczytać pliku.'));
+    reader.onload = () => {
+      const raw = reader.result;
+
+      // SVG: bez rasteryzacji — zapisujemy oryginał.
+      if (file.type === 'image/svg+xml') {
+        if (raw.length > maxBytes) {
+          reject(new Error('Plik SVG jest za duży. Wyeksportuj go bez osadzonych bitmap.'));
+        } else {
+          resolve(raw);
+        }
+        return;
+      }
+
+      const img = new Image();
+      img.onerror = () => reject(new Error('Nie udało się wczytać obrazu.'));
+      img.onload = () => {
+        try {
+          for (const maxSize of sizes) {
+            let w = img.width, h = img.height;
+            if (w > maxSize || h > maxSize) {
+              const scale = maxSize / Math.max(w, h);
+              w = Math.max(1, Math.round(w * scale));
+              h = Math.max(1, Math.round(h * scale));
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            // brak fillRect — przezroczystość logo zostaje nietknięta
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const out = canvas.toDataURL('image/png');
+            if (out.length <= maxBytes) { resolve(out); return; }
+          }
+          reject(new Error('Plik jest za duży nawet po zmniejszeniu. Najlepiej wgraj logo w formacie SVG.'));
+        } catch (e) { reject(e); }
+      };
+      img.src = raw;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* „124 kB" — ile miejsca zajmuje wgrane logo w bazie (długość data URI). */
+function dataSize(v) {
+  const n = String(v || '').length;
+  return n < 1000 ? n + ' B' : Math.round(n / 1000) + ' kB';
 }
 
 /* ============================================================
@@ -1144,7 +1286,9 @@ function ProductList({ refreshTrigger, brands, categories }) {
     setLoading(true); setErr('');
     try {
       const list = await apiList();
-      setProducts(list);
+      // twarda asekuracja: gdyby API oddało coś innego niż tablicę, panel ma
+      // pokazać pustą listę, a nie wywalić się na białą stronę
+      setProducts(Array.isArray(list) ? list : []);
     } catch (e) { setErr(e.message); }
     finally { setLoading(false); }
   }
@@ -1346,37 +1490,65 @@ function ProductList({ refreshTrigger, brands, categories }) {
 /* ============================================================
    USTAWIENIA — zarządzanie markami i kategoriami (zapis w Neon)
    ============================================================ */
-/* Parametry oferty pokazywanej na /dla-punktow/. Zmiana tutaj = zmiana
-   liczb w nagłówku, kaflach, sekcji „Dlaczego warto" i pasku pistoletu —
-   podstrona pobiera je z /api/settings przy każdym wejściu. */
-function OfferSettings() {
-  const [values, setValues] = useState(DEFAULT_OFFER);
+/* Wspólny magazyn ustawień dla całej zakładki. Jedno pobranie /api/settings
+   na wejście (logo w base64 potrafi ważyć dziesiątki kB — nie ma sensu
+   ciągnąć go trzy razy, po razie na kartę), a każda karta zapisuje TYLKO
+   swoje klucze, więc zapis kontaktu nie odsyła logo i odwrotnie. */
+function useSettingsStore(active = true) {
+  const [values, setValues] = useState(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState('');
+
+  useEffect(() => {
+    if (!active) return;
+    let alive = true;
+    apiSettings()
+      .then(d => { if (alive && d && typeof d === 'object') setValues(v => ({ ...v, ...d })); })
+      .catch(e => { if (alive) setErr(e.message); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [active]);
+
+  const set = useCallback((key, val) => setValues(v => ({ ...v, [key]: val })), []);
+
+  // Zawsze aktualna kopia dla `save` — dzięki niej funkcja zapisu nie musi się
+  // przebudowywać przy każdym wciśniętym klawiszu w formularzu.
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
+
+  /* Zapisuje wskazane klucze i przyjmuje odpowiedź serwera jako źródło prawdy. */
+  const save = useCallback(async (keys) => {
+    const body = keys.reduce((acc, k) => ({ ...acc, [k]: valuesRef.current[k] ?? '' }), {});
+    const saved = await apiSettingsSave(body);
+    if (saved && typeof saved === 'object') setValues(v => ({ ...v, ...saved }));
+  }, []);
+
+  return { values, loading, err, set, save };
+}
+
+/* Stan zapisu jednej karty: „Zapisz" → spinner → „Zapisano." / błąd. */
+function useCardSave(st, keys) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    let alive = true;
-    apiSettings()
-      .then(d => { if (alive && d) setValues(v => ({ ...v, ...d })); })
-      .catch(e => { if (alive) setErr(e.message); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, []);
-
-  function set(key, val) { setValues(v => ({ ...v, [key]: val })); setSaved(false); }
-
-  async function save(e) {
-    e.preventDefault();
+  async function submit(e) {
+    if (e) e.preventDefault();
     setErr(''); setBusy(true);
-    try {
-      const saved = await apiSettingsSave(values);
-      if (saved && typeof saved === 'object') setValues(v => ({ ...v, ...saved }));
-      setSaved(true);
-    } catch (e2) { setErr(e2.message); }
+    try { await st.save(keys); setSaved(true); }
+    catch (e2) { setErr(e2.message); }
     finally { setBusy(false); }
   }
+  return { busy, err, saved, submit, touch: () => setSaved(false) };
+}
+
+/* Parametry oferty pokazywanej na /dla-punktow/. Zmiana tutaj = zmiana
+   liczb w nagłówku, kaflach, sekcji „Dlaczego warto" i pasku pistoletu —
+   podstrona pobiera je z /api/settings przy każdym wejściu. */
+function OfferSettings({ st }) {
+  const keys = OFFER_FIELDS.map(f => f.key);
+  const { busy, err, saved, submit, touch } = useCardSave(st, keys);
+  const { values, loading } = st;
 
   const cartons = values.landing_cartons || '—';
   const pct = values.landing_discount_pct || '—';
@@ -1391,7 +1563,7 @@ function OfferSettings() {
 
       {err && <div className="login-err">{err}</div>}
 
-      <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
           {OFFER_FIELDS.map(f => (
             <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -1403,7 +1575,7 @@ function OfferSettings() {
                 min={f.min}
                 value={values[f.key] ?? ''}
                 disabled={loading}
-                onChange={e => set(f.key, e.target.value)}
+                onChange={e => { st.set(f.key, e.target.value); touch(); }}
                 style={{ padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }}
               />
               <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>{f.hint}</span>
@@ -1428,7 +1600,236 @@ function OfferSettings() {
   );
 }
 
-function Settings({ brands, categories, onChange }) {
+/* Wbudowany sygnet — ten sam kształt co na stronie. Rysujemy go w podglądzie,
+   dopóki nie wgrano własnego logo, żeby było widać, co dokładnie podmieniasz. */
+function BuiltInMark({ size = 38, accent = '#F04E23', color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden="true" style={{ flex: 'none' }}>
+      <rect x="13" y="7" width="11" height="35" rx="5.5" fill={color} />
+      <rect x="18.5" y="38" width="6" height="10" rx="3" fill={color} />
+      <rect x="13" y="46" width="42" height="13" rx="6.5" fill={accent} />
+    </svg>
+  );
+}
+
+/* Podgląd headera — dokładnie ten układ, który zobaczy klient na stronie:
+   logo (albo wbudowany sygnet), napis obok i przycisk w kolorze akcentu. */
+function LogoPreview({ values, onDark }) {
+  const height = Math.max(20, Math.min(96, parseInt(values.logo_height, 10) || 38));
+  const src = onDark
+    ? (values.logo_light || values.logo_dark)
+    : (values.logo_dark || values.logo_light);
+  const showText = values.logo_show_text !== '0';
+  const accent = values.brand_accent || '#F04E23';
+
+  return (
+    <div className={'hdr-prev ' + (onDark ? 'dark' : 'light')}>
+      <span className="prev-logo">
+        {src
+          ? <img src={src} alt="" style={{ height }} />
+          : <BuiltInMark size={height} accent={accent} color={onDark ? '#fff' : '#0E1533'} />}
+        {(showText || !src) && (
+          <span className="prev-words">
+            <span className="prev-name">LANGER</span>
+            <span className="prev-sub">DYSTRYBUCJA</span>
+          </span>
+        )}
+      </span>
+      <span className="prev-cta" style={{ background: accent }}>Zostań partnerem</span>
+    </div>
+  );
+}
+
+/* Jeden slot logo: podgląd na właściwym tle + wgrywanie z dysku + usuwanie. */
+function LogoSlot({ slot, value, onChange, onError }) {
+  const inputRef = useRef(null);
+  const [busy, setBusy] = useState(false);
+
+  async function pick(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';           // ten sam plik da się wgrać ponownie
+    if (!file) return;
+    setBusy(true);
+    try { onChange(await logoFileToDataURL(file)); onError(''); }
+    catch (e2) { onError(e2.message); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div className="logo-slot">
+      <div className="logo-slot-h">{slot.label}</div>
+      <p className="logo-slot-d">{slot.hint}</p>
+
+      <div className={'logo-prev ' + (slot.bg === 'dark' ? 'on-dark' : 'on-light')}>
+        {value
+          ? <img src={value} alt="" onError={() => onError('Nie udało się wyświetlić tego pliku.')} />
+          : <span className="logo-prev-empty">Brak pliku —<br/>zostaje wbudowany sygnet</span>}
+      </div>
+
+      <div className="logo-slot-foot">
+        <span className="muted">{value ? dataSize(value) : 'SVG / PNG'}</span>
+        <div className="gap-2">
+          <button type="button" className="btn btn-ghost" onClick={() => inputRef.current.click()} disabled={busy}
+            style={{ padding: '8px 12px', fontSize: 13 }}>
+            {busy ? <span className="spinner"/> : <IUpload s={14}/>} Wgraj
+          </button>
+          {value && (
+            <button type="button" className="btn-icon" title="Usuń logo" onClick={() => onChange('')}>
+              <ITrash s={18}/>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <input ref={inputRef} type="file" accept="image/svg+xml,image/png,image/jpeg,image/webp"
+        onChange={pick} style={{ display: 'none' }} />
+    </div>
+  );
+}
+
+/* Logo i kolorystyka. Pliki lądują w bazie jako data URI — bez zewnętrznego
+   hostingu, tak samo jak zdjęcia produktów. Strona podmienia je globalnie:
+   header, stopka, znak wodny w hero i kolor wszystkich akcentów. */
+function BrandingSettings({ st }) {
+  const KEYS = Object.keys(DEFAULT_BRANDING);
+  const { busy, err, saved, submit, touch } = useCardSave(st, KEYS);
+  const [fileErr, setFileErr] = useState('');
+  const { values, loading } = st;
+
+  function set(key, val) { st.set(key, val); touch(); setFileErr(''); }
+
+  const accent = values.brand_accent || '#F04E23';
+  const height = parseInt(values.logo_height, 10) || 38;
+  const hasLogo = !!(values.logo_light || values.logo_dark);
+
+  return (
+    <div className="adm-card">
+      <h2 className="adm-card-h">Logo i kolory marki</h2>
+      <p className="adm-card-d">
+        Wgraj oryginalne logo — podmieni wbudowany sygnet w nagłówku, stopce i na całej stronie.
+        Najlepiej <strong>SVG</strong> (ostre na każdym ekranie, waży najmniej); PNG z przezroczystym tłem też zadziała.
+        Puste sloty = strona rysuje dotychczasowy sygnet.
+      </p>
+
+      {err && <div className="login-err">{err}</div>}
+      {fileErr && <div className="login-err">{fileErr}</div>}
+
+      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+        <div className="logo-slots">
+          {LOGO_SLOTS.map(slot => (
+            <LogoSlot key={slot.key} slot={slot} value={values[slot.key] || ''}
+              onChange={v => set(slot.key, v)} onError={setFileErr} />
+          ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 18, alignItems: 'start' }}>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>Wysokość logo w nagłówku <span className="muted" style={{ fontWeight: 400 }}>({height} px)</span></span>
+            <input type="range" min="24" max="72" step="1" value={height} disabled={loading}
+              onChange={e => set('logo_height', e.target.value)} />
+            <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>Dotyczy nagłówka i stopki. Szerokość dopasuje się sama.</span>
+          </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>Napis obok logo</span>
+            <span className="gap-2" style={{ alignItems: 'center' }}>
+              <input type="checkbox" checked={values.logo_show_text !== '0'} disabled={loading}
+                onChange={e => set('logo_show_text', e.target.checked ? '1' : '0')} />
+              <span style={{ fontSize: 14 }}>Pokaż „LANGER / DYSTRYBUCJA"</span>
+            </span>
+            <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+              Wyłącz, jeśli wgrane logo ma już nazwę firmy w środku.
+            </span>
+          </label>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>Kolor akcentu</span>
+          <div className="swatches">
+            {ACCENT_PRESETS.map(c => (
+              <button key={c.hex} type="button" title={c.name} aria-label={c.name}
+                className={'swatch' + (accent.toLowerCase() === c.hex.toLowerCase() ? ' on' : '')}
+                style={{ background: c.hex }} onClick={() => set('brand_accent', c.hex)} />
+            ))}
+            <input type="color" value={accent} disabled={loading} title="Dowolny kolor"
+              onChange={e => set('brand_accent', e.target.value)}
+              style={{ width: 44, height: 34, padding: 2, border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', background: 'var(--white)' }} />
+            <input type="text" value={accent} disabled={loading} spellCheck="false"
+              onChange={e => set('brand_accent', e.target.value)}
+              style={{ width: 110, padding: '8px 10px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontFamily: 'var(--font-mono)', fontSize: 13 }} />
+          </div>
+          <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+            Przyciski, odznaki, podkreślenia i wbudowany sygnet. Odcienie hover strona wylicza sama.
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>Podgląd nagłówka</span>
+          <LogoPreview values={values} onDark />
+          <LogoPreview values={values} onDark={false} />
+          {!hasLogo && <span className="muted" style={{ fontSize: 12.5 }}>Nie wgrano jeszcze logo — strona rysuje wbudowany sygnet w kolorze akcentu.</span>}
+        </div>
+
+        <div className="gap-2" style={{ alignItems: 'center' }}>
+          <button type="submit" className="btn btn-flame" disabled={busy || loading}>
+            {busy ? <span className="spinner"/> : <IUpload s={16}/>} Zapisz logo i kolory
+          </button>
+          {saved && !busy && <span className="muted">Zapisano. Odśwież stronę, żeby zobaczyć zmianę.</span>}
+          {loading && <span className="muted">Wczytywanie…</span>}
+        </div>
+      </form>
+    </div>
+  );
+}
+
+/* Dane kontaktowe strony głównej — jedno miejsce na telefon, e-mail i adres.
+   Strona pobiera je z /api/settings, więc zmiana działa globalnie: sekcja
+   „Kontakt" i stopka. */
+function ContactSettings({ st }) {
+  const KEYS = CONTACT_FIELDS.map(f => f.key);
+  const { busy, err, saved, submit, touch } = useCardSave(st, KEYS);
+  const { values, loading } = st;
+
+  return (
+    <div className="adm-card">
+      <h2 className="adm-card-h">Dane kontaktowe</h2>
+      <p className="adm-card-d">
+        Telefon, e-mail i adres z sekcji „Kontakt" oraz stopki na <a href="/" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
+        Zapis podmienia je we wszystkich miejscach naraz.
+      </p>
+
+      {err && <div className="login-err">{err}</div>}
+
+      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          {CONTACT_FIELDS.map(f => (
+            <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{f.label}</span>
+              <input type={f.type} value={values[f.key] ?? ''} disabled={loading}
+                onChange={e => { st.set(f.key, e.target.value); touch(); }}
+                style={{ padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }} />
+              <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>{f.hint}</span>
+            </label>
+          ))}
+        </div>
+
+        <p className="muted" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>
+          Podgląd stopki: <strong>{values.contact_phone || '—'}</strong> · {values.contact_email || '—'} · {values.contact_street || '—'}, {values.contact_city || '—'}
+        </p>
+
+        <div className="gap-2" style={{ alignItems: 'center' }}>
+          <button type="submit" className="btn btn-flame" disabled={busy || loading}>
+            {busy ? <span className="spinner"/> : <ISettings s={16}/>} Zapisz kontakt
+          </button>
+          {saved && !busy && <span className="muted">Zapisano.</span>}
+          {loading && <span className="muted">Wczytywanie…</span>}
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function Settings({ brands, categories, onChange, st }) {
   const [newBrand, setNewBrand] = useState('');
   const [newCat, setNewCat] = useState('');
   const [busy, setBusy] = useState('');
@@ -1471,7 +1872,11 @@ function Settings({ brands, categories, onChange }) {
     <>
       {err && <div className="adm-card" style={{ padding: 0, border: 'none' }}><div className="login-err" style={{ margin: 0 }}>{err}</div></div>}
 
-      <OfferSettings />
+      <BrandingSettings st={st} />
+
+      <ContactSettings st={st} />
+
+      <OfferSettings st={st} />
 
       <div className="adm-card">
         <h2 className="adm-card-h">Marki ({brands.length})</h2>
@@ -1545,6 +1950,10 @@ function App() {
   const [tab, setTab] = useState('list');
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Ustawienia (logo, kolory, kontakt, oferta) — jedno pobranie na sesję,
+  // wspólne dla kart zakładki „Ustawienia" i dla logo w nagłówku panelu.
+  const st = useSettingsStore(authed);
+
   // Marki i kategorie z bazy (fallback do domyślnych, gdy brak migracji / błąd)
   const [brands, setBrands] = useState(DEFAULT_BRANDS);
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
@@ -1570,11 +1979,10 @@ function App() {
     <>
       <header className="adm-hdr">
         <div className="adm-hdr-l">
-          <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
-            <rect x="13" y="7" width="11" height="35" rx="5.5" fill="#fff" />
-            <rect x="18.5" y="38" width="6" height="10" rx="3" fill="#fff" />
-            <rect x="13" y="46" width="42" height="13" rx="6.5" fill="var(--flame)" />
-          </svg>
+          {/* to samo logo co na stronie — od razu widać, co wgrałeś */}
+          {(st.values.logo_light || st.values.logo_mark)
+            ? <img src={st.values.logo_light || st.values.logo_mark} alt="" style={{ height: 32, width: 'auto', display: 'block' }} />
+            : <BuiltInMark size={32} accent={st.values.brand_accent || '#F04E23'} color="#fff" />}
           <div>
             <div className="adm-hdr-title">Panel admina</div>
             <div className="adm-hdr-sub">Langer Dystrybucja · Neon DB</div>
@@ -1601,7 +2009,7 @@ function App() {
       <main className="adm-main">
         {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories}/>}
         {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories}/>}
-        {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig}/>}
+        {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig} st={st}/>}
       </main>
     </>
   );

@@ -149,6 +149,8 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .hero-poster { background: var(--flame); padding: calc(var(--header-h) + 80px) 0 96px; }
 .hero-poster-in { position: relative; z-index: 2; }
 .hero-watermark { position: absolute; right: -120px; bottom: -160px; color: rgba(14,21,51,.10); z-index: 1; }
+img.hero-watermark { opacity: .10; }
+img.hero-split-mark { opacity: .14; }
 
 .hero-split { display: grid; grid-template-columns: 1.15fr .85fr; min-height: 92vh; }
 .hero-split-l { background: var(--navy); display: flex; align-items: center; padding: calc(var(--header-h) + 40px) 0 60px; }
@@ -373,6 +375,59 @@ let CATEGORIES = [
 ];
 
 let BRANDS = ['Soudal', 'Tytan', 'Penosil', 'Langer', 'Den Braven'];
+
+/* ===== USTAWIENIA Z PANELU =====
+   Logo, kolor akcentu i dane kontaktowe pobierane z /api/settings (panel →
+   Ustawienia). Poniższe wartości to fallback: gdy API nie odpowie albo strona
+   jest oglądana z dysku, wszystko wygląda jak dotąd — wbudowany sygnet SVG. */
+let SITE = {
+  logo_light:      '',   // logo na ciemne tło (header u góry, stopka)
+  logo_dark:       '',   // logo na jasne tło (header po przewinięciu)
+  logo_mark:       '',   // sygnet — znak wodny w hero
+  logo_height:     '38',
+  logo_show_text:  '1',
+  brand_accent:    '#F04E23',
+  contact_phone:   '+48 000 000 000',
+  contact_email:   'biuro@langerdystrybucja.pl',
+  contact_street:  'ul. Przykładowa 00',
+  contact_city:    '00-000 Miasto',
+  contact_company: 'Langer Dystrybucja',
+};
+
+/* Logo dla danego tła. Gdy wgrano tylko jedną wersję — używamy jej wszędzie,
+   lepsze to niż brak logo w połowie miejsc. */
+function logoFor(onDark) {
+  return onDark ? (SITE.logo_light || SITE.logo_dark) : (SITE.logo_dark || SITE.logo_light);
+}
+
+/* „+48 123 456 789" -> „+48123456789" (poprawny href dla tel:) */
+function telHref(phone) {
+  return 'tel:' + String(phone || '').replace(/[^\d+]/g, '');
+}
+
+/* Odcień akcentu: mix koloru z bielą (t>0) albo z czernią (t<0).
+   Dzięki temu wybór jednego koloru w panelu daje komplet: hover, wciśnięcie
+   i jasne tło ikon — bez ręcznego dobierania czterech hexów. */
+function shade(hex, t) {
+  const m = /^#?([\da-f]{6})$/i.exec(String(hex || '').trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const mix = (c) => Math.round(t >= 0 ? c + (255 - c) * t : c * (1 + t));
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix);
+  return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
+}
+
+/* Wpina kolor akcentu w zmienne CSS — podmienia się wszystko naraz:
+   przyciski, odznaki, podkreślenia, wbudowany sygnet. */
+function applyAccent(hex) {
+  if (!/^#?[\da-f]{6}$/i.test(String(hex || '').trim())) return;
+  const root = document.documentElement.style;
+  root.setProperty('--flame', hex);
+  root.setProperty('--flame-600', shade(hex, -0.14));
+  root.setProperty('--flame-700', shade(hex, -0.28));
+  root.setProperty('--flame-tint', shade(hex, 0.86));
+  root.setProperty('--flame-glow', shade(hex, 0.14));
+}
 
 // PRODUCTS ładowane z data/products.json przez Pages CMS — patrz App.
 
@@ -643,8 +698,17 @@ function CatIcon({ name, size = 48 }) {
   );
 }
 
-/* ===== BRAND MARK ===== */
+/* ===== BRAND MARK =====
+   Sygnet: wgrany w panelu (Ustawienia → Logo i kolory marki) albo wbudowany
+   rysunek SVG, gdy nic nie wgrano. Znak wodny w hero dziedziczy przezroczysty
+   kolor przez `opacity`, bo obrazka nie da się pomalować `currentColor`. */
 function LangerMark({ size = 40, className }) {
+  if (SITE.logo_mark) {
+    return (
+      <img src={SITE.logo_mark} alt="" aria-hidden="true" className={className}
+        style={{ width: size, height: size, objectFit: 'contain', display: 'block' }} />
+    );
+  }
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} aria-hidden="true">
       <rect x="13" y="7" width="11" height="35" rx="5.5" fill="currentColor" />
@@ -655,14 +719,24 @@ function LangerMark({ size = 40, className }) {
   );
 }
 
+/* Logo w nagłówku i stopce. Gdy w panelu wgrano plik — pokazujemy go w
+   wysokości ustawionej w panelu; napis obok zostaje albo znika (logo z gotowym
+   napisem nie potrzebuje dubla). Bez wgranego pliku: sygnet + napis, jak dotąd. */
 function LangerLogo({ onDark, size = 40 }) {
+  const src = logoFor(onDark);
+  const height = parseInt(SITE.logo_height, 10) || size;
+  const showText = !src || SITE.logo_show_text !== '0';
   return (
     <a href="#top" className="logo" style={{ color: onDark ? '#fff' : 'var(--navy)' }}>
-      <LangerMark size={size} />
-      <span className="logo-words">
-        <span className="logo-name">LANGER</span>
-        <span className="logo-sub" style={{ color: onDark ? 'rgba(255,255,255,.6)' : 'var(--ash-700)' }}>DYSTRYBUCJA</span>
-      </span>
+      {src
+        ? <img src={src} alt={SITE.contact_company || 'Langer Dystrybucja'} style={{ height, width: 'auto', display: 'block' }} />
+        : <LangerMark size={size} />}
+      {showText && (
+        <span className="logo-words">
+          <span className="logo-name">LANGER</span>
+          <span className="logo-sub" style={{ color: onDark ? 'rgba(255,255,255,.6)' : 'var(--ash-700)' }}>DYSTRYBUCJA</span>
+        </span>
+      )}
     </a>
   );
 }
@@ -1014,14 +1088,14 @@ function Contact() {
       <div className="wrap contact-grid">
         <div className="reveal">
           <span className="eyebrow">Kontakt</span>
-          <h2 className="h-sec">Zostań partnerem<br/>Langer Dystrybucja.</h2>
+          <h2 className="h-sec">Zostań partnerem<br/>{SITE.contact_company || 'Langer Dystrybucja'}.</h2>
           <p className="lead" style={{ maxWidth:440, marginTop:16 }}>
             Zostaw dane — handlowiec odezwie się w ciągu jednego dnia roboczego z ofertą i cennikiem hurtowym.
           </p>
           <ul className="contact-list">
-            <li><span className="ci"><IPhone/></span><div><div className="ci-k">Telefon</div><a href="tel:+48000000000" className="ci-v num">+48 000 000 000</a></div></li>
-            <li><span className="ci"><IMail/></span><div><div className="ci-k">E-mail</div><a href="mailto:biuro@langerdystrybucja.pl" className="ci-v">biuro@langerdystrybucja.pl</a></div></li>
-            <li><span className="ci"><IPin/></span><div><div className="ci-k">Magazyn i biuro</div><div className="ci-v">ul. Przykładowa 00, 00-000 Miasto</div></div></li>
+            <li><span className="ci"><IPhone/></span><div><div className="ci-k">Telefon</div><a href={telHref(SITE.contact_phone)} className="ci-v num">{SITE.contact_phone}</a></div></li>
+            <li><span className="ci"><IMail/></span><div><div className="ci-k">E-mail</div><a href={'mailto:' + SITE.contact_email} className="ci-v">{SITE.contact_email}</a></div></li>
+            <li><span className="ci"><IPin/></span><div><div className="ci-k">Magazyn i biuro</div><div className="ci-v">{[SITE.contact_street, SITE.contact_city].filter(Boolean).join(', ')}</div></div></li>
           </ul>
         </div>
         <div className="reveal">
@@ -1074,14 +1148,14 @@ function Footer() {
           </div>
           <div className="footer-col">
             <div className="footer-h">Kontakt</div>
-            <a href="tel:+48000000000" className="num">+48 000 000 000</a>
-            <a href="mailto:biuro@langerdystrybucja.pl">biuro@langerdystrybucja.pl</a>
-            <span style={{ color:'rgba(255,255,255,.5)' }}>ul. Przykładowa 00<br/>00-000 Miasto</span>
+            <a href={telHref(SITE.contact_phone)} className="num">{SITE.contact_phone}</a>
+            <a href={'mailto:' + SITE.contact_email}>{SITE.contact_email}</a>
+            <span style={{ color:'rgba(255,255,255,.5)' }}>{SITE.contact_street}<br/>{SITE.contact_city}</span>
           </div>
         </div>
       </div>
       <div className="wrap footer-bottom">
-        <span>© {new Date().getFullYear()} Langer Dystrybucja</span>
+        <span>© {new Date().getFullYear()} {SITE.contact_company || 'Langer Dystrybucja'}</span>
         <span>Wersja beta · dane kontaktowe do uzupełnienia</span>
       </div>
     </footer>
@@ -1283,21 +1357,20 @@ function useReveal() {
 }
 
 function App() {
-  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  // Kolor akcentu startuje z panelu (SITE), a suwak w „Tweaks" może go jeszcze
+  // podmienić na czas oglądania — bez zapisu.
+  const [t, setTweak] = useTweaks({ ...TWEAK_DEFAULTS, accent: SITE.brand_accent || TWEAK_DEFAULTS.accent });
   const catRef = useRef(null);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     fetch('/api/products', { cache: 'no-store' })
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(setProducts)
+      .then(d => setProducts(Array.isArray(d) ? d : []))
       .catch(err => console.error('Nie udało się załadować produktów:', err));
   }, []);
 
-  useEffect(() => {
-    document.documentElement.style.setProperty('--flame', t.accent);
-    document.documentElement.style.setProperty('--flame-glow', t.accent);
-  }, [t.accent]);
+  useEffect(() => { applyAccent(t.accent); }, [t.accent]);
 
   useReveal();
 
@@ -1337,15 +1410,19 @@ function App() {
 (async function bootstrap() {
   const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
   try {
-    const [cats, brs] = await withTimeout(Promise.all([
+    const [cats, brs, cfg] = await withTimeout(Promise.all([
       fetch('/api/categories', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status)),
       fetch('/api/brands',     { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status)),
+      // ustawienia (logo, kolor, kontakt) — brak odpowiedzi nie może wywrócić strony
+      fetch('/api/settings',   { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
     ]), 3000);
     if (Array.isArray(cats) && cats.length) CATEGORIES = cats;
     if (Array.isArray(brs)  && brs.length)  BRANDS = brs;
+    if (cfg && typeof cfg === 'object') SITE = { ...SITE, ...cfg };
   } catch (e) {
     console.warn('Konfiguracja z API niedostępna — używam wartości domyślnych.', e);
   }
+  applyAccent(SITE.brand_accent);
   ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 })();
   </script>

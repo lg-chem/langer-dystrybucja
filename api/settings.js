@@ -11,11 +11,33 @@ const DEFAULTS = {
   landing_pistol_cartons: '5',
   landing_pistol_price:   '1',
   landing_phone:          '+48 000 000 000',
+
+  // Dane kontaktowe strony głównej — panel → Ustawienia → „Dane kontaktowe".
+  // Podmieniają się globalnie: sekcja „Kontakt" i stopka.
+  contact_phone:  '+48 000 000 000',
+  contact_email:  'biuro@langerdystrybucja.pl',
+  contact_street: 'ul. Przykładowa 00',
+  contact_city:   '00-000 Miasto',
+  contact_company:'Langer Dystrybucja',
+
+  // Identyfikacja wizualna — panel → Ustawienia → „Logo i kolory marki".
+  // Puste logo = strona rysuje wbudowany sygnet SVG (jak dotąd).
+  logo_light:     '',   // wersja na CIEMNE tło (header na górze, stopka)
+  logo_dark:      '',   // wersja na JASNE tło (header po przewinięciu)
+  logo_mark:      '',   // sam sygnet (kwadrat) — znak wodny w hero
+  logo_height:    '38', // wysokość logo w headerze, px
+  logo_show_text: '1',  // '1' = pokaż napis LANGER / DYSTRYBUCJA obok znaku
+  brand_accent:   '#F04E23', // kolor akcentu (--flame) — przyciski, odznaki
 };
 
 // Klucze, które wolno zapisywać — chroni przed zaśmieceniem tabeli
 // przypadkowym polem z formularza.
 const ALLOWED = Object.keys(DEFAULTS);
+
+// Logo trafia do bazy jako data URI (base64) — tak samo jak zdjęcia produktów.
+// Limit chroni bazę i czas ładowania strony: panel i tak zmniejsza plik przed
+// wysyłką, więc realne logo mieści się w kilkudziesięciu kB.
+const MAX_VALUE_LEN = 800_000;
 
 function requireAdmin(req) {
   const auth = req.headers.authorization || '';
@@ -48,6 +70,13 @@ export default async function handler(req, res) {
       const entries = Object.entries(body).filter(([k]) => ALLOWED.includes(k));
       if (!entries.length) {
         return res.status(400).json({ error: 'Brak znanych ustawień do zapisania' });
+      }
+
+      const tooBig = entries.find(([, v]) => String(v ?? '').length > MAX_VALUE_LEN);
+      if (tooBig) {
+        return res.status(413).json({
+          error: `Plik „${tooBig[0]}" jest za duży (limit ${Math.round(MAX_VALUE_LEN / 1000)} kB). Wgraj mniejszy albo w formacie SVG.`,
+        });
       }
 
       for (const [key, value] of entries) {
