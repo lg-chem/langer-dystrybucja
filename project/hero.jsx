@@ -9,6 +9,9 @@ const HERO = {
   lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze w piany montażowe, silikony, akryle i kleje. Sprawdzone marki, własna linia Langer i krótkie terminy dostaw — bez zamawiania pełnych kartonów.',
 };
 
+// UWAGA: to archiwum projektu — liczby poniżej pochodzą z makiety i NIE są
+// prawdziwe. Wersja live (index.html) liczy produkty i marki z bazy, a czas
+// realizacji i liczbę punktów bierze z panelu (Ustawienia → „Liczby w hero").
 function HeroStats({ onDark }) {
   const stats = [
     ['120+', 'produktów w ofercie'],

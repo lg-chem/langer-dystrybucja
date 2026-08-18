@@ -175,6 +175,11 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
 .diff-imgs { display: inline-flex; align-items: center; gap: 6px; }
 .diff-img { width: 26px; height: 26px; object-fit: contain; border: 1px solid var(--line); border-radius: 4px; background: var(--white); }
 
+/* --- Podgląd liczb w hero --- */
+.stat-prev { display: flex; flex-wrap: wrap; gap: 28px; background: var(--navy); border-radius: var(--r-md); padding: 18px 22px; }
+.stat-prev-n { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; letter-spacing: -0.02em; }
+.stat-prev-l { font-size: 12.5px; color: rgba(255,255,255,.6); margin-top: 4px; }
+
 /* --- Logo i kolory marki --- */
 .logo-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
 .logo-slot { border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
@@ -264,6 +269,22 @@ const DEFAULT_BRANDING = {
   brand_accent:   '#F04E23',
 };
 
+/* Liczby w hero strony głównej. Puste pole produktów/marek = strona liczy je
+   z bazy; puste pozostałe = kafel się nie pokazuje. */
+const DEFAULT_STATS = {
+  stat_products: '',
+  stat_brands:   '',
+  stat_delivery: '48 h',
+  stat_points:   '',
+};
+
+const STAT_FIELDS = [
+  { key: 'stat_products', label: 'Produktów w ofercie',     auto: true,  hint: 'Puste = strona wpisze tu liczbę produktów z bazy.' },
+  { key: 'stat_brands',   label: 'Marek w ofercie',         auto: true,  hint: 'Puste = strona policzy marki z listy w Ustawieniach.' },
+  { key: 'stat_delivery', label: 'Średni czas realizacji',  auto: false, hint: 'Np. „48 h" albo „24–48 h". Puste = kafel znika.' },
+  { key: 'stat_points',   label: 'Zaopatrywanych punktów',  auto: false, hint: 'Wpisz tylko realną liczbę. Puste = kafel znika.' },
+];
+
 const DEFAULT_CONTACT = {
   contact_phone:   '+48 000 000 000',
   contact_email:   'biuro@langerdystrybucja.pl',
@@ -274,7 +295,7 @@ const DEFAULT_CONTACT = {
 
 /* Komplet ustawień trzymanych w tabeli `settings` — jedna wspólna mapa dla
    wszystkich kart zakładki „Ustawienia". */
-const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT };
+const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT, ...DEFAULT_STATS };
 
 /* Trzy sloty logo. `bg` decyduje, na jakim tle rysujemy podgląd — logo na
    ciemne tło jest zwykle białe, więc na białym kwadracie byłoby niewidoczne. */
@@ -1947,6 +1968,75 @@ function BrandingSettings({ st }) {
   );
 }
 
+/* Liczby pod nagłówkiem na stronie głównej. Zamiast wpisywać je „na oko"
+   w kodzie: produkty i marki liczy sama strona z bazy, resztę ustawiasz tutaj,
+   a czego nie znasz — zostawiasz puste i kafel się nie pokazuje. */
+function HeroStatsSettings({ st }) {
+  const KEYS = STAT_FIELDS.map(f => f.key);
+  const { busy, err, saved, submit, touch } = useCardSave(st, KEYS);
+  const { values, loading } = st;
+
+  const preview = STAT_FIELDS
+    .map(f => ({ ...f, value: String(values[f.key] || '').trim() }))
+    .filter(f => f.value || f.auto);
+
+  return (
+    <div className="adm-card">
+      <h2 className="adm-card-h">Liczby w hero</h2>
+      <p className="adm-card-d">
+        Cztery liczby pod nagłówkiem na <a href="/" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
+        Produkty i marki strona liczy sama z bazy — zawsze zgadzają się z ofertą.
+        Pole, którego nie wypełnisz (i którego nie da się policzyć), po prostu nie pojawi się na stronie.
+      </p>
+
+      {err && <div className="login-err">{err}</div>}
+
+      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+          {STAT_FIELDS.map(f => (
+            <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>{f.label}</span>
+              <input
+                type="text"
+                value={values[f.key] ?? ''}
+                disabled={loading}
+                placeholder={f.auto ? 'auto — z bazy' : 'puste = ukryj kafel'}
+                onChange={e => { st.set(f.key, e.target.value); touch(); }}
+                style={{ padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }}
+              />
+              <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>{f.hint}</span>
+            </label>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>Podgląd</span>
+          {preview.length === 0
+            ? <span className="muted">Żaden kafel się nie pokaże — hero będzie bez liczb.</span>
+            : (
+              <div className="stat-prev">
+                {preview.map(f => (
+                  <div key={f.key} className="stat-prev-i">
+                    <div className="stat-prev-n">{f.value || 'z bazy'}</div>
+                    <div className="stat-prev-l">{f.label.toLowerCase()}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+        </div>
+
+        <div className="gap-2" style={{ alignItems: 'center' }}>
+          <button type="submit" className="btn btn-flame" disabled={busy || loading}>
+            {busy ? <span className="spinner"/> : <ISettings s={16}/>} Zapisz liczby
+          </button>
+          {saved && !busy && <span className="muted">Zapisano.</span>}
+          {loading && <span className="muted">Wczytywanie…</span>}
+        </div>
+      </form>
+    </div>
+  );
+}
+
 /* Dane kontaktowe strony głównej — jedno miejsce na telefon, e-mail i adres.
    Strona pobiera je z /api/settings, więc zmiana działa globalnie: sekcja
    „Kontakt" i stopka. */
@@ -2038,6 +2128,8 @@ function Settings({ brands, categories, onChange, st }) {
       {err && <div className="adm-card" style={{ padding: 0, border: 'none' }}><div className="login-err" style={{ margin: 0 }}>{err}</div></div>}
 
       <BrandingSettings st={st} />
+
+      <HeroStatsSettings st={st} />
 
       <ContactSettings st={st} />
 

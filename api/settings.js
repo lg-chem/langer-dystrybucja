@@ -20,6 +20,14 @@ const DEFAULTS = {
   contact_city:   '00-000 Miasto',
   contact_company:'Langer Dystrybucja',
 
+  // Liczby w hero strony głównej. Produkty i marki puste = liczymy je z bazy
+  // (zawsze zgodne z realną ofertą). Pozostałe puste = kafel się nie pokazuje —
+  // lepiej nie pokazać liczby, niż pokazać wymyśloną.
+  stat_products: '',
+  stat_brands:   '',
+  stat_delivery: '48 h',
+  stat_points:   '',
+
   // Identyfikacja wizualna — panel → Ustawienia → „Logo i kolory marki".
   // Puste logo = strona rysuje wbudowany sygnet SVG (jak dotąd).
   logo_light:     '',   // wersja na CIEMNE tło (header na górze, stopka)

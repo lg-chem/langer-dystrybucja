@@ -133,6 +133,9 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .hero-h { color: #fff; max-width: 14ch; margin-bottom: 8px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
 .hstats { display: grid; grid-template-columns: repeat(4, auto); gap: 40px; margin-top: 56px; }
+.hstats.n1 { grid-template-columns: auto; }
+.hstats.n2 { grid-template-columns: repeat(2, auto); }
+.hstats.n3 { grid-template-columns: repeat(3, auto); }
 .hstat-n { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px,3vw,40px); letter-spacing: -0.03em; line-height: 1; }
 .hstat-l { font-size: 14px; color: var(--ash-700); margin-top: 6px; font-weight: 500; }
 .hstats.on-dark .hstat-n { color: #fff; }
@@ -335,7 +338,7 @@ img.hero-split-mark { opacity: .14; }
   .hero-split-inner { padding: 0 32px; margin: 0; max-width: none; }
   .hero-split-r { padding: 48px 32px; }
   .contact-grid, .footer-in { grid-template-columns: 1fr; gap: 40px; }
-  .hstats { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+  .hstats, .hstats.n1, .hstats.n2, .hstats.n3 { grid-template-columns: repeat(2, 1fr); gap: 28px; }
 }
 @media (max-width: 680px){
   .sec { padding: 72px 0; }
@@ -392,6 +395,10 @@ let SITE = {
   contact_street:  'ul. Przykładowa 00',
   contact_city:    '00-000 Miasto',
   contact_company: 'Langer Dystrybucja',
+  stat_products:   '',   // puste = liczymy z bazy
+  stat_brands:     '',   // puste = liczymy z bazy
+  stat_delivery:   '48 h',
+  stat_points:     '',   // puste = kafel się nie pokazuje
 };
 
 /* Logo dla danego tła. Gdy wgrano tylko jedną wersję — używamy jej wszędzie,
@@ -785,10 +792,22 @@ const HERO = {
   lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze w piany montażowe, silikony, akryle i kleje. Sprawdzone marki, własna linia Langer i krótkie terminy dostaw — bez zamawiania pełnych kartonów.',
 };
 
-function HeroStats({ onDark }) {
-  const stats = [['120+','produktów w ofercie'],['6','marek, w tym Langer'],['48 h','średni czas realizacji'],['1 200+','zaopatrywanych punktów']];
+/* Liczby w hero. Produkty i marki liczymy z bazy — zawsze zgadzają się z tym,
+   co realnie jest w ofercie. Czas realizacji i liczbę punktów ustawiasz
+   w panelu (Ustawienia → „Liczby w hero"); pusta wartość = kafel się nie
+   pokazuje. Żadna liczba na stronie nie jest wpisana „na oko" w kodzie. */
+function HeroStats({ onDark, products = [] }) {
+  const stats = [
+    [SITE.stat_products || (products.length ? String(products.length) : ''), 'produktów w ofercie'],
+    [SITE.stat_brands   || (BRANDS.length   ? String(BRANDS.length)   : ''), 'marek w ofercie'],
+    [SITE.stat_delivery, 'średni czas realizacji'],
+    [SITE.stat_points,   'zaopatrywanych punktów'],
+  ].filter(([n]) => String(n || '').trim());
+
+  if (!stats.length) return null;
+
   return (
-    <div className={'hstats' + (onDark ? ' on-dark' : '')}>
+    <div className={'hstats n' + stats.length + (onDark ? ' on-dark' : '')}>
       {stats.map(([n,l]) => (
         <div className="hstat" key={l}>
           <div className="hstat-n num">{n}</div>
@@ -799,7 +818,7 @@ function HeroStats({ onDark }) {
   );
 }
 
-function Hero({ variant }) {
+function Hero({ variant, products }) {
   const Title = () => (
     <h1 className="display hero-h">
       {HERO.h1a} <span style={{ color:'var(--flame)' }}>{HERO.h1b}</span>{HERO.h1c}
@@ -826,7 +845,7 @@ function Hero({ variant }) {
             <a href="#kontakt" className="btn btn-dark">Zostań partnerem <IArrow/></a>
             <a href="#baza" className="btn btn-ghost" style={{ borderColor:'rgba(14,21,51,.3)', color:'var(--navy)' }}>Zobacz bazę produktów</a>
           </div>
-          <HeroStats onDark={false} />
+          <HeroStats onDark={false} products={products} />
         </div>
       </section>
     );
@@ -845,7 +864,7 @@ function Hero({ variant }) {
         </div>
         <div className="hero-split-r">
           <LangerMark size={260} className="hero-split-mark" />
-          <HeroStats onDark={false} />
+          <HeroStats onDark={false} products={products} />
         </div>
       </section>
     );
@@ -859,7 +878,7 @@ function Hero({ variant }) {
         <Title/>
         <p className="lead" style={{ color:'rgba(255,255,255,.74)', maxWidth:640 }}>{HERO.lead}</p>
         <CTAs/>
-        <HeroStats onDark />
+        <HeroStats onDark products={products} />
       </div>
     </section>
   );
@@ -1385,7 +1404,7 @@ function App() {
   return (
     <React.Fragment>
       <Header />
-      <Hero variant={HERO_KEY[t.hero] || 'navy'} />
+      <Hero variant={HERO_KEY[t.hero] || 'navy'} products={products} />
       {t.marquee && <Marquee />}
       <WhyUs />
       <Process />

@@ -146,18 +146,18 @@ Dwa szablony do pobrania w nagłówku karty: **pełny** (wszystkie kolumny) i **
 
 ## Zmiana statystyk w hero
 
-Znajdź w `index.html` linię `const stats = [` (wewnątrz `HeroStats`):
+**Panel → Ustawienia → „Liczby w hero".** Żadna z tych liczb nie jest już wpisana na sztywno w kodzie:
 
-```js
-const stats = [
-  ['120+',   'produktów w ofercie'],
-  ['6',      'marek, w tym Langer'],
-  ['48 h',   'średni czas realizacji'],
-  ['1 200+', 'zaopatrywanych punktów'],
-];
-```
+| Kafel | Skąd bierze wartość |
+|---|---|
+| Produktów w ofercie | Liczone z bazy — tyle, ile realnie masz produktów. Pole w panelu nadpisuje. |
+| Marek w ofercie | Liczone z listy marek (Ustawienia → Marki). Pole w panelu nadpisuje. |
+| Średni czas realizacji | Tylko z panelu. Puste = kafel znika. |
+| Zaopatrywanych punktów | Tylko z panelu. Puste = kafel znika. |
 
-Zmień liczby i opisy zgodnie ze swoją rzeczywistością.
+Zasada: **pusto zamiast zmyślonego**. Kafel, którego nie da się policzyć i którego nie wypełnisz, po prostu się nie pokazuje — hero układa się wtedy na 1–3 kolumny.
+
+Klucze w tabeli `settings`: `stat_products`, `stat_brands`, `stat_delivery`, `stat_points` (patrz `migrations/006_settings_hero_stats.sql` — migracja opcjonalna).
 
 ---
 
