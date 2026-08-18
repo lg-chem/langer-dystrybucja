@@ -267,7 +267,35 @@ const OFFER_DEFAULTS = {
   landing_pistol_cartons: '5',
   landing_pistol_price:   '1',
   landing_phone:          '+48 000 000 000',
+
+  // Identyfikacja wizualna z panelu (Ustawienia → Logo i kolory marki).
+  // Puste logo = wbudowany sygnet, tak jak dotąd.
+  logo_light:     '',
+  logo_dark:      '',
+  logo_show_text: '1',
+  brand_accent:   '#F04E23',
 };
+
+/* Odcień koloru: mix z bielą (t>0) albo czernią (t<0). Jeden wybrany kolor
+   akcentu daje komplet odcieni — hover, wciśnięcie, jasne tło ikon. */
+function shade(hex, t) {
+  const m = /^#?([\da-f]{6})$/i.exec(String(hex || '').trim());
+  if (!m) return hex;
+  const n = parseInt(m[1], 16);
+  const mix = (c) => Math.round(t >= 0 ? c + (255 - c) * t : c * (1 + t));
+  const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(mix);
+  return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
+}
+
+function applyAccent(hex) {
+  if (!/^#?[\da-f]{6}$/i.test(String(hex || '').trim())) return;
+  const root = document.documentElement.style;
+  root.setProperty('--flame', hex);
+  root.setProperty('--flame-600', shade(hex, -0.14));
+  root.setProperty('--flame-700', shade(hex, -0.28));
+  root.setProperty('--flame-tint', shade(hex, 0.86));
+  root.setProperty('--flame-glow', shade(hex, 0.14));
+}
 
 /* ============================================================
    DANE PRODUKTÓW
@@ -409,21 +437,40 @@ function LangerMark({ size = 38 }) {
   );
 }
 
+/* Znak marki: logo wgrane w panelu (Ustawienia → Logo i kolory marki) albo
+   wbudowany sygnet. `onDark` wybiera wersję jasną/ciemną — ta sama logika co
+   na stronie głównej, żeby oba widoki wyglądały identycznie. */
+function BrandMark({ cfg = {}, size = 38, onDark = false }) {
+  const src = onDark
+    ? (cfg.logo_light || cfg.logo_dark)
+    : (cfg.logo_dark || cfg.logo_light);
+  if (!src) return <LangerMark size={size} />;
+  return <img src={src} alt="" style={{ height: size, width: 'auto', display: 'block' }} />;
+}
+
+/* Napis obok logo znika, gdy wgrane logo ma już nazwę firmy w środku. */
+function showLogoText(cfg = {}) {
+  const src = cfg.logo_light || cfg.logo_dark;
+  return !src || cfg.logo_show_text !== '0';
+}
+
 /* ============================================================
    HEADER
    ============================================================ */
 const NAV = [['#rabat', 'Jak działa rabat'], ['#produkty', 'Produkty'], ['#wsparcie', 'Wsparcie punktu']];
 
-function Header() {
+function Header({ offer = {} }) {
   return (
     <header className="hdr">
       <div className="wrap hdr-in">
         <a href="#top" className="logo">
-          <LangerMark size={38} />
-          <span className="logo-words">
-            <span className="logo-name">LANGER</span>
-            <span className="logo-sub">DYSTRYBUCJA</span>
-          </span>
+          <BrandMark cfg={offer} size={38} />
+          {showLogoText(offer) && (
+            <span className="logo-words">
+              <span className="logo-name">LANGER</span>
+              <span className="logo-sub">DYSTRYBUCJA</span>
+            </span>
+          )}
         </a>
         <nav className="hdr-nav">
           {NAV.map(([href, label]) => <a key={href} href={href} className="hdr-link">{label}</a>)}
@@ -623,7 +670,7 @@ function Why({ offer }) {
             <h2 className="h2">Dlaczego warto nas trzymać na półce</h2>
           </div>
           <p className="lead" style={{ maxWidth: 340, fontSize: 15.5 }}>
-            Marża na Langerze plus rabat na resztę zamówienia — korzyść liczy się dwa razy.
+            Lepsza cena na Langerze plus rabat na resztę zamówienia — korzyść liczy się dwa razy.
           </p>
         </div>
         <Reveal className="why">
@@ -720,16 +767,18 @@ function Contact({ offer }) {
 /* ============================================================
    STOPKA + PRZYKLEJONY PASEK
    ============================================================ */
-function Footer() {
+function Footer({ offer = {} }) {
   return (
     <footer className="footer">
       <div className="wrap footer-in">
         <a href="/" className="logo" style={{ color: '#fff' }}>
-          <LangerMark size={30} />
-          <span className="logo-words">
-            <span className="logo-name" style={{ fontSize: 17 }}>LANGER</span>
-            <span className="logo-sub" style={{ color: 'rgba(255,255,255,.5)' }}>DYSTRYBUCJA</span>
-          </span>
+          <BrandMark cfg={offer} size={30} onDark />
+          {showLogoText(offer) && (
+            <span className="logo-words">
+              <span className="logo-name" style={{ fontSize: 17 }}>LANGER</span>
+              <span className="logo-sub" style={{ color: 'rgba(255,255,255,.5)' }}>DYSTRYBUCJA</span>
+            </span>
+          )}
         </a>
         <span>Montaż bez kompromisów</span>
         <a href="/">← Wróć na stronę główną</a>
@@ -761,9 +810,14 @@ function StickyCta({ offer }) {
    ============================================================ */
 function App() {
   const offer = useOffer();
+
+  // Kolor akcentu z panelu — podmienia --flame i odcienie pochodne na całej
+  // podstronie (przyciski, odznaki, pasek pistoletu).
+  useEffect(() => { applyAccent(offer.brand_accent); }, [offer.brand_accent]);
+
   return (
     <div id="top">
-      <Header />
+      <Header offer={offer} />
       <main>
         <Hero offer={offer} />
         <Products />
@@ -771,7 +825,7 @@ function App() {
         <PistolBand offer={offer} />
         <Contact offer={offer} />
       </main>
-      <Footer />
+      <Footer offer={offer} />
       <StickyCta offer={offer} />
     </div>
   );

@@ -10,8 +10,10 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML — b
 
 - [Jak to działa](#jak-to-działa)
 - [Paleta kolorów](#paleta-kolorów)
+- [Logo i kolory z panelu](#logo-i-kolory-z-panelu)
 - [Edycja danych kontaktowych](#edycja-danych-kontaktowych)
 - [Dodawanie nowych produktów](#dodawanie-nowych-produktów)
+- [Import i aktualizacja z CSV](#import-i-aktualizacja-z-csv)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
 - [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
 - [Wdrożenie na Vercel](#wdrożenie)
@@ -50,20 +52,42 @@ Z brand booka Langer. Żeby zmienić jakikolwiek kolor — edytuj sekcję `:root
 | `--ash-700` | `#565D67` | Szary — tekst drugorzędny, opisy |
 | `--light` | `#EEF0F3` | Jasnoszary — tło bazy produktów |
 
-**Najszybsza zmiana akcentu:** podmień `#F04E23` na inny kolor w linii `--flame: #F04E23;` — automatycznie zmieni się na wszystkich przyciskach, odznakach i podkreśleniach.
+**Najszybsza zmiana akcentu:** nie ruszaj kodu — ustaw kolor w panelu (Ustawienia → „Logo i kolory marki"). Wartość z panelu nadpisuje `--flame` wraz z odcieniami hover. W kodzie zmienisz go, podmieniając `#F04E23` w linii `--flame: #F04E23;` — to wartość startowa, zanim odpowie API.
+
+---
+
+## Logo i kolory z panelu
+
+**Panel → Ustawienia → „Logo i kolory marki".** Nie trzeba ruszać kodu — wgrane pliki lądują w bazie (tabela `settings`, jako data URI) i podmieniają się na stronie głównej, na `/dla-punktow/` i w samym panelu.
+
+**Trzy sloty:**
+
+| Slot | Gdzie się pokazuje | Jaka wersja |
+|---|---|---|
+| Logo na jasne tło | Nagłówek po przewinięciu strony | Kolorowa / ciemna |
+| Logo na ciemne tło | Nagłówek na samej górze, stopka | Jasna (biała) |
+| Sygnet (kwadrat) | Znak wodny w hero (wariant „Plakat") | Sam znak, bez napisu |
+
+Wgrasz tylko jedną wersję — użyjemy jej wszędzie. Nie wgrasz żadnej — strona rysuje dotychczasowy sygnet SVG, dokładnie jak dotąd.
+
+**Format:** najlepiej **SVG** (ostry na każdym ekranie, waży kilka kB). PNG/JPG/WebP też zadziała — panel sam zmniejsza plik i zachowuje przezroczystość. Limit to ~700 kB po zmniejszeniu; jeśli plik nie wejdzie, panel powie o tym wprost.
+
+**Pozostałe ustawienia w tej karcie:**
+
+- **Wysokość logo** (24–72 px) — dotyczy nagłówka i stopki, szerokość dopasowuje się sama.
+- **Napis obok logo** — wyłącz, jeśli wgrane logo ma już nazwę firmy w środku.
+- **Kolor akcentu** — osiem gotowych wariantów albo dowolny hex z próbnika. Podmienia `--flame` na całej stronie (przyciski, odznaki, podkreślenia, wbudowany sygnet); odcienie hover i tła ikon strona wylicza sama.
+- **Podgląd nagłówka** — pokazuje układ na ciemnym i jasnym tle, zanim cokolwiek zapiszesz.
 
 ---
 
 ## Edycja danych kontaktowych
 
-Wszystkie miejsca z danymi kontaktowymi w `index.html` — wyszukaj poniższe (Ctrl+F):
+**Panel → Ustawienia → „Dane kontaktowe".** Telefon, e-mail, adres i nazwa firmy w jednym miejscu — zapis podmienia je naraz w sekcji „Kontakt" i w stopce strony głównej. Link `tel:` tworzy się automatycznie.
 
-| Co | Co zmienić |
-|---|---|
-| `+48 000 000 000` | Numer telefonu (3 miejsca: header, stopka, sekcja kontakt) |
-| `biuro@langerdystrybucja.pl` | E-mail (2 miejsca: kontakt, stopka) |
-| `ul. Przykładowa 00, 00-000 Miasto` | Adres magazynu (sekcja kontakt) |
-| `ul. Przykładowa 00<br/>00-000 Miasto` | Adres w stopce |
+Telefon na podstronie `/dla-punktow/` jest osobny (karta „Oferta dla punktów handlowych") — landing bywa używany w kampaniach z innym numerem.
+
+Wartości domyślne, gdy baza nie odpowiada, siedzą w `api/settings.js` (obiekt `DEFAULTS`) i w `index.html` (obiekt `SITE`).
 
 ---
 
@@ -96,20 +120,44 @@ Znajdź w `index.html` linię `const PRODUCTS = [` i dopisuj kolejne wiersze wed
 
 ---
 
+## Import i aktualizacja z CSV
+
+**Panel → Import CSV.** Ten sam plik służy do dodawania nowych produktów i do poprawiania tych, które już są w bazie — dopasowanie idzie po `SKU`.
+
+**Wymagane kolumny:** tylko `sku`. Nazwa jest potrzebna wyłącznie dla produktów, których jeszcze nie ma w bazie — plik `sku,image_url` podmieni same zdjęcia.
+
+**Krok 2 — mapowanie:** nagłówki z pliku przypisujesz do pól produktu (część zgadujemy sami). Możesz też rozpoznać markę z pierwszego słowa nazwy i przypisać własne nazwy kategorii do tych zdefiniowanych.
+
+**Krok 3 — podgląd.** Widać, ile pozycji jest nowych, ile do aktualizacji, a ile jest w bazie identycznych (te pomijamy). Do wyboru tryb:
+
+| Tryb | Co robi |
+|---|---|
+| Dodaj nowe i zaktualizuj istniejące | Pełny import |
+| Tylko nowe | Dorzuca brakujące SKU, istniejących nie rusza |
+| Tylko aktualizacja | Nic nie dodaje, poprawia to, co już jest |
+
+Przy aktualizacji dochodzi drugi wybór: **nadpisz wartościami z pliku** albo **uzupełnij tylko braki** (rusza wyłącznie pola, które w bazie są puste).
+
+**Nic nie znika.** Aktualizujemy wyłącznie pola wypisane w kolumnie „Co się zmieni" — czyli te, które są w pliku i faktycznie mają inną wartość. Kolumny, której w pliku nie ma (albo komórka jest pusta), import nie tyka: wgranie samych zdjęć nie skasuje nazw, wariantów ani tagów. Tabela pokazuje każdą zmianę jako `było → będzie`, przy zdjęciach z miniaturkami.
+
+Dwa szablony do pobrania w nagłówku karty: **pełny** (wszystkie kolumny) i **aktualizacji** (`sku,image_url`).
+
+---
+
 ## Zmiana statystyk w hero
 
-Znajdź w `index.html` linię `const stats = [` (wewnątrz `HeroStats`):
+**Panel → Ustawienia → „Liczby w hero".** Żadna z tych liczb nie jest już wpisana na sztywno w kodzie:
 
-```js
-const stats = [
-  ['120+',   'produktów w ofercie'],
-  ['6',      'marek, w tym Langer'],
-  ['48 h',   'średni czas realizacji'],
-  ['1 200+', 'zaopatrywanych punktów'],
-];
-```
+| Kafel | Skąd bierze wartość |
+|---|---|
+| Produktów w ofercie | Liczone z bazy — tyle, ile realnie masz produktów. Pole w panelu nadpisuje. |
+| Marek w ofercie | Liczone z listy marek (Ustawienia → Marki). Pole w panelu nadpisuje. |
+| Średni czas realizacji | Tylko z panelu. Puste = kafel znika. |
+| Zaopatrywanych punktów | Tylko z panelu. Puste = kafel znika. |
 
-Zmień liczby i opisy zgodnie ze swoją rzeczywistością.
+Zasada: **pusto zamiast zmyślonego**. Kafel, którego nie da się policzyć i którego nie wypełnisz, po prostu się nie pokazuje — hero układa się wtedy na 1–3 kolumny.
+
+Klucze w tabeli `settings`: `stat_products`, `stat_brands`, `stat_delivery`, `stat_points` (patrz `migrations/006_settings_hero_stats.sql` — migracja opcjonalna).
 
 ---
 
@@ -143,6 +191,12 @@ z `/api/settings` przy każdym wejściu. **Wymaga uruchomienia migracji
 `migrations/004_settings_table.sql`** — do tego czasu (albo gdy API nie
 odpowie) strona pokazuje wartości domyślne: 10 kartonów, 15%, pistolet za 1 zł
 do 5 kartonów.
+
+Logo i kolor akcentu podstrona bierze z tych samych ustawień co strona główna —
+patrz [Logo i kolory z panelu](#logo-i-kolory-z-panelu). Nowe klucze (logo,
+kolory, dane kontaktowe) dokłada `migrations/005_settings_brand_and_contact.sql`;
+migracja jest opcjonalna — pierwszy zapis z panelu i tak utworzy brakujące
+wiersze, a bez niej wszystko działa na wartościach domyślnych.
 
 ### Co zmienisz w kodzie
 
@@ -190,7 +244,7 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 │   ├── products.js         # Lista i zapis produktów
 │   ├── brands.js           # Marki
 │   ├── categories.js       # Kategorie
-│   └── settings.js         # Parametry oferty dla /dla-punktow/
+│   └── settings.js         # Ustawienia: logo, kolory, kontakt, oferta
 ├── migrations/             # Migracje SQL — uruchamiane ręcznie w Neon
 └── project/                # Archiwum — oryginalne pliki źródłowe (rozbite)
     ├── brand.css           # Tokeny kolorów, fonty, spacing

@@ -24,18 +24,41 @@ export default async function handler(req, res) {
     if (req.method === 'PUT') {
       if (!requireAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
 
+      // Aktualizacja częściowa (PATCH-owa): zmieniamy WYŁĄCZNIE pola przysłane
+      // w żądaniu. Klucza nie ma w body -> kolumna zostaje nietknięta; klucz
+      // jest, ale pusty -> świadome czyszczenie pola. Dzięki temu import CSV
+      // z samym `sku,image_url` podmienia zdjęcie i nie kasuje reszty danych.
       const body = req.body || {};
-      const { name, brand, category, variant, pack, role, tags, image_url } = body;
+      const has = (k) => Object.prototype.hasOwnProperty.call(body, k);
+
+      const current = await sql`SELECT * FROM products WHERE sku = ${sku}`;
+      if (!current.length) return res.status(404).json({ error: 'Nie znaleziono' });
+      const cur = current[0];
+
+      if (has('name') && !String(body.name ?? '').trim()) {
+        return res.status(400).json({ error: 'Nazwa nie może być pusta' });
+      }
+
+      // '' i null znaczą to samo: wyczyść kolumnę (poza tagami — tam pusta lista)
+      const val = (k) => {
+        if (!has(k)) return cur[k];
+        const v = body[k];
+        return (v === '' || v === undefined) ? null : v;
+      };
+      const tags = has('tags')
+        ? (Array.isArray(body.tags) ? body.tags : String(body.tags || '').split(/[|;]/).map(t => t.trim()).filter(Boolean))
+        : (cur.tags ?? []);
+
       const rows = await sql`
         UPDATE products SET
-          name = COALESCE(${name}, name),
-          brand = COALESCE(${brand}, brand),
-          category = COALESCE(${category}, category),
-          variant = ${variant ?? null},
-          pack = ${pack ?? null},
-          role = COALESCE(${role}, role),
-          tags = ${tags ?? null},
-          image_url = ${image_url ?? null}
+          name      = ${val('name')},
+          brand     = ${val('brand')},
+          category  = ${val('category')},
+          variant   = ${val('variant')},
+          pack      = ${val('pack')},
+          role      = ${val('role')},
+          tags      = ${tags},
+          image_url = ${val('image_url')}
         WHERE sku = ${sku}
         RETURNING *
       `;
