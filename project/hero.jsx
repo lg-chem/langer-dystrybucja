@@ -5,8 +5,8 @@ const HERO = {
   eyebrow: 'Hurtowa dystrybucja chemii budowlanej',
   h1a: 'Chemia budowlana',
   h1b: 'na czas',
-  h1c: ', w pełnych kartonach.',
-  lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze w piany montażowe, silikony, akryle i kleje. Sprawdzone marki, marka własna Langer z najlepszą marżą i krótkie terminy dostaw.',
+  h1c: ', dokładnie ile potrzebujesz.',
+  lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze w piany montażowe, silikony, akryle i kleje. Sprawdzone marki, własna linia Langer i krótkie terminy dostaw — bez zamawiania pełnych kartonów.',
 };
 
 function HeroStats({ onDark }) {
@@ -118,8 +118,8 @@ function WhyUs() {
   const items = [
     [IClock,'Krótkie terminy','Średnio 48 h od zamówienia do rozładunku. Zamówienia do 13:00 kompletujemy tego samego dnia.'],
     [IBox,'Pełen asortyment','Piany, silikony, akryle, kleje i akcesoria w jednym miejscu — bez żonglowania kilkoma hurtowniami.'],
-    [ITag,'Marka własna Langer','Produkty Langer w jakości premium, ale z marżą, która realnie zarabia na półce.'],
-    [ITruck,'Dostawa na paletach','Logistyka skrojona pod handel — pełne kartony, palety i transport własny w regionie.'],
+    [ITag,'Marka własna Langer','Pełna linia pian, klejów i silikonów pod naszą marką — jakość premium w hurtowej cenie.'],
+    [ITruck,'Elastyczne zamówienia','Nie musisz brać pełnych kartonów ani zbierać całej palety. Wysyłamy tyle, ile realnie potrzebujesz.'],
     [IHead,'Doradztwo handlowca','Stały opiekun, który zna Twój asortyment i podpowiada, co dobrać do zamówienia.'],
     [IShield,'Stała jakość','Tylko sprawdzone marki i partie z atestami. Reklamacje załatwiamy bez przepychanek.'],
   ];
@@ -147,9 +147,9 @@ function WhyUs() {
 /* PROCESS */
 function Process() {
   const steps = [
-    ['01','Składasz zamówienie','Online z bazy produktów, mailem lub przez swojego handlowca. Pełne kartony, jasne jednostki sprzedaży.'],
+    ['01','Składasz zamówienie','Online z bazy produktów, mailem lub przez swojego handlowca. Bez sztywnych minimów — także pojedyncze opakowania.'],
     ['02','Kompletujemy i pakujemy','Magazyn zbiera towar tego samego dnia. Kontrola ilości i partii przed wysyłką.'],
-    ['03','Wysyłka i transport','Transport własny w regionie lub spedycja w całej Polsce. Dostawa na paletach pod sklep.'],
+    ['03','Wysyłka i transport','Transport własny w regionie lub spedycja w całej Polsce. Od paczki po paletę — pod sam sklep.'],
     ['04','Rozładunek i rozliczenie','Dostawa w 48 h, faktura z terminem, a Twój handlowiec pilnuje kolejnego uzupełnienia.'],
   ];
   return (
@@ -258,10 +258,10 @@ function LangerShowcase() {
         <div className="lshow-head reveal">
           <div>
             <span className="eyebrow">Marka własna</span>
-            <h2 className="h-sec">Linia Langer —<br/>marża, która zarabia.</h2>
+            <h2 className="h-sec">Linia Langer —<br/>jakość pod własną marką.</h2>
           </div>
           <p className="lead lshow-lead">
-            Pełna gama pian, klejów, silikonów i akcesoriów pod naszą marką. Premium jakość, hurtowa cena i marża, której nie zaoferuje Ci żadna inna hurtownia.
+            Pełna gama pian, klejów, silikonów i akcesoriów pod naszą marką. Jakość premium w hurtowej cenie, prosto z naszego magazynu.
           </p>
         </div>
 
