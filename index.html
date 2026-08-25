@@ -129,41 +129,45 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .mm-close { align-self: flex-end; padding: 8px; color: var(--navy); margin-bottom: 12px; }
 .mm-link { font-family: var(--font-display); font-weight: 600; font-size: 20px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
 
-/* ===== HERO ===== */
+/* ===== HERO (kompaktowy) =====
+   Zamiast pełnoekranowego plakatu: jedno zdanie o tym, co sprzedajemy, twarde
+   liczby z bazy i pasek kategorii — żeby od pierwszego ekranu było wiadomo,
+   po co tu jesteś, i dało się jednym kliknięciem wejść w katalog. */
 .hero { position: relative; overflow: hidden; }
-.hero-h { color: #fff; max-width: 14ch; margin-bottom: 8px; }
-.hero-cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
-.hstats { display: grid; grid-template-columns: repeat(4, auto); gap: 40px; margin-top: 56px; }
-.hstats.n1 { grid-template-columns: auto; }
-.hstats.n2 { grid-template-columns: repeat(2, auto); }
-.hstats.n3 { grid-template-columns: repeat(3, auto); }
-.hstat-n { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px,3vw,40px); letter-spacing: -0.03em; line-height: 1; }
-.hstat-l { font-size: 14px; color: var(--ash-700); margin-top: 6px; font-weight: 500; }
-.hstats.on-dark .hstat-n { color: #fff; }
-.hstats.on-dark .hstat-l { color: rgba(255,255,255,.6); }
+.hero-navy { background: var(--navy); padding: calc(var(--header-h) + 44px) 0 44px; }
+.hero-navy-in { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 20px 48px; align-items: center; }
+.hero-copy { min-width: 0; }
+.hero-h { color: #fff; font-size: clamp(31px, 3.9vw, 48px); line-height: 1.05; letter-spacing: -0.035em; max-width: 21ch; margin: 14px 0 0; }
+.hero-lead { font-size: clamp(16px, 1.5vw, 19px); line-height: 1.5; color: rgb(255 255 255 / 0.72); max-width: 620px; margin: 14px 0 0; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
 
-.hero-navy { background: var(--navy); padding: calc(var(--header-h) + 80px) 0 100px; }
-.hero-navy-in { position: relative; z-index: 2; }
+/* Liczby jako panel po prawej — wypełniają kolumnę, której nagłówek nie potrzebuje,
+   i od razu mówią, jaka jest skala oferty. */
+.hero-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;
+  padding: 24px 26px; border-radius: var(--r-lg);
+  background: rgb(255 255 255 / 0.05); border: 1px solid rgb(255 255 255 / 0.1); }
+.hero-fact b { display: block; font-family: var(--font-display); font-weight: 700; font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1; letter-spacing: -.03em; color: #fff; }
+.hero-fact span { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.35; color: rgb(255 255 255 / 0.55); }
+
+/* Pasek kategorii w hero — przewijalny w poziomie na telefonie */
+.hero-cats-wrap { position: relative; z-index: 2; }
+.hero-cats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; min-width: 0; }
+.hero-cats::-webkit-scrollbar { display: none; }
+.hcat { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: var(--r-full);
+  border: 1px solid rgb(255 255 255 / 0.18); background: rgb(255 255 255 / 0.06); color: #fff;
+  font-size: 13.5px; font-weight: 600; white-space: nowrap; transition: transform .14s, background .14s, border-color .14s; }
+.hcat:hover { background: rgb(255 255 255 / 0.14); border-color: rgb(255 255 255 / 0.42); transform: translateY(-1px); }
+.hcat:active { transform: translateY(0); }
+.hcat-n { font-family: var(--font-mono); font-size: 11px; color: rgb(255 255 255 / 0.5); }
+.hcat-all { background: var(--flame); border-color: var(--flame); }
+.hcat-all:hover { background: var(--flame-600); border-color: var(--flame-600); }
+
 .hero-grid-bg { position: absolute; inset: 0; opacity: .5;
   background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
   background-size: 56px 56px; -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000, transparent 75%); mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000, transparent 75%); }
-.hero-navy::after { content:''; position:absolute; top:-160px; right:-120px; width:520px; height:520px; border-radius:50%;
-  background: radial-gradient(circle, rgba(240,78,35,.28), transparent 65%); filter: blur(20px); }
-
-.hero-poster { background: var(--flame); padding: calc(var(--header-h) + 80px) 0 96px; }
-.hero-poster-in { position: relative; z-index: 2; }
-.hero-watermark { position: absolute; right: -120px; bottom: -160px; color: rgba(14,21,51,.10); z-index: 1; }
-img.hero-watermark { opacity: .10; }
-img.hero-split-mark { opacity: .14; }
-
-.hero-split { display: grid; grid-template-columns: 1.15fr .85fr; min-height: 92vh; }
-.hero-split-l { background: var(--navy); display: flex; align-items: center; padding: calc(var(--header-h) + 40px) 0 60px; }
-.hero-split-inner { max-width: 620px; margin-left: auto; padding: 0 56px 0 max(32px, calc((100vw - var(--max))/2 + 32px)); }
-.hero-split-r { background: var(--flame); position: relative; display: flex; flex-direction: column; justify-content: center; gap: 40px; padding: 60px; overflow: hidden; }
-.hero-split-mark { color: rgba(14,21,51,.14); position: absolute; top: -40px; right: -40px; }
-.hero-split-r .hstats { grid-template-columns: repeat(2, auto); position: relative; z-index: 2; gap: 32px 48px; }
-.hero-split-r .hstat-n { color: var(--navy); }
-.hero-split-r .hstat-l { color: rgba(14,21,51,.7); }
+.hero-navy::after { content:''; position:absolute; top:-200px; right:-120px; width:480px; height:480px; border-radius:50%;
+  background: radial-gradient(circle, rgba(240,78,35,.26), transparent 65%); filter: blur(20px); }
 
 /* ===== MARQUEE ===== */
 .marquee { background: var(--navy-900); color: #fff; overflow: hidden; padding: 18px 0; }
@@ -194,18 +198,6 @@ img.hero-split-mark { opacity: .14; }
 .proc-t { color: #fff; font-size: 21px; margin-bottom: 10px; letter-spacing: -0.02em; }
 .proc-d { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.55; }
 
-.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-.cat-card { display: flex; align-items: flex-start; gap: 20px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 28px; transition: transform .2s, box-shadow .2s, border-color .2s; }
-.cat-card:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
-.cat-ic { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: var(--r-md); background: var(--light); color: var(--navy); }
-.cat-card:hover .cat-ic { background: var(--flame); color: #fff; }
-.cat-body { flex: 1; }
-.cat-t { font-size: 21px; margin-bottom: 8px; letter-spacing: -0.02em; }
-.cat-d { color: var(--ash-700); font-size: 14.5px; line-height: 1.5; }
-.cat-go { color: var(--ash); flex: none; transition: transform .2s, color .2s; }
-.cat-card:hover .cat-go { color: var(--flame); transform: translate(3px,-3px); }
-.cat-card-all { flex-direction: column; justify-content: space-between; gap: 24px; background: var(--navy); border-color: var(--navy); min-height: 180px; }
-.cat-card-all:hover { box-shadow: var(--e2); }
 
 /* ===== LANGER SHOWCASE (karuzela marki własnej) ===== */
 .sec-langer { background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
@@ -279,6 +271,47 @@ img.hero-split-mark { opacity: .14; }
 .footer-bottom { display: flex; justify-content: space-between; padding-top: 28px; color: rgba(255,255,255,.45); font-size: 13px; }
 
 /* ===== CATALOG ===== */
+/* Wybór idzie od góry do dołu: kategoria (kafelki) -> podkategoria -> marka.
+   Każdy poziom pokazuje TYLKO to, co realnie jest w bieżącym zawężeniu, i ile
+   tego jest — nie da się kliknąć w pustkę. */
+.pick { margin-bottom: 20px; }
+.pick-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.pick-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
+.pick-hint { font-size: 13px; color: var(--ash); }
+
+.ctiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.ctile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 108px; padding: 14px;
+  border: 1.5px solid var(--line); border-radius: var(--r-md); background: var(--white); color: var(--navy); text-align: left;
+  transition: transform .14s, box-shadow .14s, border-color .14s, background .14s, color .14s; }
+.ctile:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--e2); border-color: transparent; }
+.ctile:active:not(:disabled) { transform: translateY(-1px); box-shadow: var(--e1); }
+.ctile.on { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: var(--e2); }
+.ctile:disabled { opacity: .38; cursor: not-allowed; }
+.ctile-ic { color: var(--flame); display: block; }
+.ctile.on .ctile-ic { color: var(--flame-glow); }
+.ctile-t { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; line-height: 1.15; letter-spacing: -.02em; }
+.ctile-n { font-family: var(--font-mono); font-size: 11.5px; color: var(--ash); margin-top: auto; }
+.ctile.on .ctile-n { color: rgb(255 255 255 / 0.6); }
+.ctile-all { background: var(--light); border-style: dashed; }
+.ctile-all.on { background: var(--navy); border-style: solid; }
+
+.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; font-size: 14px; }
+.crumb { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: var(--r-full);
+  background: var(--navy); color: #fff; font-weight: 600; }
+.crumb-x { display: inline-flex; opacity: .7; }
+.crumb-x:hover { opacity: 1; }
+.crumb-sep { color: var(--ash); }
+.crumb-home { color: var(--ash-700); font-weight: 600; }
+.crumb-home:hover { color: var(--navy); }
+
+.load-more { display: flex; justify-content: center; margin-top: 30px; }
+
+/* Nagłówek katalogu: tytuł i wyszukiwarka w jednym pasie — sekcja zaczyna się
+   od rzeczy, po którą tu przyszedłeś, a nie od pół ekranu typografii. */
+.base-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 460px); gap: 20px 32px;
+  align-items: end; margin-bottom: 22px; }
+.h-base { font-size: clamp(26px, 3vw, 38px); letter-spacing: -.03em; margin-top: 12px; }
+
 .base-toolbar { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; }
 .search { flex: 1; display: flex; align-items: center; gap: 12px; background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 0 16px; transition: border-color .15s, box-shadow .15s; }
 .search:focus-within { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
@@ -291,11 +324,16 @@ img.hero-split-mark { opacity: .14; }
 .sortbox label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
 .sortbox select { font-family: var(--font-text); font-size: 15px; font-weight: 600; color: var(--navy); background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 13px 14px; cursor: pointer; }
 .sortbox select:focus { outline: none; border-color: var(--navy); }
-.filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
-.filter-line { display: flex; align-items: baseline; gap: 16px; }
+/* min-width:0 w całym łańcuchu — bez tego przewijany poziomo pasek chipów
+   rozpycha stronę na szerokość swojej zawartości i cały layout jedzie w bok. */
+.filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; min-width: 0; }
+.filter-line { display: flex; align-items: baseline; gap: 16px; min-width: 0; }
+.filter-line .chips { min-width: 0; }
 .filter-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; flex: none; width: 84px; padding-top: 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .base-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; font-size: 15px; color: var(--ash-700); font-weight: 600; }
+.base-meta .sortbox { margin-left: auto; }
+.base-meta .sortbox select { padding: 9px 12px; font-size: 14px; }
 .base-meta .num { color: var(--navy); font-size: 18px; }
 .base-clear { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--flame); border: 1px solid var(--flame-tint); background: var(--flame-tint); padding: 6px 12px; border-radius: var(--r-full); }
 .base-clear:hover { background: var(--flame); color: #fff; }
@@ -326,7 +364,8 @@ img.hero-split-mark { opacity: .14; }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1080px){
-  .why-grid, .cat-grid { grid-template-columns: repeat(2, 1fr); }
+  .ctiles { grid-template-columns: repeat(4, 1fr); }
+  .why-grid { grid-template-columns: repeat(2, 1fr); }
   .proc-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 24px; }
   .pgrid { grid-template-columns: repeat(3, 1fr); }
   .lshow-head { grid-template-columns: 1fr; gap: 20px; align-items: start; }
@@ -336,15 +375,43 @@ img.hero-split-mark { opacity: .14; }
 @media (max-width: 900px){
   .hdr-nav, .hdr-cta { display: none; }
   .hdr-burger { display: inline-flex; }
-  .hero-split { grid-template-columns: 1fr; min-height: 0; }
-  .hero-split-inner { padding: 0 32px; margin: 0; max-width: none; }
-  .hero-split-r { padding: 48px 32px; }
+  .hero-navy-in { grid-template-columns: 1fr; gap: 28px; }
+  .hero-facts { padding: 18px 20px; gap: 16px; }
+  .ctiles { grid-template-columns: repeat(3, 1fr); }
   .contact-grid, .footer-in { grid-template-columns: 1fr; gap: 40px; }
-  .hstats, .hstats.n1, .hstats.n2, .hstats.n3 { grid-template-columns: repeat(2, 1fr); gap: 28px; }
 }
 @media (max-width: 680px){
   .sec { padding: 72px 0; }
-  .why-grid, .cat-grid, .proc-grid, .pgrid { grid-template-columns: 1fr; }
+  .why-grid, .proc-grid { grid-template-columns: 1fr; }
+  /* Dwie kolumny kart produktów zamiast jednej — mniej przewijania na telefonie */
+  .pgrid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .pcard-body { padding: 13px; gap: 6px; }
+  .pcard-name { font-size: 15px; }
+  .pcard-variant, .pcard-pack { font-size: 12.5px; }
+  .pcard-foot { flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; }
+  .ctiles { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  /* Kafelek kładzie się na bok: 11 kategorii w dwóch kolumnach zajmuje wtedy
+     ekran, a nie trzy — do produktów jest bliżej. */
+  .ctile { flex-direction: row; align-items: center; gap: 10px; min-height: 58px; padding: 10px 12px; }
+  .ctile-ic svg { width: 20px; height: 20px; }
+  .ctile-t { font-size: 13.5px; }
+  .ctile-n { margin: 0 0 0 auto; font-size: 11px; }
+  .base-head { grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
+  .h-base { margin-top: 10px; }
+  .pick-hint { display: none; }
+  .base-meta { flex-wrap: wrap; gap: 10px; }
+  /* Paski podkategorii i marek przewijamy w poziomie zamiast zawijać na 4 linie */
+  .filter-line .chips { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: x proximity; }
+  .filter-line .chip { scroll-snap-align: start; }
+  .filter-line .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; }
+  .hero-navy { padding: calc(var(--header-h) + 28px) 0 32px; }
+  /* Na telefonie zamiast zawijania na cztery linie — jeden przewijany pas */
+  .hero-cats { flex-wrap: nowrap; overflow-x: auto; width: 100%; margin-top: 22px; padding-bottom: 4px;
+    scrollbar-width: none; -ms-overflow-style: none; }
+  .hero-cats::-webkit-scrollbar { display: none; }
+  .pcard-sub { display: none; }
+  .base-meta .sortbox { margin-left: 0; }
   .lcar-track { grid-auto-columns: 78%; }
   .lcar-nav { display: none; }
   .form-row { grid-template-columns: 1fr; }
@@ -759,7 +826,7 @@ function Header() {
     on(); window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
   }, []);
-  const links = [['#proces','Proces'],['#oferta','Oferta'],['#baza','Baza produktów'],['/dla-punktow/','Dla punktów'],['#dlaczego','Dlaczego my'],['#kontakt','Kontakt']];
+  const links = [['#baza','Produkty'],['#langer','Marka Langer'],['/dla-punktow/','Dla punktów'],['#dlaczego','Dlaczego my'],['#proces','Proces'],['#kontakt','Kontakt']];
   return (
     <header className={'hdr' + (scrolled ? ' hdr-solid' : '')}>
       <div className="wrap hdr-in">
@@ -785,110 +852,93 @@ function Header() {
   );
 }
 
-/* ===== HERO ===== */
+/* ===== HERO =====
+   Kompaktowy: nagłówek mówi wprost, czym handlujemy, liczby lecą z bazy,
+   a pasek kategorii wrzuca prosto do katalogu. Bez pełnoekranowego plakatu —
+   pierwszy ekran ma odpowiadać „co tu jest", nie robić wrażenie. */
 const HERO = {
   eyebrow: 'Hurtowa dystrybucja chemii budowlanej',
-  h1a: 'Chemia budowlana',
-  h1b: 'na czas',
-  h1c: ', dokładnie ile potrzebujesz.',
-  lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze w piany montażowe, silikony, akryle i kleje. Sprawdzone marki, własna linia Langer i krótkie terminy dostaw — bez zamawiania pełnych kartonów.',
+  h1a: 'Piany, silikony, akryle, kleje',
+  h1b: ' i cała reszta',
+  h1c: ' — hurtowo.',
+  lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze. Sprawdzone marki, własna linia Langer i zamówienia bez pełnych kartonów.',
 };
 
-/* Liczby w hero. Produkty i marki liczymy z bazy — zawsze zgadzają się z tym,
-   co realnie jest w ofercie. Czas realizacji i liczbę punktów ustawiasz
-   w panelu (Ustawienia → „Liczby w hero"); pusta wartość = kafel się nie
-   pokazuje. Żadna liczba na stronie nie jest wpisana „na oko" w kodzie. */
-function HeroStats({ onDark, products = [] }) {
-  const stats = [
-    [SITE.stat_products || (products.length ? String(products.length) : ''), 'produktów w ofercie'],
-    [SITE.stat_brands   || (BRANDS.length   ? String(BRANDS.length)   : ''), 'marek w ofercie'],
+/* Fakty w hero: produkty i marki liczymy z bazy, czas realizacji i liczbę
+   punktów bierzemy z panelu (Ustawienia → „Liczby w hero"). Pusta wartość =
+   fakt się nie pokazuje. Żadnej liczby nie wpisujemy „na oko" w kodzie. */
+function HeroFacts({ products = [], catCount = 0 }) {
+  const facts = [
+    [SITE.stat_products || (products.length ? String(products.length) : ''), 'produktów'],
+    [catCount ? String(catCount) : '', 'kategorii'],
+    [SITE.stat_brands || (BRANDS.length ? String(BRANDS.length) : ''), 'marek'],
     [SITE.stat_delivery, 'średni czas realizacji'],
-    [SITE.stat_points,   'zaopatrywanych punktów'],
+    [SITE.stat_points, 'zaopatrywanych punktów'],
   ].filter(([n]) => String(n || '').trim());
 
-  if (!stats.length) return null;
-
+  if (!facts.length) return null;
   return (
-    <div className={'hstats n' + stats.length + (onDark ? ' on-dark' : '')}>
-      {stats.map(([n,l]) => (
-        <div className="hstat" key={l}>
-          <div className="hstat-n num">{n}</div>
-          <div className="hstat-l">{l}</div>
+    <div className="hero-facts">
+      {facts.map(([n, l]) => (
+        <div className="hero-fact" key={l}>
+          <b className="num">{n}</b>
+          <span>{l}</span>
         </div>
       ))}
     </div>
   );
 }
 
-function Hero({ variant, products }) {
-  const Title = () => (
-    <h1 className="display hero-h">
-      {HERO.h1a} <span style={{ color:'var(--flame)' }}>{HERO.h1b}</span>{HERO.h1c}
-    </h1>
-  );
-  const CTAs = ({ darkBtns }) => (
-    <div className="hero-cta">
-      <a href="#kontakt" className="btn btn-flame">Zostań partnerem <IArrow/></a>
-      <a href="#baza" className={'btn ' + (darkBtns ? 'btn-ghost' : 'btn-ghost on-dark')}>Zobacz bazę produktów</a>
-    </div>
-  );
-
-  if (variant === 'poster') {
-    return (
-      <section id="top" className="hero hero-poster">
-        <LangerMark size={520} className="hero-watermark" />
-        <div className="wrap hero-poster-in">
-          <span className="eyebrow" style={{ color:'var(--navy)' }}>{HERO.eyebrow}</span>
-          <h1 className="display hero-h" style={{ color:'var(--navy)', maxWidth:980 }}>
-            {HERO.h1a} <span style={{ color:'#fff' }}>{HERO.h1b}</span>{HERO.h1c}
-          </h1>
-          <p className="lead" style={{ color:'var(--navy)', maxWidth:620, opacity:.85 }}>{HERO.lead}</p>
-          <div className="hero-cta">
-            <a href="#kontakt" className="btn btn-dark">Zostań partnerem <IArrow/></a>
-            <a href="#baza" className="btn btn-ghost" style={{ borderColor:'rgba(14,21,51,.3)', color:'var(--navy)' }}>Zobacz bazę produktów</a>
-          </div>
-          <HeroStats onDark={false} products={products} />
-        </div>
-      </section>
-    );
-  }
-
-  if (variant === 'split') {
-    return (
-      <section id="top" className="hero hero-split">
-        <div className="hero-split-l">
-          <div className="hero-split-inner">
-            <span className="eyebrow on-dark">{HERO.eyebrow}</span>
-            <Title/>
-            <p className="lead" style={{ color:'rgba(255,255,255,.72)', maxWidth:520 }}>{HERO.lead}</p>
-            <CTAs/>
-          </div>
-        </div>
-        <div className="hero-split-r">
-          <LangerMark size={260} className="hero-split-mark" />
-          <HeroStats onDark={false} products={products} />
-        </div>
-      </section>
-    );
-  }
+function Hero({ products, onPick }) {
+  /* Kategorie w pasku układamy wg liczby produktów — na wierzchu to, czego
+     realnie mamy najwięcej. Puste kategorie się nie pokazują. */
+  const cats = useMemo(() => {
+    const counts = new Map();
+    for (const p of products) if (p.category) counts.set(p.category, (counts.get(p.category) || 0) + 1);
+    return CATEGORIES
+      .map(c => ({ ...c, count: counts.get(c.id) || 0 }))
+      .filter(c => c.count > 0)
+      .sort((a, b) => b.count - a.count);
+  }, [products]);
 
   return (
     <section id="top" className="hero hero-navy">
       <div className="hero-grid-bg" />
       <div className="wrap hero-navy-in">
-        <span className="eyebrow on-dark">{HERO.eyebrow}</span>
-        <Title/>
-        <p className="lead" style={{ color:'rgba(255,255,255,.74)', maxWidth:640 }}>{HERO.lead}</p>
-        <CTAs/>
-        <HeroStats onDark products={products} />
+        <div className="hero-copy">
+          <span className="eyebrow on-dark">{HERO.eyebrow}</span>
+          <h1 className="hero-h">
+            {HERO.h1a}<span style={{ color: 'var(--flame)' }}>{HERO.h1b}</span>{HERO.h1c}
+          </h1>
+          <p className="hero-lead">{HERO.lead}</p>
+          <div className="hero-cta">
+            <a href="#baza" className="btn btn-flame">Przeglądaj produkty <IArrow/></a>
+            <a href="#kontakt" className="btn btn-ghost on-dark">Zostań partnerem</a>
+          </div>
+        </div>
+        <HeroFacts products={products} catCount={cats.length} />
       </div>
+      {cats.length > 0 && (
+        <div className="wrap hero-cats-wrap">
+          <div className="hero-cats">
+            {cats.map(c => (
+              <a key={c.id} href="#baza" className="hcat" onClick={() => onPick && onPick(c.id)}>
+                {c.label} <span className="hcat-n">{c.count}</span>
+              </a>
+            ))}
+            <a href="#baza" className="hcat hcat-all" onClick={() => onPick && onPick('all')}>Cała baza <IArrow s={15}/></a>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
 
 /* ===== MARQUEE ===== */
 function Marquee() {
-  const items = ['SOUDAL','TYTAN','PENOSIL','DEN BRAVEN','LANGER','SOUDAL','TYTAN','PENOSIL','DEN BRAVEN','LANGER'];
+  // Marki bierzemy z bazy — pasek nie może obiecywać marek, których nie mamy.
+  const base = (BRANDS.length ? BRANDS : ['Langer']).map(b => b.toUpperCase());
+  const items = base.length >= 5 ? base : [...base, ...base, ...base].slice(0, 10);
   return (
     <div className="marquee" aria-hidden="true">
       <div className="marquee-track">
@@ -954,40 +1004,6 @@ function Process() {
               <p className="proc-d">{d}</p>
             </div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ===== CATEGORIES ===== */
-function Categories({ onPick }) {
-  return (
-    <section id="oferta" className="sec">
-      <div className="wrap">
-        <div className="sec-head reveal">
-          <span className="eyebrow">Oferta</span>
-          <h2 className="h-sec">Pięć kategorii,<br/>jeden dostawca.</h2>
-        </div>
-        <div className="cat-grid">
-          {CATEGORIES.map((c,i) => (
-            <a href="#baza" key={c.id} onClick={() => onPick && onPick(c.id)}
-               className="cat-card reveal" style={{ transitionDelay:(i*60)+'ms' }}>
-              <span className="cat-ic"><CatIcon name={c.icon} size={40}/></span>
-              <div className="cat-body">
-                <h3 className="cat-t">{c.label}</h3>
-                <p className="cat-d">{c.blurb}</p>
-              </div>
-              <span className="cat-go"><IArrow s={20}/></span>
-            </a>
-          ))}
-          <a href="#baza" onClick={() => onPick && onPick('all')} className="cat-card cat-card-all reveal">
-            <div>
-              <h3 className="cat-t" style={{ color:'#fff' }}>Cała baza produktów</h3>
-              <p className="cat-d" style={{ color:'rgba(255,255,255,.7)' }}>Przeszukaj i filtruj pełny katalog.</p>
-            </div>
-            <span className="btn btn-flame" style={{ alignSelf:'flex-start' }}>Otwórz bazę <IArrow/></span>
-          </a>
         </div>
       </div>
     </section>
@@ -1064,7 +1080,7 @@ function LangerShowcase({ products }) {
   if (!items.length) return null;
 
   return (
-    <section className="sec sec-langer">
+    <section id="langer" className="sec sec-langer">
       <div className="wrap">
         <div className="lshow-head reveal">
           <div>
@@ -1265,73 +1281,221 @@ function ProductTile({ p }) {
   );
 }
 
+/* Ile kart pokazujemy naraz — reszta dochodzi przyciskiem. Na telefonie
+   renderowanie 300 kafli naraz potrafi zatkać przewijanie. */
+const PAGE = 24;
+
+/* Odmiana rzeczownika po liczbie: 1 produkt, 2–4 produkty, 5+ produktów. */
+function plProducts(n) {
+  if (n === 1) return 'produkt';
+  const t = n % 10, h = n % 100;
+  return (t >= 2 && t <= 4 && !(h >= 12 && h <= 14)) ? 'produkty' : 'produktów';
+}
+
+const subKey = (p) => String(p.subcategory || '').trim().toLowerCase();
+
+/* ===== BAZA PRODUKTÓW =====
+   Zawężanie schodkowe: kategoria -> podkategoria -> marka. Liczniki na każdym
+   poziomie liczymy z produktów, które przeszły POZOSTAŁE filtry — dlatego pod
+   „Akryle" widać tylko te marki, które w akrylach faktycznie są, i od razu
+   wiadomo ile. Wybór, po którym nic by nie zostało, jest nieklikalny. */
 function ProductDatabase({ products, initialCatRef }) {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('all');
-  const [sub, setSub] = useState('all');          // podkategoria — klucz małymi literami
+  const [sub, setSub] = useState('all');
   const [brand, setBrand] = useState('all');
   const [sort, setSort] = useState('name');
+  const [shown, setShown] = useState(PAGE);
+  const resultsRef = useRef(null);
 
-  /* Podkategorie nie mają osobnej listy — wynikają z produktów w wybranej
-     kategorii. Pokazujemy je dopiero po wybraniu kategorii, żeby nie wysypać
-     kilkudziesięciu przycisków naraz. */
+  React.useEffect(() => {
+    if (initialCatRef) initialCatRef.current = (c) => { setCat(c === 'all' ? 'all' : c); setSub('all'); };
+  }, [initialCatRef]);
+
+  const term = q.trim().toLowerCase();
+  const searched = useMemo(() => {
+    if (!term) return products;
+    return products.filter(p => {
+      const hay = [p.name, p.brand, p.sku, p.variant, p.subcategory, (p.tags || []).join(' ')]
+        .filter(Boolean).join(' ').toLowerCase();
+      return hay.includes(term);
+    });
+  }, [products, term]);
+
+  // KATEGORIE — liczone po wyszukiwaniu i wybranej marce
+  const catOptions = useMemo(() => {
+    const base = searched.filter(p => brand === 'all' || p.brand === brand);
+    const counts = new Map();
+    for (const p of base) if (p.category) counts.set(p.category, (counts.get(p.category) || 0) + 1);
+    return CATEGORIES.map(c => ({ ...c, count: counts.get(c.id) || 0 }));
+  }, [searched, brand]);
+
+  const totalInScope = useMemo(
+    () => searched.filter(p => brand === 'all' || p.brand === brand).length,
+    [searched, brand]);
+
+  // PODKATEGORIE — tylko z wybranej kategorii, tylko niepuste
   const subOptions = useMemo(() => {
     if (cat === 'all') return [];
+    const base = searched.filter(p => p.category === cat && (brand === 'all' || p.brand === brand));
     const acc = new Map();
-    for (const p of products) {
-      if (p.category !== cat) continue;
-      const label = (p.subcategory || '').trim();
-      if (!label) continue;
-      const key = label.toLowerCase();
-      const cur = acc.get(key) || { key, label, count: 0 };
+    for (const p of base) {
+      const key = subKey(p);
+      if (!key) continue;
+      const cur = acc.get(key) || { key, label: String(p.subcategory).trim(), count: 0 };
       cur.count++;
       acc.set(key, cur);
     }
     return [...acc.values()].sort((a, b) => a.label.localeCompare(b.label, 'pl'));
-  }, [products, cat]);
+  }, [searched, cat, brand]);
 
-  useEffect(() => { setSub('all'); }, [cat]);
+  // MARKI — tylko te obecne w bieżącym zawężeniu (kategoria + podkategoria)
+  const brandOptions = useMemo(() => {
+    const base = searched.filter(p =>
+      (cat === 'all' || p.category === cat) && (sub === 'all' || subKey(p) === sub));
+    const counts = new Map();
+    for (const p of base) if (p.brand) counts.set(p.brand, (counts.get(p.brand) || 0) + 1);
+    return BRANDS.map(b => ({ name: b, count: counts.get(b) || 0 })).filter(b => b.count > 0);
+  }, [searched, cat, sub]);
 
-  React.useEffect(() => {
-    if (initialCatRef) initialCatRef.current = (c) => setCat(c === 'all' ? 'all' : c);
-  }, [initialCatRef]);
+  // Zawężenie mogło wyciąć wybraną wcześniej podkategorię albo markę — wracamy
+  // do „wszystkich" zamiast pokazywać pustą listę z aktywnym filtrem.
+  useEffect(() => {
+    if (sub !== 'all' && !subOptions.some(o => o.key === sub)) setSub('all');
+  }, [subOptions, sub]);
+  useEffect(() => {
+    if (brand !== 'all' && !brandOptions.some(o => o.name === brand)) setBrand('all');
+  }, [brandOptions, brand]);
+  useEffect(() => { setShown(PAGE); }, [q, cat, sub, brand, sort]);
 
   const results = useMemo(() => {
-    let r = products.filter(p => {
+    let r = searched.filter(p => {
       if (cat !== 'all' && p.category !== cat) return false;
-      if (sub !== 'all' && (p.subcategory || '').trim().toLowerCase() !== sub) return false;
+      if (sub !== 'all' && subKey(p) !== sub) return false;
       if (brand !== 'all' && p.brand !== brand) return false;
-      if (q.trim()) {
-        const s = [p.name, p.brand, p.sku, p.variant, p.subcategory, (p.tags || []).join(' ')].filter(Boolean).join(' ').toLowerCase();
-        if (!s.includes(q.trim().toLowerCase())) return false;
-      }
       return true;
     });
     if (sort === 'name') r = [...r].sort((a,b) => (a.name || '').localeCompare(b.name || '','pl'));
     if (sort === 'brand') r = [...r].sort((a,b) => (a.brand || '').localeCompare(b.brand || '','pl') || (a.name || '').localeCompare(b.name || '','pl'));
     return r;
-  }, [q, cat, sub, brand, sort, products]);
+  }, [searched, cat, sub, brand, sort]);
 
+  const catObj = CATEGORIES.find(c => c.id === cat);
+  const subObj = subOptions.find(o => o.key === sub);
   const active = q || cat !== 'all' || sub !== 'all' || brand !== 'all';
   const clear = () => { setQ(''); setCat('all'); setSub('all'); setBrand('all'); };
+
+  /* Po wyborze kategorii na telefonie zjeżdżamy do filtrów i wyników — inaczej
+     trzeba by przewinąć przez całą siatkę kafelków. Na dużym ekranie wszystko
+     jest widoczne naraz, więc nie ruszamy stroną pod palcem użytkownika. */
+  const pickCategory = (id) => {
+    setCat(prev => (prev === id ? 'all' : id));
+    setSub('all');
+    if (window.innerWidth <= 680 && resultsRef.current) {
+      requestAnimationFrame(() => {
+        const el = resultsRef.current;
+        if (!el) return;
+        window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' });
+      });
+    }
+  };
 
   return (
     <section id="baza" className="sec sec-base">
       <div className="wrap">
-        <div className="sec-head reveal">
-          <span className="eyebrow">Baza produktów</span>
-          <h2 className="h-sec">Przeszukaj cały katalog.</h2>
-          <p className="lead" style={{ maxWidth:560, marginTop:14 }}>
-            Wersja beta — ceny hurtowe pokazujemy po zalogowaniu. Filtruj po kategorii i marce, a o cenę pytaj jednym kliknięciem.
-          </p>
-        </div>
-
-        <div className="base-toolbar">
+        <div className="base-head">
+          <div>
+            <span className="eyebrow">Baza produktów</span>
+            <h2 className="h-base">Wybierz kategorię.</h2>
+          </div>
           <div className="search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder={'Szukaj: nazwa, marka, SKU, np. „silikon sanitarny"…'} />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder={'Szukaj: nazwa, marka, SKU…'} />
             {q && <button className="search-x" onClick={() => setQ('')} aria-label="Wyczyść"><IX s={18}/></button>}
           </div>
+        </div>
+
+        {/* Ścieżka wyboru — widać, gdzie się jest, i wychodzi się jednym kliknięciem */}
+        {(cat !== 'all' || sub !== 'all' || brand !== 'all') && (
+          <div className="crumbs">
+            <button className="crumb-home" onClick={clear}>Wszystkie produkty</button>
+            {catObj && <><span className="crumb-sep">/</span>
+              <button className="crumb" onClick={() => { setCat('all'); setSub('all'); }}>
+                {catObj.label} <span className="crumb-x"><IX s={13}/></span>
+              </button></>}
+            {subObj && <><span className="crumb-sep">/</span>
+              <button className="crumb" onClick={() => setSub('all')}>
+                {subObj.label} <span className="crumb-x"><IX s={13}/></span>
+              </button></>}
+            {brand !== 'all' && <><span className="crumb-sep">/</span>
+              <button className="crumb" onClick={() => setBrand('all')}>
+                {brand} <span className="crumb-x"><IX s={13}/></span>
+              </button></>}
+          </div>
+        )}
+
+        {/* KROK 1 — kategoria */}
+        <div className="pick">
+          <div className="pick-h">
+            <span className="pick-k">Kategoria</span>
+            <span className="pick-hint">Kliknij kafelek, żeby zawęzić. Drugi klik cofa wybór.</span>
+
+          </div>
+          <div className="ctiles">
+            <button className={'ctile ctile-all' + (cat === 'all' ? ' on' : '')} onClick={() => pickCategory('all')}>
+              <span className="ctile-ic"><IGrid s={26}/></span>
+              <span className="ctile-t">Wszystkie</span>
+              <span className="ctile-n">{totalInScope}</span>
+            </button>
+            {catOptions.map(c => (
+              <button key={c.id}
+                      className={'ctile' + (cat === c.id ? ' on' : '')}
+                      disabled={!c.count && cat !== c.id}
+                      onClick={() => pickCategory(c.id)}>
+                <span className="ctile-ic"><CatIcon name={c.icon} size={26}/></span>
+                <span className="ctile-t">{c.label}</span>
+                <span className="ctile-n">{c.count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* KROK 2 i 3 — podkategoria i marka, wyłącznie dostępne wartości */}
+        <div ref={resultsRef} />
+        {(subOptions.length > 0 || brandOptions.length > 1) && (
+          <div className="filters">
+            {subOptions.length > 0 && (
+              <div className="filter-line">
+                <span className="filter-k">Podkategoria</span>
+                <div className="chips">
+                  <button className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>Wszystkie</button>
+                  {subOptions.map(o => (
+                    <button key={o.key} className={'chip' + (sub === o.key ? ' active' : '')} onClick={() => setSub(o.key)}>
+                      {o.label} <span className="chip-n">{o.count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {brandOptions.length > 1 && (
+              <div className="filter-line">
+                <span className="filter-k">Marka</span>
+                <div className="chips">
+                  <button className={'chip' + (brand === 'all' ? ' active' : '')} onClick={() => setBrand('all')}>Wszystkie</button>
+                  {brandOptions.map(b => (
+                    <button key={b.name} className={'chip' + (brand === b.name ? ' active' : '')} onClick={() => setBrand(b.name)}>
+                      {b.name} <span className="chip-n">{b.count}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="base-meta">
+          <span><span className="num">{results.length}</span> {plProducts(results.length)}</span>
+          {active && <button className="base-clear" onClick={clear}>Wyczyść filtry <IX s={15}/></button>}
           <div className="sortbox">
             <label>Sortuj</label>
             <select value={sort} onChange={e => setSort(e.target.value)}>
@@ -1341,49 +1505,19 @@ function ProductDatabase({ products, initialCatRef }) {
           </div>
         </div>
 
-        <div className="filters">
-          <div className="filter-line">
-            <span className="filter-k">Kategoria</span>
-            <div className="chips">
-              <button className={'chip' + (cat==='all'?' active':'')} onClick={() => setCat('all')}>Wszystkie</button>
-              {CATEGORIES.map(c => (
-                <button key={c.id} className={'chip' + (cat===c.id?' active':'')} onClick={() => setCat(c.id)}>{c.label}</button>
-              ))}
-            </div>
-          </div>
-          {subOptions.length > 0 && (
-            <div className="filter-line">
-              <span className="filter-k">Podkategoria</span>
-              <div className="chips">
-                <button className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>Wszystkie</button>
-                {subOptions.map(o => (
-                  <button key={o.key} className={'chip' + (sub === o.key ? ' active' : '')} onClick={() => setSub(o.key)}>
-                    {o.label} <span className="chip-n">{o.count}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="filter-line">
-            <span className="filter-k">Marka</span>
-            <div className="chips">
-              <button className={'chip' + (brand==='all'?' active':'')} onClick={() => setBrand('all')}>Wszystkie</button>
-              {BRANDS.map(b => (
-                <button key={b} className={'chip' + (brand===b?' active':'')} onClick={() => setBrand(b)}>{b}</button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="base-meta">
-          <span className="num">{results.length}</span> {results.length === 1 ? 'produkt' : (results.length >= 2 && results.length <= 4 ? 'produkty' : 'produktów')}
-          {active && <button className="base-clear" onClick={clear}>Wyczyść filtry <IX s={15}/></button>}
-        </div>
-
         {results.length ? (
-          <div className="pgrid">
-            {results.map(p => <ProductTile key={p.sku} p={p} />)}
-          </div>
+          <>
+            <div className="pgrid">
+              {results.slice(0, shown).map(p => <ProductTile key={p.sku} p={p} />)}
+            </div>
+            {results.length > shown && (
+              <div className="load-more">
+                <button className="btn btn-ghost" onClick={() => setShown(n => n + PAGE)}>
+                  Pokaż kolejne {Math.min(PAGE, results.length - shown)} z {results.length}
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="empty">
             <span className="empty-ic"><IGrid s={30}/></span>
@@ -1398,8 +1532,7 @@ function ProductDatabase({ products, initialCatRef }) {
 }
 
 /* ===== APP ===== */
-const TWEAK_DEFAULTS = { hero: 'Granat', accent: '#F04E23', marquee: true };
-const HERO_KEY = { 'Granat': 'navy', 'Split': 'split', 'Plakat': 'poster' };
+const TWEAK_DEFAULTS = { accent: '#F04E23', marquee: true };
 
 function useReveal() {
   useEffect(() => {
@@ -1441,19 +1574,19 @@ function App() {
   return (
     <React.Fragment>
       <Header />
-      <Hero variant={HERO_KEY[t.hero] || 'navy'} products={products} />
+      {/* Kolejność sekcji: najpierw towar (hero -> katalog), dopiero potem
+          argumenty sprzedażowe. Kto wchodzi po produkt, ma go od razu. */}
+      <Hero products={products} onPick={pickCat} />
       {t.marquee && <Marquee />}
+      <ProductDatabase products={products} initialCatRef={catRef} />
+      <LangerShowcase products={products} />
       <WhyUs />
       <Process />
-      <Categories onPick={pickCat} />
-      <LangerShowcase products={products} />
-      <ProductDatabase products={products} initialCatRef={catRef} />
       <Contact />
       <Footer />
 
       <TweaksPanel>
-        <TweakSection label="Strona główna (hero)" />
-        <TweakRadio label="Wariant hero" value={t.hero} options={['Granat', 'Split', 'Plakat']} onChange={(v) => setTweak('hero', v)} />
+        <TweakSection label="Strona główna" />
         <TweakColor label="Kolor akcentu" value={t.accent} options={['#F04E23', '#E5421A', '#1E3FB5', '#0E1533']} onChange={(v) => setTweak('accent', v)} />
         <TweakToggle label="Pasek marek (marquee)" value={t.marquee} onChange={(v) => setTweak('marquee', v)} />
       </TweaksPanel>

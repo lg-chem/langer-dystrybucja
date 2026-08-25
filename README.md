@@ -15,6 +15,7 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML — b
 - [Dodawanie nowych produktów](#dodawanie-nowych-produktów)
 - [Import i aktualizacja z CSV](#import-i-aktualizacja-z-csv)
 - [Kategorie i podkategorie](#kategorie-i-podkategorie)
+- [Jak działa strona główna](#jak-działa-strona-główna)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
 - [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
 - [Wdrożenie na Vercel](#wdrożenie)
@@ -94,30 +95,24 @@ Wartości domyślne, gdy baza nie odpowiada, siedzą w `api/settings.js` (obiekt
 
 ## Dodawanie nowych produktów
 
-Znajdź w `index.html` linię `const PRODUCTS = [` i dopisuj kolejne wiersze według tego wzoru:
+**Panel → Produkty → „Nowy produkt".** Produkty siedzą w bazie (Neon), nie w kodzie — `index.html` pobiera je z `/api/products` przy każdym wejściu. Pola formularza:
 
-```js
-{
-  sku:      'PU-LNG-100',                 // unikalny kod produktu
-  name:     'Langer 100 PRO 750 ml',      // nazwa wyświetlana
-  brand:    'Langer',                     // jedna z marek z listy BRANDS
-  category: 'piany',                      // jedna z: piany | silikony | akryle | kleje | akcesoria
-  variant:  'Pistoletowa · 750 ml',       // wariant / pojemność
-  pack:     '12 szt. / karton',           // jednostka sprzedaży
-  role:     'magnet',                     // magnet (Bestseller) | margin (Marka własna) | premium | neutral
-  tags:     ['Pistoletowa', 'Całoroczna'] // tagi — wyświetlane jako pigułki
-},
-```
+| Pole | Do czego służy |
+|---|---|
+| SKU | Unikalny kod produktu. Po nim dopasowuje się import z pliku — nie da się go zmienić po zapisaniu. |
+| Nazwa | To, co widać na karcie produktu. |
+| Marka | Jedna z listy (Ustawienia → Marki). Filtr na stronie. |
+| Kategoria | Jedna z listy (Ustawienia → Kategorie). Pierwszy poziom filtrów. |
+| Podkategoria | Swobodny tekst z podpowiedziami — patrz [Kategorie i podkategorie](#kategorie-i-podkategorie). |
+| Wariant / pojemność | Druga linia na karcie, np. „Pistoletowa · 750 ml". |
+| Jednostka sprzedaży | Stopka karty, np. „12 szt. / karton". |
+| Oznaczenie | Odznaka na zdjęciu: Bestseller (pomarańczowa), Marka własna (niebieska), Premium (granatowa) albo bez. |
+| Tagi | Pigułki pod nazwą, oddzielane pionową kreską. |
+| Zdjęcie | Wgrywasz z dysku (panel zmniejsza je i zapisuje w bazie) albo wklejasz adres URL. |
 
-**Pole `role`** kontroluje jakie pojawi się oznaczenie na karcie:
-- `magnet` → pomarańczowa odznaka **Bestseller**
-- `margin` → niebieska odznaka **Marka własna**
-- `premium` → granatowa odznaka **Premium**
-- `neutral` → bez odznaki
+Marek i kategorii nie dopisuje się w kodzie — **Panel → Ustawienia → Marki / Kategorie**. Nowa kategoria bez własnej ikony SVG dostaje na stronie neutralną ikonę zastępczą.
 
-**Dodanie nowej marki:** znajdź `const BRANDS = [` i dopisz nazwę. Pojawi się automatycznie jako filtr.
-
-**Dodanie nowej kategorii:** wymaga dodania też ikony SVG do komponentu `CatIcon` — daj znać jak potrzebujesz, pomogę.
+Więcej naraz? Patrz niżej — import z pliku albo wklejenie kolumn z arkusza.
 
 ---
 
@@ -181,7 +176,42 @@ Przy aktualizacji działa też **„uzupełnij tylko braki"** — przypisze kate
 
 ### Co widać na stronie
 
-Podkategoria pokazuje się na karcie produktu obok marki, a w bazie produktów dochodzi rząd filtrów **Podkategoria** — pojawia się po wybraniu kategorii i pokazuje tylko te podkategorie, które w niej realnie występują (z liczbą produktów).
+Podkategoria pokazuje się na karcie produktu obok marki i buduje drugi poziom filtrów w bazie produktów — patrz [Jak działa strona główna](#jak-działa-strona-główna).
+
+---
+
+## Jak działa strona główna
+
+### Hero — krótkie, konkretne
+
+Pierwszy ekran mieści się w pół wysokości okna: nagłówek mówi wprost, czym handlujemy, obok panel z liczbami (produkty i kategorie liczone z bazy, marki z listy marek, czas realizacji i liczba punktów z panelu), a pod spodem **pasek wszystkich kategorii z licznikami** — kliknięcie wrzuca prosto w katalog z tą kategorią. Puste kategorie się nie pokazują, więc pasek zawsze mówi prawdę o ofercie.
+
+Pasek marek pod hero też jedzie z bazy (Ustawienia → Marki) — nie da się już zostawić w kodzie marki, której nie ma w ofercie.
+
+Kolejność sekcji: **hero → baza produktów → linia Langer → dlaczego my → proces → kontakt**. Kto wchodzi po produkt, ma go od razu; argumenty sprzedażowe są niżej, dla tych, którzy przewijają.
+
+### Baza produktów — zawężanie schodkowe
+
+Trzy poziomy, każdy z licznikami, każdy liczony z tego, co zostało po pozostałych filtrach:
+
+| Poziom | Jak wygląda | Co pokazuje |
+|---|---|---|
+| **Kategoria** | Kafelki z ikoną i liczbą | Wszystkie kategorie. Bez produktów (np. po wyszukiwaniu) — wygaszone i nieklikalne. Drugi klik w wybraną cofa wybór. |
+| **Podkategoria** | Pasek pigułek | Tylko podkategorie z wybranej kategorii, tylko niepuste. |
+| **Marka** | Pasek pigułek | **Tylko marki, które faktycznie są w tym zawężeniu** — wybierasz Akryle, widzisz marki mające akryle, z liczbą sztuk. |
+
+Nad filtrami jest ścieżka wyboru (`Wszystkie produkty / Akryle / Kity do parkietu / Langer`) — każdy element zdejmuje się jednym kliknięciem. Jeśli zawężenie wytnie wybraną wcześniej podkategorię albo markę, filtr sam wraca do „wszystkich" — nigdy nie zostaje pusta lista z aktywnym, niemożliwym filtrem.
+
+Wyszukiwarka działa równolegle do filtrów: przeszukuje nazwę, markę, SKU, wariant, podkategorię i tagi, a liczniki na kafelkach od razu pokazują, gdzie są trafienia.
+
+Produkty ładują się po **24 sztuki** (przycisk „Pokaż kolejne") — 300 kart naraz potrafiło zapchać przewijanie na telefonie.
+
+### Na telefonie
+
+- Kafelki kategorii kładą się na bok (ikona · nazwa · licznik) — wszystkie kategorie mieszczą się na jednym ekranie zamiast na trzech.
+- Paski podkategorii i marek przewijają się w poziomie zamiast zawijać na cztery linie.
+- Po wybraniu kategorii strona sama zjeżdża do filtrów i wyników (na dużym ekranie nie skacze — tam wszystko widać naraz).
+- Karty produktów w dwóch kolumnach.
 
 ---
 
@@ -189,14 +219,15 @@ Podkategoria pokazuje się na karcie produktu obok marki, a w bazie produktów d
 
 **Panel → Ustawienia → „Liczby w hero".** Żadna z tych liczb nie jest już wpisana na sztywno w kodzie:
 
-| Kafel | Skąd bierze wartość |
+| Liczba | Skąd bierze wartość |
 |---|---|
 | Produktów w ofercie | Liczone z bazy — tyle, ile realnie masz produktów. Pole w panelu nadpisuje. |
+| Kategorii | Liczone z bazy — tylko kategorie, w których coś jest. Bez pola w panelu. |
 | Marek w ofercie | Liczone z listy marek (Ustawienia → Marki). Pole w panelu nadpisuje. |
-| Średni czas realizacji | Tylko z panelu. Puste = kafel znika. |
-| Zaopatrywanych punktów | Tylko z panelu. Puste = kafel znika. |
+| Średni czas realizacji | Tylko z panelu. Puste = liczba znika. |
+| Zaopatrywanych punktów | Tylko z panelu. Puste = liczba znika. |
 
-Zasada: **pusto zamiast zmyślonego**. Kafel, którego nie da się policzyć i którego nie wypełnisz, po prostu się nie pokazuje — hero układa się wtedy na 1–3 kolumny.
+Zasada: **pusto zamiast zmyślonego**. Liczba, której nie da się policzyć i której nie wypełnisz, po prostu się nie pokazuje — panel w hero układa się z tego, co zostało.
 
 Klucze w tabeli `settings`: `stat_products`, `stat_brands`, `stat_delivery`, `stat_points` (patrz `migrations/006_settings_hero_stats.sql` — migracja opcjonalna).
 
