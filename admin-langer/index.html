@@ -395,6 +395,12 @@ async function apiCategoryDel(id)         { return apiCall(`/api/categories?id=$
 async function apiSettings()              { return apiCall('/api/settings'); }
 async function apiSettingsSave(values)    { return apiCall('/api/settings', { method: 'POST', body: JSON.stringify(values) }); }
 
+/* „farby i spraye" -> „Farby i spraye" — nazwa kategorii z pliku pisanego małymi */
+function capFirst(s) {
+  const t = String(s || '').trim();
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+}
+
 /* slug: „Taśmy izolacyjne" -> „tasmyizolacyjne" (id kategorii, tylko [a-z0-9]) */
 function slugify(s) {
   return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '');
@@ -789,7 +795,7 @@ const IMPORT_MODES = [
 /* ============================================================
    CSV IMPORT
    ============================================================ */
-function CsvImport({ onDone, brands, categories }) {
+function CsvImport({ onDone, brands, categories, onConfigChange }) {
   const [step, setStep] = useState('upload');      // upload | map | review
   const [filename, setFilename] = useState('');
   const [headers, setHeaders] = useState([]);
@@ -798,6 +804,8 @@ function CsvImport({ onDone, brands, categories }) {
   const [over, setOver] = useState(false);
   const [pasteMode, setPasteMode] = useState(false);   // wklejanie prosto z arkusza
   const [pasteText, setPasteText] = useState('');
+  const [catBusy, setCatBusy] = useState('');          // dodawanie kategorii z pliku
+  const [catErr, setCatErr] = useState('');
 
   const [brandFromName, setBrandFromName] = useState(false); // marka z pierwszego słowa nazwy
   const [stripPrefix, setStripPrefix] = useState(false);     // usuń przedrostek z nazwy
@@ -844,6 +852,7 @@ function CsvImport({ onDone, brands, categories }) {
     setMode('both'); setPolicy('overwrite');
     setBrandFromName(false); setStripPrefix(false); setPrefixMap({}); setCatMap({});
     setPasteMode(false); setPasteText('');
+    setCatErr('');
   }
 
   // Wspólne wejście dla pliku i dla tekstu wklejonego z arkusza.
@@ -897,17 +906,70 @@ function CsvImport({ onDone, brands, categories }) {
     return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
   }, [rawRows, mapping.name]);
 
-  // Rozkład wartości kolumny kategorii — do mapowania na zdefiniowane kategorie
+  // Rozkład wartości kolumny kategorii — do mapowania na zdefiniowane kategorie.
+  // `value` (małymi) grupuje, `label` trzyma pisownię z pliku — przyda się,
+  // gdy z takiej wartości robimy nową kategorię.
   const catCounts = useMemo(() => {
     if (!mapping.category) return [];
     const counts = new Map();
     for (const raw of rawRows) {
-      const v = String(raw[mapping.category] || '').trim().toLowerCase();
-      if (!v) continue;
-      counts.set(v, (counts.get(v) || 0) + 1);
+      const orig = String(raw[mapping.category] || '').trim();
+      if (!orig) continue;
+      const value = orig.toLowerCase();
+      const cur = counts.get(value) || { value, label: orig, count: 0 };
+      cur.count++;
+      counts.set(value, cur);
     }
-    return [...counts.entries()].map(([value, count]) => ({ value, count })).sort((a, b) => b.count - a.count);
+    return [...counts.values()].sort((a, b) => b.count - a.count);
   }, [rawRows, mapping.category]);
+
+  /* Kategorie z pliku, których nie ma w panelu. Zamiast odsyłać do zakładki
+     „Ustawienia" i kazać przepisywać nazwy ręcznie, pozwalamy je stąd dodać —
+     pojedynczo albo wszystkie naraz. */
+  const catTarget = (c) => (catMap[c.value] !== undefined ? catMap[c.value] : guessCatId(c.value, categories));
+  const missingCats = useMemo(() => catCounts.filter(c => !catTarget(c)), [catCounts, catMap, categories]);
+
+  async function addCategory(value, label) {
+    const id = slugify(label);
+    if (!id) { setCatErr(`„${label}" nie ma liter ani cyfr — nie zrobię z tego identyfikatora kategorii.`); return; }
+    // Ten sam identyfikator co istniejąca kategoria = zmiana jej nazwy. Bywa
+    // zamierzone, ale nigdy przypadkiem — dlatego pytamy wprost.
+    const clash = categories.find(c => c.id === id);
+    if (clash && clash.label !== label &&
+        !confirm(`Kategoria o identyfikatorze „${id}" już istnieje jako „${clash.label}".\nZapis zmieni jej nazwę na „${label}". Kontynuować?`)) return;
+    setCatErr(''); setCatBusy(value);
+    try {
+      await apiCategoryAdd({ id, label });
+      if (onConfigChange) await onConfigChange();
+      setCatMap(m => ({ ...m, [value]: id }));
+    } catch (e) { setCatErr(e.message); }
+    finally { setCatBusy(''); }
+  }
+
+  function promptAddCategory(value, label) {
+    const typed = (prompt('Nazwa nowej kategorii — tak pokaże się na stronie:', capFirst(label)) || '').trim();
+    if (typed) addCategory(value, typed);
+  }
+
+  async function addAllMissingCats() {
+    if (!missingCats.length) return;
+    const names = missingCats.map(c => capFirst(c.label));
+    if (!confirm(`Dodać ${names.length} nowych kategorii?\n\n${names.map(n => '• ' + n).join('\n')}\n\nNazwy poprawisz później w Ustawieniach.`)) return;
+    setCatErr(''); setCatBusy('__all');
+    try {
+      for (const c of missingCats) {
+        const label = capFirst(c.label);
+        const id = slugify(label);
+        if (!id) continue;
+        // Identyfikator zajęty przez inną kategorię — nie zmieniamy jej nazwy
+        // hurtem, tylko podpinamy wartość z pliku pod to, co już jest.
+        if (!categories.some(x => x.id === id)) await apiCategoryAdd({ id, label });
+        setCatMap(m => ({ ...m, [c.value]: id }));
+      }
+      if (onConfigChange) await onConfigChange();
+    } catch (e) { setCatErr(e.message); }
+    finally { setCatBusy(''); }
+  }
 
   // Auto-dopasowanie przedrostków do marek (force = nadpisz też już ustawione)
   function autoGuessPrefixes(force) {
@@ -1199,15 +1261,35 @@ function CsvImport({ onDone, brands, categories }) {
           {/* Mapowanie wartości kolumny kategorii na zdefiniowane kategorie */}
           {catCounts.length > 0 && (
             <div className="imp-sec">
-              <div className="imp-sec-h">Dopasuj kategorie</div>
-              <p className="imp-sec-d">Wartości z kolumny kategorii przypisz do zdefiniowanych kategorii. Niedopasowane zostaną bez kategorii.</p>
+              <div className="flex-between" style={{ flexWrap: 'wrap', gap: 8 }}>
+                <div className="imp-sec-h" style={{ margin: 0 }}>Dopasuj kategorie</div>
+                {missingCats.length > 0 && (
+                  <button type="button" className="btn btn-ghost btn-sm" onClick={addAllMissingCats} disabled={!!catBusy}>
+                    {catBusy === '__all' ? <><span className="spinner"/> Dodaję...</> : <><IPlus s={15}/> Dodaj wszystkie brakujące ({missingCats.length})</>}
+                  </button>
+                )}
+              </div>
+              <p className="imp-sec-d">
+                Wartości z kolumny kategorii przypisz do zdefiniowanych kategorii. Czego nie ma na liście, możesz
+                dodać od razu stąd — <span className="mono">+ dodaj jako nową kategorię</span> w rozwijanym polu
+                albo hurtem przyciskiem obok. Niedopasowane zostaną bez kategorii.
+              </p>
+              {catErr && <div className="login-err" style={{ marginTop: 0, marginBottom: 12 }}>{catErr}</div>}
               <div className="prefix-grid">
-                {catCounts.map(({ value, count }) => (
+                {catCounts.map(({ value, label, count }) => (
                   <React.Fragment key={value}>
                     <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
-                    <select value={catMap[value] !== undefined ? catMap[value] : guessCatId(value, categories)} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
+                    <select
+                      value={catMap[value] !== undefined ? catMap[value] : guessCatId(value, categories)}
+                      disabled={!!catBusy}
+                      onChange={e => {
+                        const v = e.target.value;
+                        if (v === '__new') { promptAddCategory(value, label); return; }
+                        setCatMap({ ...catMap, [value]: v });
+                      }}>
                       <option value="">— nie mapuj —</option>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                      <option value="__new">+ dodaj „{capFirst(label)}" jako nową kategorię…</option>
                     </select>
                   </React.Fragment>
                 ))}
@@ -2491,7 +2573,7 @@ function App() {
 
       <main className="adm-main">
         {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories}/>}
-        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories}/>}
+        {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories} onConfigChange={loadConfig}/>}
         {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig} st={st}/>}
       </main>
     </>
