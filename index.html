@@ -1423,6 +1423,50 @@ function ProductDatabase({ products, initialCatRef }) {
   }, [brandOptions, brand]);
   useEffect(() => { setShown(PAGE); }, [q, cat, sub, brand, sort]);
 
+  /* HISTORIA PRZEGLĄDARKI
+     Na telefonie ludzie cofają się gestem od krawędzi albo systemowym „wstecz",
+     nie przyciskiem w interfejsie. Bez tego wychodzili z całej strony w środku
+     przeglądania. Każde zejście poziom niżej (kategoria, podkategoria) to wpis
+     w historii; marka tylko odświeża bieżący wpis, bo jest doprecyzowaniem
+     wewnątrz poziomu — dzięki temu jedno cofnięcie = jeden poziom wyżej,
+     dokładnie jak przycisk w pasku kroku.
+     `restoring` pilnuje, żeby przywracanie stanu z historii nie dopisało
+     kolejnego wpisu (i nie zapętliło cofania). */
+  const restoring = useRef(false);
+  const histReady = useRef(false);
+
+  useEffect(() => {
+    const onPop = (e) => {
+      const st = e.state && e.state.langer;
+      restoring.current = true;
+      setCat(st ? st.cat : 'all');
+      setSub(st ? st.sub : 'all');
+      setBrand(st ? st.brand : 'all');
+      if (narrow) scrollTo(pickRef);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [narrow]);
+
+  useEffect(() => {
+    const snapshot = { langer: { cat, sub, brand } };
+    if (!histReady.current) {
+      // pierwszy render: podpinamy stan pod wpis, na którym już jesteśmy
+      history.replaceState(snapshot, '');
+      histReady.current = true;
+      return;
+    }
+    if (restoring.current) { restoring.current = false; history.replaceState(snapshot, ''); return; }
+    history.pushState(snapshot, '');
+  }, [cat, sub]);
+
+  // Marka: bez nowego wpisu, ale zapisana w bieżącym — po powrocie do tego
+  // ekranu (np. z karty produktu) filtry są takie, jak je zostawiono.
+  useEffect(() => {
+    if (!histReady.current || restoring.current) return;
+    history.replaceState({ langer: { cat, sub, brand } }, '');
+  }, [brand]);
+
   const results = useMemo(() => {
     let r = searched.filter(p => {
       if (cat !== 'all' && p.category !== cat) return false;

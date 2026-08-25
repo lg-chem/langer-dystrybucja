@@ -220,6 +220,8 @@ Telefon dostaje inny sposób wybierania niż desktop. Zasada: **nic nie chowa si
 
 Pod nagłówkiem przykleja się **pasek kroku**: po lewej przycisk wstecz (`← Kategorie` albo `← Akryle`), po prawej gdzie właśnie jesteś i ile tam produktów. Widać go przez cały czas przewijania, więc powrót o poziom wyżej to zawsze jedno tapnięcie — z podkategorii do kategorii, z kategorii do listy wszystkich. **Cofnięcie zdejmuje też filtr marki**, żeby po powrocie dało się wybrać cokolwiek.
 
+**Gest wstecz telefonu działa tak samo jak przycisk w pasku.** Zejście poziom niżej (kategoria, podkategoria) zapisuje się w historii przeglądarki, więc systemowe „wstecz" — gest od krawędzi na iOS, przycisk na Androidzie — cofa o jeden poziom, zamiast wyrzucać z całej strony w środku przeglądania. Marka nie zakłada nowego wpisu, tylko odświeża bieżący: jest doprecyzowaniem wewnątrz poziomu, więc jedno cofnięcie zawsze znaczy jeden poziom wyżej. Dlatego pasek kroku został na górze (kontekst i wyjście wyżej), a nie na dole — po zasięg kciuka użytkownik i tak sięga gestem systemowym.
+
 Strona sama zjeżdża do kolejnego kroku po wyborze (na dużym ekranie nie skacze — tam wszystkie poziomy widać naraz). Karty produktów idą w dwóch kolumnach.
 
 Pasek kategorii w hero jest na telefonie skrócony do sześciu pozycji plus `+N kategorii` — reszta jest w katalogu, jedno tapnięcie dalej.
