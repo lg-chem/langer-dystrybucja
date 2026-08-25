@@ -129,7 +129,9 @@ Znajdź w `index.html` linię `const PRODUCTS = [` i dopisuj kolejne wiersze wed
 
 **Nie musisz zapisywać pliku.** Pod polem wgrywania jest „…albo wklej kolumny prosto z arkusza": zaznaczasz w Arkuszach Google (albo w Excelu) kolumny **razem z wierszem nagłówka**, Ctrl+C, wklejasz w panelu. Kolumny rozdzielone tabulatorem rozpoznajemy tak samo jak CSV.
 
-**Krok 2 — mapowanie:** nagłówki z pliku przypisujesz do pól produktu (część zgadujemy sami — `Kategoria` i `Podkategoria` trafiają tam, gdzie trzeba, niezależnie od kolejności kolumn). Możesz też rozpoznać markę z pierwszego słowa nazwy i przypisać własne nazwy kategorii do tych zdefiniowanych. Wartości kategorii dopasowujemy same po nazwie i identyfikatorze — „Piany" trafi do kategorii `piany`. Podkategorii nie mapujemy (to swobodny tekst), za to pokazujemy listę wszystkich znalezionych z liczbą wierszy i znacznikiem **nowa** — dobre miejsce, żeby wyłapać literówkę, zanim zrobi się z niej osobny filtr.
+**Krok 2 — mapowanie:** nagłówki z pliku przypisujesz do pól produktu (część zgadujemy sami — `Kategoria` i `Podkategoria` trafiają tam, gdzie trzeba, niezależnie od kolejności kolumn). Możesz też rozpoznać markę z pierwszego słowa nazwy i przypisać własne nazwy kategorii do tych zdefiniowanych. Wartości kategorii dopasowujemy same po nazwie i identyfikatorze — „Piany" trafi do kategorii `piany`.
+
+**Kategorii z pliku nie ma jeszcze w panelu?** Nie trzeba wychodzić do Ustawień i przepisywać nazw ręcznie. W rozwijanym polu przy każdej wartości jest pozycja **„+ dodaj … jako nową kategorię"** (pyta o nazwę, jaka pokaże się na stronie), a nad listą przycisk **„Dodaj wszystkie brakujące (N)"** — tworzy naraz wszystkie nieprzypisane i od razu je mapuje. Identyfikator powstaje z nazwy, tak samo jak w Ustawieniach. Gdyby nowa nazwa dawała identyfikator zajęty przez istniejącą kategorię, panel zapyta, zanim ją przemianuje (a przy dodawaniu hurtem po prostu podepnie się pod istniejącą). Podkategorii nie mapujemy (to swobodny tekst), za to pokazujemy listę wszystkich znalezionych z liczbą wierszy i znacznikiem **nowa** — dobre miejsce, żeby wyłapać literówkę, zanim zrobi się z niej osobny filtr.
 
 **Krok 3 — podgląd.** Widać, ile pozycji jest nowych, ile do aktualizacji, a ile jest w bazie identycznych (te pomijamy). Do wyboru tryb:
 
@@ -174,6 +176,7 @@ Przy aktualizacji działa też **„uzupełnij tylko braki"** — przypisze kate
 ### Pojedynczo i zbiorczo w panelu
 
 - **Formularz produktu** — pole „Podkategoria" podpowiada wartości już używane w wybranej kategorii (żeby „Piany pistoletowe" nie rozjechały się na trzy warianty zapisu).
+- **Import CSV** — brakujące kategorie dodasz wprost z kroku mapowania (patrz wyżej).
 - **Lista produktów** — zaznacz kilka pozycji (checkboxy) i ustaw markę, kategorię albo podkategorię naraz; „+ nowa podkategoria…" pozwala wpisać własną. Tędy też się zmienia nazwę podkategorii: wyszukaj ją w polu wyszukiwania, zaznacz wszystkie, ustaw nową nazwę.
 
 ### Co widać na stronie
