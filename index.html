@@ -295,6 +295,22 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .ctile-all { background: var(--light); border-style: dashed; }
 .ctile-all.on { background: var(--navy); border-style: solid; }
 
+/* Numer kroku przy etykiecie — „1 Wybierz kategorię", „2 Podkategoria"… */
+.pick-no { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-right: 7px;
+  border-radius: 50%; background: var(--navy); color: #fff; font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; }
+
+/* Pasek kroku (telefon): gdzie jestem + jedno tapnięcie wstecz */
+.step-bar { position: sticky; top: var(--header-h); z-index: 20; display: flex; align-items: center; gap: 12px;
+  margin: 0 -20px 16px; padding: 10px 20px; background: var(--white); border-bottom: 1px solid var(--line);
+  box-shadow: 0 6px 16px -12px rgb(14 21 51 / 0.4); }
+.step-back { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 8px 12px 8px 8px;
+  border-radius: var(--r-full); background: var(--light); color: var(--navy); font-size: 13.5px; font-weight: 700; }
+.step-back:active { background: var(--line); }
+.step-now { min-width: 0; margin-left: auto; display: flex; align-items: baseline; gap: 8px; }
+.step-now strong { font-family: var(--font-display); font-size: 14.5px; letter-spacing: -.02em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.step-now .num { flex: none; font-size: 12px; color: var(--ash); }
+
 .crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; font-size: 14px; }
 .crumb { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: var(--r-full);
   background: var(--navy); color: #fff; font-weight: 600; }
@@ -329,7 +345,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; min-width: 0; }
 .filter-line { display: flex; align-items: baseline; gap: 16px; min-width: 0; }
 .filter-line .chips { min-width: 0; }
-.filter-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; flex: none; width: 84px; padding-top: 8px; }
+.filter-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; flex: none; width: 132px; padding-top: 7px; display: flex; align-items: center; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .base-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; font-size: 15px; color: var(--ash-700); font-weight: 600; }
 .base-meta .sortbox { margin-left: auto; }
@@ -397,19 +413,19 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .ctile-t { font-size: 13.5px; }
   .ctile-n { margin: 0 0 0 auto; font-size: 11px; }
   .base-head { grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
+  /* Krok 2 na telefonie to kafelki, nie pigułki — kafelek „Wszystkie w kategorii"
+     bywa dłuższy, więc łamiemy tekst zamiast go ucinać. */
+  .ctile-t { overflow-wrap: break-word; hyphens: auto; }
   .h-base { margin-top: 10px; }
   .pick-hint { display: none; }
   .base-meta { flex-wrap: wrap; gap: 10px; }
-  /* Paski podkategorii i marek przewijamy w poziomie zamiast zawijać na 4 linie */
-  .filter-line .chips { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: x proximity; }
-  .filter-line .chip { scroll-snap-align: start; }
-  .filter-line .chips::-webkit-scrollbar { display: none; }
-  .chip { flex: none; }
+  /* Pigułki zawijają się do kolejnych linii — na telefonie nic nie może chować
+     się poza krawędzią, bo nikt tego nie znajdzie. */
+  .filter-line .chips { flex-wrap: wrap; width: 100%; }
+  .chip { padding: 9px 14px; }
   .hero-navy { padding: calc(var(--header-h) + 28px) 0 32px; }
-  /* Na telefonie zamiast zawijania na cztery linie — jeden przewijany pas */
-  .hero-cats { flex-wrap: nowrap; overflow-x: auto; width: 100%; margin-top: 22px; padding-bottom: 4px;
-    scrollbar-width: none; -ms-overflow-style: none; }
-  .hero-cats::-webkit-scrollbar { display: none; }
+  .hero-cats { margin-top: 22px; gap: 7px; }
+  .hcat { padding: 8px 13px; font-size: 13px; }
   .pcard-sub { display: none; }
   .base-meta .sortbox { margin-left: 0; }
   .lcar-track { grid-auto-columns: 78%; }
@@ -890,6 +906,8 @@ function HeroFacts({ products = [], catCount = 0 }) {
 }
 
 function Hero({ products, onPick }) {
+  const narrow = useNarrow();
+
   /* Kategorie w pasku układamy wg liczby produktów — na wierzchu to, czego
      realnie mamy najwięcej. Puste kategorie się nie pokazują. */
   const cats = useMemo(() => {
@@ -921,12 +939,16 @@ function Hero({ products, onPick }) {
       {cats.length > 0 && (
         <div className="wrap hero-cats-wrap">
           <div className="hero-cats">
-            {cats.map(c => (
+            {/* Na telefonie skracamy pasek do sześciu pozycji — reszta jest jedno
+                tapnięcie dalej, w katalogu, gdzie i tak widać wszystkie kategorie. */}
+            {(narrow ? cats.slice(0, 6) : cats).map(c => (
               <a key={c.id} href="#baza" className="hcat" onClick={() => onPick && onPick(c.id)}>
                 {c.label} <span className="hcat-n">{c.count}</span>
               </a>
             ))}
-            <a href="#baza" className="hcat hcat-all" onClick={() => onPick && onPick('all')}>Cała baza <IArrow s={15}/></a>
+            <a href="#baza" className="hcat hcat-all" onClick={() => onPick && onPick('all')}>
+              {narrow && cats.length > 6 ? `+${cats.length - 6} kategorii` : 'Cała baza'} <IArrow s={15}/>
+            </a>
           </div>
         </div>
       )}
@@ -1281,6 +1303,20 @@ function ProductTile({ p }) {
   );
 }
 
+/* Czy jesteśmy na wąskim ekranie. Telefon dostaje inny sposób wybierania —
+   nie „wszystko naraz, część za krawędzią", tylko jeden krok na ekranie. */
+function useNarrow(query = '(max-width: 680px)') {
+  const [narrow, setNarrow] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setNarrow(mq.matches);
+    on();
+    if (mq.addEventListener) { mq.addEventListener('change', on); return () => mq.removeEventListener('change', on); }
+    mq.addListener(on); return () => mq.removeListener(on);
+  }, [query]);
+  return narrow;
+}
+
 /* Ile kart pokazujemy naraz — reszta dochodzi przyciskiem. Na telefonie
    renderowanie 300 kafli naraz potrafi zatkać przewijanie. */
 const PAGE = 24;
@@ -1307,6 +1343,8 @@ function ProductDatabase({ products, initialCatRef }) {
   const [sort, setSort] = useState('name');
   const [shown, setShown] = useState(PAGE);
   const resultsRef = useRef(null);
+  const pickRef = useRef(null);
+  const narrow = useNarrow();
 
   React.useEffect(() => {
     if (initialCatRef) initialCatRef.current = (c) => { setCat(c === 'all' ? 'all' : c); setSub('all'); };
@@ -1380,6 +1418,9 @@ function ProductDatabase({ products, initialCatRef }) {
     return r;
   }, [searched, cat, sub, brand, sort]);
 
+  const subTotal = useMemo(() => searched.filter(p =>
+    (cat === 'all' || p.category === cat) && (brand === 'all' || p.brand === brand)).length, [searched, cat, brand]);
+
   const catObj = CATEGORIES.find(c => c.id === cat);
   const subObj = subOptions.find(o => o.key === sub);
   const active = q || cat !== 'all' || sub !== 'all' || brand !== 'all';
@@ -1388,16 +1429,30 @@ function ProductDatabase({ products, initialCatRef }) {
   /* Po wyborze kategorii na telefonie zjeżdżamy do filtrów i wyników — inaczej
      trzeba by przewinąć przez całą siatkę kafelków. Na dużym ekranie wszystko
      jest widoczne naraz, więc nie ruszamy stroną pod palcem użytkownika. */
+  /* Przewijamy tak, żeby cel wypadł POD nagłówkiem i paskiem kroku — inaczej
+     „Wybierz podkategorię" ląduje dokładnie za przyklejonym paskiem. */
+  const scrollTo = (ref) => requestAnimationFrame(() => {
+    const el = ref.current;
+    if (!el) return;
+    const bar = document.querySelector('.step-bar');
+    const offset = 84 + (bar ? bar.getBoundingClientRect().height : 0);
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
+  });
+
   const pickCategory = (id) => {
-    setCat(prev => (prev === id ? 'all' : id));
+    const next = cat === id ? 'all' : id;
+    setCat(next);
     setSub('all');
-    if (window.innerWidth <= 680 && resultsRef.current) {
-      requestAnimationFrame(() => {
-        const el = resultsRef.current;
-        if (!el) return;
-        window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: 'smooth' });
-      });
-    }
+    // Telefon: po wyborze kategorii pokazujemy krok 2 (albo od razu wyniki,
+    // gdy kategoria nie ma podkategorii). Desktop nie skacze — tam widać wszystko.
+    if (narrow) scrollTo(next === 'all' ? pickRef : resultsRef);
+  };
+
+  /* Cofanie o jeden poziom — z podkategorii do kategorii, z kategorii do listy
+     wszystkich kategorii. Zawsze wraca na górę wyboru, żeby było widać, gdzie się jest. */
+  const stepBack = () => {
+    if (sub !== 'all') { setSub('all'); scrollTo(pickRef); return; }
+    setCat('all'); setSub('all'); scrollTo(pickRef);
   };
 
   return (
@@ -1434,39 +1489,79 @@ function ProductDatabase({ products, initialCatRef }) {
           </div>
         )}
 
-        {/* KROK 1 — kategoria */}
-        <div className="pick">
-          <div className="pick-h">
-            <span className="pick-k">Kategoria</span>
-            <span className="pick-hint">Kliknij kafelek, żeby zawęzić. Drugi klik cofa wybór.</span>
-
-          </div>
-          <div className="ctiles">
-            <button className={'ctile ctile-all' + (cat === 'all' ? ' on' : '')} onClick={() => pickCategory('all')}>
-              <span className="ctile-ic"><IGrid s={26}/></span>
-              <span className="ctile-t">Wszystkie</span>
-              <span className="ctile-n">{totalInScope}</span>
+        {/* Pasek kroku — na telefonie przykleja się pod nagłówkiem, więc przez cały
+            czas widać, gdzie się jest i czym wrócić poziom wyżej. */}
+        <div ref={pickRef} />
+        {narrow && cat !== 'all' && (
+          <div className="step-bar">
+            <button className="step-back" onClick={stepBack}>
+              <IArrow s={16} style={{ transform: 'rotate(180deg)' }}/>
+              {sub !== 'all' ? (catObj ? catObj.label : 'Kategoria') : 'Kategorie'}
             </button>
-            {catOptions.map(c => (
-              <button key={c.id}
-                      className={'ctile' + (cat === c.id ? ' on' : '')}
-                      disabled={!c.count && cat !== c.id}
-                      onClick={() => pickCategory(c.id)}>
-                <span className="ctile-ic"><CatIcon name={c.icon} size={26}/></span>
-                <span className="ctile-t">{c.label}</span>
-                <span className="ctile-n">{c.count}</span>
-              </button>
-            ))}
+            <div className="step-now">
+              <strong>{subObj ? subObj.label : (catObj ? catObj.label : '')}</strong>
+              <span className="num">{results.length}</span>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* KROK 2 i 3 — podkategoria i marka, wyłącznie dostępne wartości */}
+        {/* KROK 1 — kategoria. Na telefonie znika, gdy kategoria jest już wybrana:
+            jej miejsce zajmuje krok 2, żeby nie przewijać przez całą siatkę. */}
+        {(!narrow || cat === 'all') && (
+          <div className="pick">
+            <div className="pick-h">
+              <span className="pick-k"><span className="pick-no">1</span> Wybierz kategorię</span>
+              <span className="pick-hint">Kliknij kafelek, żeby zawęzić. Drugi klik cofa wybór.</span>
+            </div>
+            <div className="ctiles">
+              <button className={'ctile ctile-all' + (cat === 'all' ? ' on' : '')} onClick={() => pickCategory('all')}>
+                <span className="ctile-ic"><IGrid s={26}/></span>
+                <span className="ctile-t">Wszystkie</span>
+                <span className="ctile-n">{totalInScope}</span>
+              </button>
+              {catOptions.map(c => (
+                <button key={c.id}
+                        className={'ctile' + (cat === c.id ? ' on' : '')}
+                        disabled={!c.count && cat !== c.id}
+                        onClick={() => pickCategory(c.id)}>
+                  <span className="ctile-ic"><CatIcon name={c.icon} size={26}/></span>
+                  <span className="ctile-t">{c.label}</span>
+                  <span className="ctile-n">{c.count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div ref={resultsRef} />
-        {(subOptions.length > 0 || brandOptions.length > 1) && (
-          <div className="filters">
-            {subOptions.length > 0 && (
+
+        {/* KROK 2 — podkategoria. Na telefonie kafelki (wszystko widoczne naraz),
+            na dużym ekranie pigułki obok kroku 1. */}
+        {subOptions.length > 0 && (
+          narrow ? (
+            <div className="pick">
+              <div className="pick-h">
+                <span className="pick-k"><span className="pick-no">2</span> Wybierz podkategorię</span>
+              </div>
+              <div className="ctiles">
+                <button className={'ctile ctile-all' + (sub === 'all' ? ' on' : '')} onClick={() => setSub('all')}>
+                  <span className="ctile-ic"><IGrid s={26}/></span>
+                  <span className="ctile-t">Wszystkie w kategorii</span>
+                  <span className="ctile-n">{subTotal}</span>
+                </button>
+                {subOptions.map(o => (
+                  <button key={o.key} className={'ctile' + (sub === o.key ? ' on' : '')} onClick={() => setSub(o.key)}>
+                    <span className="ctile-ic"><CatIcon name={catObj ? catObj.icon : ''} size={26}/></span>
+                    <span className="ctile-t">{o.label}</span>
+                    <span className="ctile-n">{o.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="filters">
               <div className="filter-line">
-                <span className="filter-k">Podkategoria</span>
+                <span className="filter-k"><span className="pick-no">2</span> Podkategoria</span>
                 <div className="chips">
                   <button className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>Wszystkie</button>
                   {subOptions.map(o => (
@@ -1476,20 +1571,28 @@ function ProductDatabase({ products, initialCatRef }) {
                   ))}
                 </div>
               </div>
-            )}
-            {brandOptions.length > 1 && (
-              <div className="filter-line">
-                <span className="filter-k">Marka</span>
-                <div className="chips">
-                  <button className={'chip' + (brand === 'all' ? ' active' : '')} onClick={() => setBrand('all')}>Wszystkie</button>
-                  {brandOptions.map(b => (
-                    <button key={b.name} className={'chip' + (brand === b.name ? ' active' : '')} onClick={() => setBrand(b.name)}>
-                      {b.name} <span className="chip-n">{b.count}</span>
-                    </button>
-                  ))}
-                </div>
+            </div>
+          )
+        )}
+
+        {/* KROK 3 — marka. Pigułki zawijają się do kolejnych linii, nic nie chowa
+            się poza krawędzią ekranu. */}
+        {brandOptions.length > 1 && (
+          <div className="filters">
+            <div className="filter-line">
+              <span className="filter-k">
+                <span className="pick-no">{subOptions.length > 0 ? 3 : 2}</span>
+                {narrow ? 'Wybierz markę' : 'Marka'}
+              </span>
+              <div className="chips">
+                <button className={'chip' + (brand === 'all' ? ' active' : '')} onClick={() => setBrand('all')}>Wszystkie</button>
+                {brandOptions.map(b => (
+                  <button key={b.name} className={'chip' + (brand === b.name ? ' active' : '')} onClick={() => setBrand(b.name)}>
+                    {b.name} <span className="chip-n">{b.count}</span>
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
           </div>
         )}
 
