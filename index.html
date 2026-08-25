@@ -99,6 +99,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   background: var(--white); transition: all .12s; cursor:pointer; }
 .chip:hover { border-color: var(--navy); color: var(--navy); }
 .chip.active { background: var(--navy); color:#fff; border-color: var(--navy); }
+.chip-n { font-family: var(--font-mono); font-size: 11px; opacity: .55; }
 
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2,0,0,1), transform .7s cubic-bezier(.2,0,0,1); }
 .reveal.in { opacity: 1; transform: none; }
@@ -310,6 +311,7 @@ img.hero-split-mark { opacity: .14; }
 .role-premium { background: var(--navy); }
 .pcard-body { padding: 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .pcard-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
+.pcard-sub { color: var(--ash-700); }
 .pcard-name { font-size: 17px; line-height: 1.2; letter-spacing: -0.02em; }
 .pcard-variant { font-size: 13.5px; color: var(--ash-700); margin-top: -2px; }
 .pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
@@ -1245,7 +1247,7 @@ function ProductTile({ p }) {
         {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
       </div>
       <div className="pcard-body">
-        <div className="pcard-brand">{p.brand}</div>
+        <div className="pcard-brand">{p.brand}{p.subcategory ? <span className="pcard-sub"> · {p.subcategory}</span> : null}</div>
         <h3 className="pcard-name">{p.name}</h3>
         <div className="pcard-variant">{p.variant}</div>
         <div className="pcard-tags">
@@ -1266,8 +1268,29 @@ function ProductTile({ p }) {
 function ProductDatabase({ products, initialCatRef }) {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState('all');
+  const [sub, setSub] = useState('all');          // podkategoria — klucz małymi literami
   const [brand, setBrand] = useState('all');
   const [sort, setSort] = useState('name');
+
+  /* Podkategorie nie mają osobnej listy — wynikają z produktów w wybranej
+     kategorii. Pokazujemy je dopiero po wybraniu kategorii, żeby nie wysypać
+     kilkudziesięciu przycisków naraz. */
+  const subOptions = useMemo(() => {
+    if (cat === 'all') return [];
+    const acc = new Map();
+    for (const p of products) {
+      if (p.category !== cat) continue;
+      const label = (p.subcategory || '').trim();
+      if (!label) continue;
+      const key = label.toLowerCase();
+      const cur = acc.get(key) || { key, label, count: 0 };
+      cur.count++;
+      acc.set(key, cur);
+    }
+    return [...acc.values()].sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+  }, [products, cat]);
+
+  useEffect(() => { setSub('all'); }, [cat]);
 
   React.useEffect(() => {
     if (initialCatRef) initialCatRef.current = (c) => setCat(c === 'all' ? 'all' : c);
@@ -1276,9 +1299,10 @@ function ProductDatabase({ products, initialCatRef }) {
   const results = useMemo(() => {
     let r = products.filter(p => {
       if (cat !== 'all' && p.category !== cat) return false;
+      if (sub !== 'all' && (p.subcategory || '').trim().toLowerCase() !== sub) return false;
       if (brand !== 'all' && p.brand !== brand) return false;
       if (q.trim()) {
-        const s = [p.name, p.brand, p.sku, p.variant, (p.tags || []).join(' ')].filter(Boolean).join(' ').toLowerCase();
+        const s = [p.name, p.brand, p.sku, p.variant, p.subcategory, (p.tags || []).join(' ')].filter(Boolean).join(' ').toLowerCase();
         if (!s.includes(q.trim().toLowerCase())) return false;
       }
       return true;
@@ -1286,10 +1310,10 @@ function ProductDatabase({ products, initialCatRef }) {
     if (sort === 'name') r = [...r].sort((a,b) => (a.name || '').localeCompare(b.name || '','pl'));
     if (sort === 'brand') r = [...r].sort((a,b) => (a.brand || '').localeCompare(b.brand || '','pl') || (a.name || '').localeCompare(b.name || '','pl'));
     return r;
-  }, [q, cat, brand, sort, products]);
+  }, [q, cat, sub, brand, sort, products]);
 
-  const active = q || cat !== 'all' || brand !== 'all';
-  const clear = () => { setQ(''); setCat('all'); setBrand('all'); };
+  const active = q || cat !== 'all' || sub !== 'all' || brand !== 'all';
+  const clear = () => { setQ(''); setCat('all'); setSub('all'); setBrand('all'); };
 
   return (
     <section id="baza" className="sec sec-base">
@@ -1327,6 +1351,19 @@ function ProductDatabase({ products, initialCatRef }) {
               ))}
             </div>
           </div>
+          {subOptions.length > 0 && (
+            <div className="filter-line">
+              <span className="filter-k">Podkategoria</span>
+              <div className="chips">
+                <button className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>Wszystkie</button>
+                {subOptions.map(o => (
+                  <button key={o.key} className={'chip' + (sub === o.key ? ' active' : '')} onClick={() => setSub(o.key)}>
+                    {o.label} <span className="chip-n">{o.count}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="filter-line">
             <span className="filter-k">Marka</span>
             <div className="chips">

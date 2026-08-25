@@ -165,6 +165,18 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
 .mode-l { display: block; font-size: 14px; font-weight: 700; }
 .mode-d { display: block; font-size: 12.5px; color: var(--ash-700); line-height: 1.4; margin-top: 2px; }
 
+/* --- Import: wklejanie z arkusza i podgląd podkategorii --- */
+.paste-box { margin-top: 14px; }
+.paste-area { width: 100%; min-height: 150px; padding: 12px 14px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm);
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.6; resize: vertical; white-space: pre; }
+.paste-area:focus { outline: none; border-color: var(--flame); }
+
+.subcat-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.subcat-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1.5px solid var(--line);
+  border-radius: 999px; font-size: 13px; background: var(--white); }
+.subcat-cat { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--cobalt); }
+.subcat-new { font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-tint); padding: 1px 6px; border-radius: 999px; }
+
 .diffs { display: flex; flex-direction: column; gap: 5px; }
 .diff { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 12.5px; }
 .diff-k { font-weight: 700; text-transform: lowercase; }
@@ -237,7 +249,6 @@ const DEFAULT_CATEGORIES = [
   { id: 'kleje',     label: 'Kleje' },
   { id: 'akcesoria', label: 'Akcesoria' },
 ];
-const DEFAULT_CAT_IDS = DEFAULT_CATEGORIES.map(c => c.id);
 
 /* Parametry oferty z podstrony /dla-punktow/. Te same wartości domyślne
    siedzą w api/settings.js i w samej podstronie — tu są fallbackiem na czas
@@ -584,7 +595,10 @@ const FIELD_DEFS = [
   // istniejące SKU (np. same zdjęcia) nie musi jej zawierać.
   { key: 'name',      label: 'Nazwa',               required: false, hints: ['name', 'nazwa', 'produkt', 'towar', 'opis'] },
   { key: 'brand',     label: 'Marka',               required: false, hints: ['brand', 'marka', 'producent'] },
-  { key: 'category',  label: 'Kategoria',           required: false, hints: ['category', 'kategoria', 'grupa', 'kat'] },
+  // `avoid` chroni przed podebraniem kolumny „Podkategoria" polu Kategoria —
+  // dopasowanie luźne („kategoria" mieści się w „podkategoria") zgadłoby źle.
+  { key: 'category',  label: 'Kategoria',           required: false, hints: ['category', 'kategoria', 'grupa', 'kat'], avoid: ['pod', 'sub'] },
+  { key: 'subcategory', label: 'Podkategoria',      required: false, hints: ['subcategory', 'podkategoria', 'subkategoria', 'podgrupa', 'podkat'] },
   { key: 'variant',   label: 'Wariant / pojemność', required: false, hints: ['variant', 'wariant', 'pojemnosc'] },
   { key: 'pack',      label: 'Jednostka sprzedaży', required: false, hints: ['pack', 'opakowanie', 'jednostka', 'karton'] },
   { key: 'role',      label: 'Oznaczenie',          required: false, hints: ['role', 'oznaczenie'] },
@@ -596,22 +610,34 @@ function normHeader(s) {
   return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
 }
 
-/* Zgadnij mapowanie: pole -> nagłówek kolumny w pliku */
+/* Zgadnij mapowanie: pole -> nagłówek kolumny w pliku.
+   Dwa przebiegi: najpierw trafienia dokładne („Podkategoria" -> podkategoria),
+   dopiero potem luźne. Bez tego pole Kategoria zabrałoby kolumnę
+   „Podkategoria" tylko dlatego, że jest pierwsze na liście. */
 function guessMapping(headers) {
   const used = new Set();
   const m = {};
-  for (const f of FIELD_DEFS) {
-    let found = '';
+  const pick = (f, exact) => {
     for (const h of headers) {
       if (used.has(h)) continue;
       const nh = normHeader(h);
       if (!nh) continue;
-      if (f.hints.some(hint => { const n = normHeader(hint); return nh === n || nh.includes(n) || n.includes(nh); })) {
-        found = h; break;
-      }
+      if (!exact && (f.avoid || []).some(a => nh.includes(normHeader(a)))) continue;
+      const hit = f.hints.some(hint => {
+        const n = normHeader(hint);
+        return exact ? nh === n : (nh.includes(n) || n.includes(nh));
+      });
+      if (hit) return h;
     }
-    m[f.key] = found;
-    if (found) used.add(found);
+    return '';
+  };
+  for (const exact of [true, false]) {
+    for (const f of FIELD_DEFS) {
+      if (m[f.key]) continue;
+      const found = pick(f, exact);
+      m[f.key] = found;
+      if (found) used.add(found);
+    }
   }
   return m;
 }
@@ -622,17 +648,34 @@ function firstWord(s) {
   return m ? m[0] : '';
 }
 
+/* Dopasuj wartość z pliku do zdefiniowanej kategorii — po id, po nazwie albo
+   po uproszczonym zapisie („Piany" -> piany, „Piany montażowe" -> piany).
+   Nic nie pasuje -> pusto (kategorię uzupełnisz później albo zmapujesz ręcznie). */
+function guessCatId(value, categories = DEFAULT_CATEGORIES) {
+  const v = slugify(value);
+  if (!v) return '';
+  const hit = categories.find(c => slugify(c.id) === v || slugify(c.label) === v);
+  if (hit) return hit.id;
+  const near = categories.find(c => {
+    const id = slugify(c.id), lab = slugify(c.label);
+    return (id && v.startsWith(id)) || (lab && lab.startsWith(v));
+  });
+  return near ? near.id : '';
+}
+
 /* Zbuduj znormalizowany produkt z surowego wiersza CSV wg mapowania kolumn.
    opts:
      brandFromName  – rozpoznaj markę z pierwszego słowa nazwy
      prefixMap      – { PRZEDROSTEK(WIELKIMI): marka }
      stripPrefix    – usuń rozpoznany przedrostek z nazwy
-     catMap         – { wartość_kolumny(małymi): id_kategorii }
+     catMap         – { wartość_kolumny(małymi): id_kategorii }; wpis pusty = nie mapuj
+     categories     – lista zdefiniowanych kategorii (do dopasowania po nazwie)
    Marka, kategoria i oznaczenie przyjmują TYLKO wartości ze zdefiniowanych list
-   (BRANDS / CATEGORIES / ROLES). Cokolwiek spoza list -> puste (uzupełnisz później). */
+   (BRANDS / CATEGORIES / ROLES). Cokolwiek spoza list -> puste (uzupełnisz później).
+   Podkategoria jest wyjątkiem: to swobodny tekst prosto z pliku. */
 function mapRow(raw, mapping, opts = {}) {
   const brands = opts.brands || DEFAULT_BRANDS;
-  const catIds = opts.catIds || DEFAULT_CAT_IDS;
+  const cats = opts.categories || DEFAULT_CATEGORIES;
   const get = (key) => {
     const col = mapping[key];
     if (!col || raw[col] == null) return '';
@@ -653,12 +696,20 @@ function mapRow(raw, mapping, opts = {}) {
     }
   }
 
-  // KATEGORIA: z kolumny, opcjonalnie przez mapę wartości; tylko ze zdefiniowanej listy
-  let category = get('category').toLowerCase();
+  // KATEGORIA: z kolumny, opcjonalnie przez mapę wartości; tylko ze zdefiniowanej listy.
+  // Pusty wpis w catMap to świadome „nie mapuj" — dlatego sprawdzamy `undefined`,
+  // a nie samą prawdziwość wartości.
+  let category = get('category');
   if (category) {
-    if (opts.catMap && opts.catMap[category]) category = opts.catMap[category];
-    else if (!catIds.includes(category)) category = '';
+    const key = category.toLowerCase();
+    category = (opts.catMap && opts.catMap[key] !== undefined)
+      ? opts.catMap[key]
+      : guessCatId(category, cats);
   }
+
+  // PODKATEGORIA: swobodny tekst (np. „Piany pistoletowe") — nie ma zamkniętej
+  // listy, bo to arkusz jest jej źródłem. Normalizujemy tylko odstępy.
+  const subcategory = get('subcategory').replace(/\s+/g, ' ');
 
   // OZNACZENIE: tylko ze zdefiniowanej listy
   let role = get('role').toLowerCase();
@@ -669,6 +720,7 @@ function mapRow(raw, mapping, opts = {}) {
     name,
     brand: brand || null,
     category: category || null,
+    subcategory: subcategory || null,
     variant: get('variant') || null,
     pack: get('pack') || null,
     role: role || null,
@@ -678,10 +730,10 @@ function mapRow(raw, mapping, opts = {}) {
 }
 
 /* Pola, które import może aktualizować w istniejącym produkcie. */
-const UPDATABLE_FIELDS = ['name', 'brand', 'category', 'variant', 'pack', 'role', 'tags', 'image_url'];
+const UPDATABLE_FIELDS = ['name', 'brand', 'category', 'subcategory', 'variant', 'pack', 'role', 'tags', 'image_url'];
 const FIELD_LABEL = {
-  name: 'nazwa', brand: 'marka', category: 'kategoria', variant: 'wariant',
-  pack: 'opakowanie', role: 'oznaczenie', tags: 'tagi', image_url: 'zdjęcie',
+  name: 'nazwa', brand: 'marka', category: 'kategoria', subcategory: 'podkategoria',
+  variant: 'wariant', pack: 'opakowanie', role: 'oznaczenie', tags: 'tagi', image_url: 'zdjęcie',
 };
 
 /* Wartość pola jako tekst — do porównania „było / będzie". */
@@ -738,13 +790,14 @@ const IMPORT_MODES = [
    CSV IMPORT
    ============================================================ */
 function CsvImport({ onDone, brands, categories }) {
-  const catIds = categories.map(c => c.id);
   const [step, setStep] = useState('upload');      // upload | map | review
   const [filename, setFilename] = useState('');
   const [headers, setHeaders] = useState([]);
   const [rawRows, setRawRows] = useState([]);
   const [mapping, setMapping] = useState({});
   const [over, setOver] = useState(false);
+  const [pasteMode, setPasteMode] = useState(false);   // wklejanie prosto z arkusza
+  const [pasteText, setPasteText] = useState('');
 
   const [brandFromName, setBrandFromName] = useState(false); // marka z pierwszego słowa nazwy
   const [stripPrefix, setStripPrefix] = useState(false);     // usuń przedrostek z nazwy
@@ -790,24 +843,39 @@ function CsvImport({ onDone, brands, categories }) {
     setSelNew(new Set()); setSelDup(new Set());
     setMode('both'); setPolicy('overwrite');
     setBrandFromName(false); setStripPrefix(false); setPrefixMap({}); setCatMap({});
+    setPasteMode(false); setPasteText('');
+  }
+
+  // Wspólne wejście dla pliku i dla tekstu wklejonego z arkusza.
+  function loadParsed(results, name) {
+    const hdrs = (results.meta.fields || []).filter(h => h != null && String(h).trim() !== '');
+    if (!hdrs.length) { alert('Nie rozpoznałem nagłówków — pierwszy wiersz musi zawierać nazwy kolumn (np. SKU, Kategoria, Podkategoria).'); return; }
+    setFilename(name);
+    setHeaders(hdrs);
+    setRawRows(results.data || []);
+    setMapping(guessMapping(hdrs));
+    setStep('map');
   }
 
   function handleFile(file) {
     if (!file) return;
-    setFilename(file.name);
     setLog([]); setDone(0); setTotal(0);
     Papa.parse(file, {
       header: true,
       skipEmptyLines: 'greedy',
-      complete: (results) => {
-        const hdrs = (results.meta.fields || []).filter(h => h != null && String(h).trim() !== '');
-        setHeaders(hdrs);
-        setRawRows(results.data || []);
-        setMapping(guessMapping(hdrs));
-        setStep('map');
-      },
+      complete: (results) => loadParsed(results, file.name),
       error: (err) => alert('Błąd parsowania CSV: ' + err.message)
     });
+  }
+
+  /* Wklejone z Arkuszy Google / Excela kolumny rozdziela tabulator — Papa
+     wykrywa separator sam, więc ta sama ścieżka obsługuje CSV i TSV. */
+  function handlePaste() {
+    const text = pasteText.trim();
+    if (!text) return;
+    setLog([]); setDone(0); setTotal(0);
+    const results = Papa.parse(text, { header: true, skipEmptyLines: 'greedy' });
+    loadParsed(results, `wklejone z arkusza (${(results.data || []).length} wierszy)`);
   }
 
   function onDrop(e) {
@@ -857,7 +925,7 @@ function CsvImport({ onDone, brands, categories }) {
     if (v) autoGuessPrefixes(false);
   }
 
-  const rowOpts = { brandFromName, prefixMap, stripPrefix, catMap, brands, catIds };
+  const rowOpts = { brandFromName, prefixMap, stripPrefix, catMap, brands, categories };
 
   // Znormalizowane wiersze wg aktualnego mapowania. SKU jest wymagane zawsze;
   // nazwa tylko dla produktów, których jeszcze nie ma w bazie — plik
@@ -878,13 +946,43 @@ function CsvImport({ onDone, brands, categories }) {
       const isKnown = !!(r.sku && existing.has(r.sku.toUpperCase()));
       const errors = [], warnings = [];
       if (!r.sku) errors.push('brak SKU');
-      if (!r.name && !isKnown) errors.push('brak nazwy (nowy produkt)');
+      // Rozróżniamy dwa powody: „nie ma nazwy" i „tego SKU nie ma w bazie".
+      // Przy imporcie samych kategorii to drugie zwykle znaczy, że SKU rozjechało
+      // się formatem (np. arkusz obciął zera wiodące: 00242 -> 242).
+      if (!r.name && !isKnown) errors.push('SKU nie ma w bazie — bez kolumny Nazwa nie utworzę produktu');
       const rawBrand = mapping.brand && raw[mapping.brand] ? String(raw[mapping.brand]).trim() : '';
       if (rawBrand && !r.brand) warnings.push('marka spoza listy');
       const rawCat = mapping.category && raw[mapping.category] ? String(raw[mapping.category]).trim() : '';
       if (rawCat && !r.category) warnings.push('kategoria spoza listy');
       return { ...r, _idx: i + 1, _errors: errors, _warnings: warnings, _provided: provided };
     }), [rawRows, mapping, brandFromName, prefixMap, stripPrefix, catMap, brands, categories, existing]);
+
+  // Podkategorie z pliku: co i ile razy wjedzie do bazy — plus informacja,
+  // czy taka podkategoria już gdzieś jest (żeby wyłapać literówki w arkuszu).
+  const knownSubs = useMemo(() => {
+    const set = new Set();
+    existing.forEach(p => { if (p.subcategory) set.add(String(p.subcategory).toLowerCase()); });
+    return set;
+  }, [existing]);
+
+  const subCounts = useMemo(() => {
+    if (!mapping.subcategory) return [];
+    const acc = new Map();
+    for (const r of normalized) {
+      if (!r.subcategory) continue;
+      const key = (r.category || '') + '|' + r.subcategory.toLowerCase();
+      const cur = acc.get(key) || { key, category: r.category || '', label: r.subcategory, count: 0 };
+      cur.count++;
+      acc.set(key, cur);
+    }
+    return [...acc.values()].sort((a, b) => b.count - a.count);
+  }, [normalized, mapping.subcategory]);
+
+  const catLabel = (id) => {
+    if (!id) return 'bez kategorii';
+    const c = categories.find(x => x.id === id);
+    return c ? c.label : id;
+  };
 
   // Klasyfikacja: błędne / nowe / duplikaty (dedup po SKU w obrębie pliku — ostatni wygrywa).
   // Do każdego duplikatu dokładamy `_changes` — dokładną listę pól, które
@@ -939,7 +1037,7 @@ function CsvImport({ onDone, brands, categories }) {
   }
 
   function bodyOf(r) {
-    return { sku: r.sku, name: r.name, brand: r.brand, category: r.category,
+    return { sku: r.sku, name: r.name, brand: r.brand, category: r.category, subcategory: r.subcategory,
              variant: r.variant, pack: r.pack, role: r.role, tags: r.tags, image_url: r.image_url };
   }
 
@@ -977,13 +1075,15 @@ function CsvImport({ onDone, brands, categories }) {
           <h2 className="adm-card-h">Import produktów z CSV</h2>
           <p className="adm-card-d" style={{ margin: 0 }}>
             Dodawanie i aktualizacja w jednym: wymagane jest <span className="mono">SKU</span>, nazwa tylko dla nowych produktów.
-            Plik z samym <span className="mono">sku,image_url</span> podmieni zdjęcia i nie ruszy reszty danych.
+            Plik z samym <span className="mono">sku,image_url</span> podmieni zdjęcia, a
+            <span className="mono"> sku,kategoria,podkategoria</span> przypisze kategorie zbiorczo — reszta danych zostaje nietknięta.
             Nagłówki dopasujesz w kroku 2, tagi dziel pionową kreską <span className="mono">|</span>.
           </p>
         </div>
         <div className="gap-2">
           <button className="btn btn-ghost" onClick={() => downloadCsvTemplate('full')}><IDownload s={16}/> Szablon pełny</button>
           <button className="btn btn-ghost" onClick={() => downloadCsvTemplate('update')}><IDownload s={16}/> Szablon aktualizacji</button>
+          <button className="btn btn-ghost" onClick={() => downloadCsvTemplate('categories')}><IDownload s={16}/> Szablon kategorii</button>
           {step !== 'upload' && <button className="btn btn-ghost" onClick={resetFile}>Inny plik</button>}
         </div>
       </div>
@@ -1002,6 +1102,39 @@ function CsvImport({ onDone, brands, categories }) {
           <p className="drop-h">Przeciągnij CSV tutaj lub kliknij</p>
           <p className="drop-d">obsługujemy .csv (oddzielony przecinkami, UTF-8)</p>
           <input ref={fileRef} type="file" accept=".csv,text/csv" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+        </div>
+      )}
+
+      {/* KROK 1b — wklejenie kolumn prosto z arkusza (Google Sheets / Excel) */}
+      {step === 'upload' && (
+        <div className="paste-box">
+          {!pasteMode ? (
+            <button className="linkish" onClick={() => setPasteMode(true)}>
+              …albo wklej kolumny prosto z arkusza (bez zapisywania pliku)
+            </button>
+          ) : (
+            <>
+              <div className="imp-sec-h">Wklej z arkusza</div>
+              <p className="imp-sec-d">
+                Zaznacz w Arkuszach Google (albo w Excelu) kolumny <strong>razem z wierszem nagłówka</strong>, skopiuj
+                (Ctrl+C) i wklej poniżej. Do przypisania kategorii wystarczą trzy kolumny:
+                <span className="mono"> SKU</span>, <span className="mono">Kategoria</span>, <span className="mono">Podkategoria</span>.
+              </p>
+              <textarea
+                className="paste-area"
+                value={pasteText}
+                onChange={e => setPasteText(e.target.value)}
+                placeholder={'SKU\tKategoria\tPodkategoria\n00242\tPiany\tPiany pistoletowe\n210\tKleje\tKleje - uszczelniacze'}
+                spellCheck={false}
+              />
+              <div className="flex-between" style={{ marginTop: 10 }}>
+                <button className="linkish" onClick={() => { setPasteMode(false); setPasteText(''); }}>Anuluj</button>
+                <button className="btn btn-flame" onClick={handlePaste} disabled={!pasteText.trim()}>
+                  Wczytaj wklejone →
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -1072,11 +1205,33 @@ function CsvImport({ onDone, brands, categories }) {
                 {catCounts.map(({ value, count }) => (
                   <React.Fragment key={value}>
                     <div className="prefix-key"><span className="mono">{value}</span> <span className="muted">×{count}</span></div>
-                    <select value={catMap[value] || (catIds.includes(value) ? value : '')} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
+                    <select value={catMap[value] !== undefined ? catMap[value] : guessCatId(value, categories)} onChange={e => setCatMap({ ...catMap, [value]: e.target.value })}>
                       <option value="">— nie mapuj —</option>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
                     </select>
                   </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Podkategorie — wolny tekst, więc zamiast mapowania pokazujemy, co wjedzie */}
+          {subCounts.length > 0 && (
+            <div className="imp-sec">
+              <div className="imp-sec-h">Podkategorie w pliku <span className="pill pill-new">{subCounts.length}</span></div>
+              <p className="imp-sec-d">
+                Podkategorii nie mapujemy — trafiają do bazy dokładnie tak, jak w arkuszu, i z nich układa się filtr
+                na stronie. Sprawdź listę pod kątem literówek: <span className="mono">Piany pistoletowe</span> i
+                <span className="mono"> piany pistoletowe</span> to dla filtrów dwie różne pozycje.
+              </p>
+              <div className="subcat-list">
+                {subCounts.map(sc => (
+                  <span key={sc.key} className="subcat-chip">
+                    <span className="subcat-cat">{catLabel(sc.category)}</span>
+                    {sc.label}
+                    <span className="muted">×{sc.count}</span>
+                    {!knownSubs.has(sc.label.toLowerCase()) && <span className="subcat-new">nowa</span>}
+                  </span>
                 ))}
               </div>
             </div>
@@ -1134,7 +1289,7 @@ function CsvImport({ onDone, brands, categories }) {
                 <table className="tbl">
                   <thead><tr>
                     <th className="chkcell"><input type="checkbox" checked={news.every(r => selNew.has(r.sku))} onChange={() => toggleAll(news, selNew, setSelNew)} /></th>
-                    <th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Uwagi</th>
+                    <th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Podkategoria</th><th>Uwagi</th>
                   </tr></thead>
                   <tbody>
                     {news.slice(0, 300).map(r => (
@@ -1144,6 +1299,7 @@ function CsvImport({ onDone, brands, categories }) {
                         <td>{r.name}</td>
                         <td>{r.brand || <span className="muted">—</span>}</td>
                         <td>{r.category || <span className="muted">—</span>}</td>
+                        <td>{r.subcategory || <span className="muted">—</span>}</td>
                         <td>{r._warnings.map((w, i) => <span key={i} className="tag-warn">{w}</span>)}</td>
                       </tr>
                     ))}
@@ -1238,7 +1394,11 @@ function CsvImport({ onDone, brands, categories }) {
           {invalid.length > 0 && (
             <div className="imp-sec">
               <div className="imp-sec-h">Pominięte — brak wymaganych pól <span className="pill pill-err">{invalid.length}</span></div>
-              <p className="imp-sec-d">Te wiersze nie mają SKU lub nazwy. Popraw mapowanie w kroku 2 albo popraw plik.</p>
+              <p className="imp-sec-d">
+                Te wiersze nie mają SKU albo mają SKU, którego nie ma w bazie, a bez nazwy nie da się utworzyć produktu.
+                Sprawdź mapowanie w kroku 2 — a jeśli importujesz z arkusza, czy SKU nie straciło zer wiodących
+                (<span className="mono">00242</span> → <span className="mono">242</span>); w arkuszu ustaw tej kolumnie format tekstowy.
+              </p>
               <div className="tbl-wrap">
                 <table className="tbl">
                   <thead><tr><th>#</th><th>SKU</th><th>Nazwa</th><th>Powód</th></tr></thead>
@@ -1282,34 +1442,43 @@ function CsvImport({ onDone, brands, categories }) {
   );
 }
 
-/* Dwa szablony: pełny (nowe produkty) i aktualizacyjny — sam SKU plus pola,
-   które chcesz podmienić. Kolumn, których nie ma w pliku, import nie rusza. */
+/* Trzy szablony: pełny (nowe produkty), aktualizacyjny (sam SKU plus pola,
+   które chcesz podmienić) i kategorii (zbiorcze przypisanie kategorii
+   i podkategorii). Kolumn, których nie ma w pliku, import nie rusza. */
 function downloadCsvTemplate(kind = 'full') {
-  const csv = kind === 'update'
+  const csv = kind === 'categories'
+    ? [
+        'sku,category,subcategory',
+        '00242,Piany,Piany pistoletowe',
+        '210,Kleje,Kleje - uszczelniacze',
+        '00053,Silikony,Silikony neutralne',
+      ]
+    : kind === 'update'
     ? [
         'sku,image_url',
         'TEST-001,https://przyklad.pl/zdjecie1.jpg',
         'TEST-002,https://przyklad.pl/zdjecie2.jpg',
       ]
     : [
-        'sku,name,brand,category,variant,pack,role,tags,image_url',
-        'TEST-001,Soudal Classic Premium 870 ml,Soudal,piany,Pistoletowa · 870 ml,12 szt. / karton,magnet,Pistoletowa|Premium,https://przyklad.pl/zdjecie1.jpg',
-        'TEST-002,Langer Akryl Pro 300 ml,,,,,,,',
+        'sku,name,brand,category,subcategory,variant,pack,role,tags,image_url',
+        'TEST-001,Soudal Classic Premium 870 ml,Soudal,piany,Piany pistoletowe,Pistoletowa · 870 ml,12 szt. / karton,magnet,Pistoletowa|Premium,https://przyklad.pl/zdjecie1.jpg',
+        'TEST-002,Langer Akryl Pro 300 ml,,,,,,,,',
       ];
   const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = kind === 'update' ? 'szablon-aktualizacja.csv' : 'szablon-produkty.csv'; a.click();
+  const names = { update: 'szablon-aktualizacja.csv', categories: 'szablon-kategorie.csv', full: 'szablon-produkty.csv' };
+  a.href = url; a.download = names[kind] || names.full; a.click();
   URL.revokeObjectURL(url);
 }
 
 /* ============================================================
    FORMULARZ POJEDYNCZEGO PRODUKTU (dodanie / edycja)
    ============================================================ */
-function ProductForm({ initial, onSave, onCancel, brands, categories }) {
+function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = [] }) {
   const isEdit = !!initial;
   const [p, setP] = useState(initial || {
-    sku: '', name: '', brand: '', category: '',
+    sku: '', name: '', brand: '', category: '', subcategory: '',
     variant: '', pack: '', role: 'neutral', tags: [], image_url: ''
   });
   const [saving, setSaving] = useState(false);
@@ -1319,6 +1488,13 @@ function ProductForm({ initial, onSave, onCancel, brands, categories }) {
   const fileRef = useRef(null);
 
   function set(k, v) { setP({ ...p, [k]: v }); }
+
+  // Podpowiedzi podkategorii: najpierw te z wybranej kategorii, potem reszta.
+  const subcatHints = useMemo(() => {
+    const mine = subcats.filter(sc => !p.category || sc.category === p.category).map(sc => sc.label);
+    const rest = subcats.filter(sc => p.category && sc.category !== p.category).map(sc => sc.label);
+    return [...new Set([...mine, ...rest])];
+  }, [subcats, p.category]);
 
   async function onPickFile(e) {
     const file = e.target.files && e.target.files[0];
@@ -1347,6 +1523,7 @@ function ProductForm({ initial, onSave, onCancel, brands, categories }) {
         name: p.name.trim(),
         brand: p.brand || null,
         category: p.category || null,
+        subcategory: (p.subcategory || '').trim() || null,
         variant: p.variant || null,
         pack: p.pack || null,
         image_url: p.image_url || null,
@@ -1398,6 +1575,21 @@ function ProductForm({ initial, onSave, onCancel, brands, categories }) {
               {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
           </div>
+        </div>
+
+        {/* Podkategoria: swobodny tekst, ale z podpowiedziami tego, co już jest
+            w bazie — żeby „Piany pistoletowe" nie rozjechały się na trzy warianty. */}
+        <div className="field">
+          <label>Podkategoria</label>
+          <input
+            list="subcat-hints"
+            value={p.subcategory || ''}
+            onChange={e => set('subcategory', e.target.value)}
+            placeholder="np. Piany pistoletowe"
+          />
+          <datalist id="subcat-hints">
+            {subcatHints.map(sc => <option key={sc} value={sc} />)}
+          </datalist>
         </div>
 
         <div className="field">
@@ -1514,9 +1706,25 @@ function ProductList({ refreshTrigger, brands, categories }) {
     if (!q.trim()) return products;
     const term = q.trim().toLowerCase();
     return products.filter(p =>
-      (p.sku + ' ' + p.name + ' ' + p.brand + ' ' + p.category).toLowerCase().includes(term)
+      [p.sku, p.name, p.brand, p.category, p.subcategory].filter(Boolean).join(' ').toLowerCase().includes(term)
     );
   }, [products, q]);
+
+  /* Podkategorie wyliczamy z produktów — nie ma osobnej tabeli do pilnowania.
+     Stąd biorą się podpowiedzi w formularzu i lista w edycji zbiorczej. */
+  const subcats = useMemo(() => {
+    const acc = new Map();
+    for (const p of products) {
+      const label = (p.subcategory || '').trim();
+      if (!label) continue;
+      const key = (p.category || '') + '|' + label.toLowerCase();
+      const cur = acc.get(key) || { key, category: p.category || '', label, count: 0 };
+      cur.count++;
+      acc.set(key, cur);
+    }
+    return [...acc.values()].sort((a, b) =>
+      (a.category || '').localeCompare(b.category || '', 'pl') || a.label.localeCompare(b.label, 'pl'));
+  }, [products]);
 
   // --- edycja zbiorcza ---
   const selProducts = useMemo(() => products.filter(p => sel.has(p.sku)), [products, sel]);
@@ -1532,9 +1740,9 @@ function ProductList({ refreshTrigger, brands, categories }) {
   async function applyBulk(field, value) {
     const targets = selProducts;
     if (!targets.length) return;
-    const label = field === 'brand'
-      ? (value ? `markę „${value}"` : 'pustą markę')
-      : (value ? `kategorię „${value}"` : 'pustą kategorię');
+    const noun = { brand: ['markę', 'pustą markę'], category: ['kategorię', 'pustą kategorię'],
+                   subcategory: ['podkategorię', 'pustą podkategorię'] }[field];
+    const label = value ? `${noun[0]} „${value}"` : noun[1];
     if (!confirm(`Ustawić ${label} dla ${targets.length} zaznaczonych produktów?`)) return;
     setBulk({ done: 0, total: targets.length });
     let done = 0, failed = 0;
@@ -1572,7 +1780,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
       <div className="flex-between">
         <div>
           <h2 className="adm-card-h">Lista produktów ({products.length})</h2>
-          <p className="adm-card-d">Edytuj, usuwaj, dodawaj pojedyncze produkty. Zmiany natychmiast widoczne na stronie.</p>
+          <p className="adm-card-d">Edytuj, usuwaj, dodawaj pojedyncze produkty. Zaznacz kilka, żeby ustawić markę, kategorię lub podkategorię naraz. Zmiany natychmiast widoczne na stronie.</p>
         </div>
         <div className="gap-2">
           <button className="btn btn-ghost" onClick={reload} disabled={loading}>
@@ -1612,6 +1820,23 @@ function ProductList({ refreshTrigger, brands, categories }) {
                 {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
                 <option value="__clear">(wyczyść kategorię)</option>
               </select>
+              <label className="bulk-lbl">Podkategoria:</label>
+              <select className="bulk-sel" value="__" onChange={e => {
+                const v = e.target.value;
+                if (v === '__') return;
+                if (v === '__clear') { applyBulk('subcategory', ''); return; }
+                if (v === '__new') {
+                  const typed = (prompt('Nazwa podkategorii, np. „Piany pistoletowe":') || '').trim();
+                  if (typed) applyBulk('subcategory', typed);
+                  return;
+                }
+                applyBulk('subcategory', v);
+              }}>
+                <option value="__">— ustaw —</option>
+                <option value="__new">+ nowa podkategoria…</option>
+                {subcats.map(sc => <option key={sc.key} value={sc.label}>{sc.label}{sc.category ? ` (${sc.category})` : ''}</option>)}
+                <option value="__clear">(wyczyść podkategorię)</option>
+              </select>
               <button className="btn btn-ghost" onClick={bulkDelete} style={{ color: 'var(--red)', borderColor: 'var(--red-tint)' }}>
                 <ITrash s={16}/> Usuń ({sel.size})
               </button>
@@ -1629,7 +1854,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
             <thead>
               <tr>
                 <th className="chkcell"><input type="checkbox" checked={allFilteredSelected} onChange={toggleSelAll} title="Zaznacz wszystkie" /></th>
-                <th></th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th></th>
+                <th></th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Podkategoria</th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -1645,6 +1870,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
                   <td>{p.name}</td>
                   <td>{p.brand || <span className="muted">—</span>}</td>
                   <td>{p.category || <span className="muted">—</span>}</td>
+                  <td>{p.subcategory || <span className="muted">—</span>}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div className="gap-2" style={{ justifyContent: 'flex-end' }}>
                       <button className="btn-icon" onClick={() => setEditing(p)} title="Edytuj" style={{ color: 'var(--cobalt)' }}>
@@ -1658,7 +1884,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan="7" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
+                <tr><td colSpan="8" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
                   {q ? 'Brak wyników wyszukiwania' : 'Brak produktów'}
                 </td></tr>
               )}
@@ -1667,8 +1893,8 @@ function ProductList({ refreshTrigger, brands, categories }) {
         </div>
       )}
 
-      {editing && <ProductForm initial={editing} brands={brands} categories={categories} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
-      {adding && <ProductForm brands={brands} categories={categories} onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
+      {editing && <ProductForm initial={editing} brands={brands} categories={categories} subcats={subcats} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
+      {adding && <ProductForm brands={brands} categories={categories} subcats={subcats} onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
     </div>
   );
 }
