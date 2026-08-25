@@ -14,6 +14,7 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML — b
 - [Edycja danych kontaktowych](#edycja-danych-kontaktowych)
 - [Dodawanie nowych produktów](#dodawanie-nowych-produktów)
 - [Import i aktualizacja z CSV](#import-i-aktualizacja-z-csv)
+- [Kategorie i podkategorie](#kategorie-i-podkategorie)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
 - [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
 - [Wdrożenie na Vercel](#wdrożenie)
@@ -124,9 +125,11 @@ Znajdź w `index.html` linię `const PRODUCTS = [` i dopisuj kolejne wiersze wed
 
 **Panel → Import CSV.** Ten sam plik służy do dodawania nowych produktów i do poprawiania tych, które już są w bazie — dopasowanie idzie po `SKU`.
 
-**Wymagane kolumny:** tylko `sku`. Nazwa jest potrzebna wyłącznie dla produktów, których jeszcze nie ma w bazie — plik `sku,image_url` podmieni same zdjęcia.
+**Wymagane kolumny:** tylko `sku`. Nazwa jest potrzebna wyłącznie dla produktów, których jeszcze nie ma w bazie — plik `sku,image_url` podmieni same zdjęcia, a `sku,kategoria,podkategoria` przypisze kategorie zbiorczo.
 
-**Krok 2 — mapowanie:** nagłówki z pliku przypisujesz do pól produktu (część zgadujemy sami). Możesz też rozpoznać markę z pierwszego słowa nazwy i przypisać własne nazwy kategorii do tych zdefiniowanych.
+**Nie musisz zapisywać pliku.** Pod polem wgrywania jest „…albo wklej kolumny prosto z arkusza": zaznaczasz w Arkuszach Google (albo w Excelu) kolumny **razem z wierszem nagłówka**, Ctrl+C, wklejasz w panelu. Kolumny rozdzielone tabulatorem rozpoznajemy tak samo jak CSV.
+
+**Krok 2 — mapowanie:** nagłówki z pliku przypisujesz do pól produktu (część zgadujemy sami — `Kategoria` i `Podkategoria` trafiają tam, gdzie trzeba, niezależnie od kolejności kolumn). Możesz też rozpoznać markę z pierwszego słowa nazwy i przypisać własne nazwy kategorii do tych zdefiniowanych. Wartości kategorii dopasowujemy same po nazwie i identyfikatorze — „Piany" trafi do kategorii `piany`. Podkategorii nie mapujemy (to swobodny tekst), za to pokazujemy listę wszystkich znalezionych z liczbą wierszy i znacznikiem **nowa** — dobre miejsce, żeby wyłapać literówkę, zanim zrobi się z niej osobny filtr.
 
 **Krok 3 — podgląd.** Widać, ile pozycji jest nowych, ile do aktualizacji, a ile jest w bazie identycznych (te pomijamy). Do wyboru tryb:
 
@@ -140,7 +143,42 @@ Przy aktualizacji dochodzi drugi wybór: **nadpisz wartościami z pliku** albo *
 
 **Nic nie znika.** Aktualizujemy wyłącznie pola wypisane w kolumnie „Co się zmieni" — czyli te, które są w pliku i faktycznie mają inną wartość. Kolumny, której w pliku nie ma (albo komórka jest pusta), import nie tyka: wgranie samych zdjęć nie skasuje nazw, wariantów ani tagów. Tabela pokazuje każdą zmianę jako `było → będzie`, przy zdjęciach z miniaturkami.
 
-Dwa szablony do pobrania w nagłówku karty: **pełny** (wszystkie kolumny) i **aktualizacji** (`sku,image_url`).
+Trzy szablony do pobrania w nagłówku karty: **pełny** (wszystkie kolumny), **aktualizacji** (`sku,image_url`) i **kategorii** (`sku,category,subcategory`).
+
+---
+
+## Kategorie i podkategorie
+
+Produkt ma **kategorię** (jedna ze zdefiniowanej listy — `piany`, `silikony`, `akryle`, `kleje`, `akcesoria`, plus co dodasz w Ustawieniach) i **podkategorię** — swobodny tekst w rodzaju „Piany pistoletowe" czy „Kleje montażowe".
+
+Podkategorie nie mają osobnej listy do pilnowania: wyliczamy je z produktów. Przypiszesz podkategorię pięciu produktom — na stronie pojawi się filtr z tą podkategorią; wyczyścisz ją wszędzie — filtr zniknie sam.
+
+**Wymaga migracji `migrations/007_product_subcategory.sql`** (SQL Editor w Neonie). Bez niej panel i strona działają jak dotąd, a próba zapisu podkategorii kończy się czytelnym komunikatem z nazwą migracji.
+
+### Zbiorcze przypisanie z arkusza
+
+Najszybsza droga dla całego cennika — arkusz z trzema kolumnami:
+
+| SKU | Kategoria | Podkategoria |
+|---|---|---|
+| 00242 | Piany | Piany pistoletowe |
+| 210 | Kleje | Kleje - uszczelniacze |
+| 00053 | Silikony | Silikony neutralne |
+
+**Panel → Import CSV** → wklej kolumny z arkusza (albo wgraj plik) → krok 2 potwierdza mapowanie → w kroku 3 wybierz tryb **„Tylko aktualizacja"**. Import ruszy wyłącznie kategorię i podkategorię — nazwy, zdjęcia, warianty i tagi zostają nietknięte. SKU, których nie ma w bazie, wylądują w sekcji „pominięte" (bez nazwy nie da się utworzyć produktu).
+
+> **Zera wiodące w SKU.** Arkusze potrafią zamienić `00242` na `242`. Zanim skopiujesz kolumnę, ustaw jej format na tekstowy (Format → Liczby → Zwykły tekst). Wiersze z SKU, którego nie ma w bazie, import pokaże w sekcji „pominięte" z tym właśnie powodem.
+
+Przy aktualizacji działa też **„uzupełnij tylko braki"** — przypisze kategorię tam, gdzie jej nie ma, i nie ruszy tego, co już poprawiłeś ręcznie.
+
+### Pojedynczo i zbiorczo w panelu
+
+- **Formularz produktu** — pole „Podkategoria" podpowiada wartości już używane w wybranej kategorii (żeby „Piany pistoletowe" nie rozjechały się na trzy warianty zapisu).
+- **Lista produktów** — zaznacz kilka pozycji (checkboxy) i ustaw markę, kategorię albo podkategorię naraz; „+ nowa podkategoria…" pozwala wpisać własną. Tędy też się zmienia nazwę podkategorii: wyszukaj ją w polu wyszukiwania, zaznacz wszystkie, ustaw nową nazwę.
+
+### Co widać na stronie
+
+Podkategoria pokazuje się na karcie produktu obok marki, a w bazie produktów dochodzi rząd filtrów **Podkategoria** — pojawia się po wybraniu kategorii i pokazuje tylko te podkategorie, które w niej realnie występują (z liczbą produktów).
 
 ---
 
