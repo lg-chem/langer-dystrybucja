@@ -200,6 +200,10 @@ Trzy poziomy, każdy z licznikami, każdy liczony z tego, co zostało po pozosta
 | **Podkategoria** | Pasek pigułek | Tylko podkategorie z wybranej kategorii, tylko niepuste. |
 | **Marka** | Pasek pigułek | **Tylko marki, które faktycznie są w tym zawężeniu** — wybierasz Akryle, widzisz marki mające akryle, z liczbą sztuk. |
 
+**Wybór niżej nigdy nie blokuje wyboru wyżej.** Kategoria, w której wybrana marka nie ma nic, jest wygaszona, ale **klikalna** — wejście w nią zdejmuje filtr marki i pokazuje całą kategorię (nad kafelkami wyjaśnia to jedna linijka tekstu). To samo dotyczy podkategorii. Wyłączona na amen jest tylko kategoria, w której nie ma nic nawet bez marki — na przykład po wyszukiwaniu.
+
+Zmiana poziomu wyżej czyści poziomy niższe: inna kategoria kasuje podkategorię, a cofnięcie się o krok (przycisk na telefonie) kasuje też markę — po powrocie wybierasz od nowa, zamiast zderzać się z filtrem, o którym już się nie pamięta.
+
 Poziomy są ponumerowane (**1 Wybierz kategorię**, **2 Podkategoria**, **3 Marka**), a nad nimi jest ścieżka wyboru (`Wszystkie produkty / Akryle / Kity do parkietu / Langer`) — każdy element zdejmuje się jednym kliknięciem. Jeśli zawężenie wytnie wybraną wcześniej podkategorię albo markę, filtr sam wraca do „wszystkich" — nigdy nie zostaje pusta lista z aktywnym, niemożliwym filtrem.
 
 Wyszukiwarka działa równolegle do filtrów: przeszukuje nazwę, markę, SKU, wariant, podkategorię i tagi, a liczniki na kafelkach od razu pokazują, gdzie są trafienia.
@@ -214,7 +218,7 @@ Telefon dostaje inny sposób wybierania niż desktop. Zasada: **nic nie chowa si
 2. **Krok 2 — podkategoria.** Po wybraniu kategorii siatka kategorii **znika i zastępuje ją siatka podkategorii** (z kafelkiem „Wszystkie w kategorii"). Nie trzeba przewijać przez całą listę kategorii, żeby dojść do produktów.
 3. **Krok 3 — marka.** Pigułki zawijają się do kolejnych linii — wszystkie widoczne naraz.
 
-Pod nagłówkiem przykleja się **pasek kroku**: po lewej przycisk wstecz (`← Kategorie` albo `← Akryle`), po prawej gdzie właśnie jesteś i ile tam produktów. Widać go przez cały czas przewijania, więc powrót o poziom wyżej to zawsze jedno tapnięcie — z podkategorii do kategorii, z kategorii do listy wszystkich.
+Pod nagłówkiem przykleja się **pasek kroku**: po lewej przycisk wstecz (`← Kategorie` albo `← Akryle`), po prawej gdzie właśnie jesteś i ile tam produktów. Widać go przez cały czas przewijania, więc powrót o poziom wyżej to zawsze jedno tapnięcie — z podkategorii do kategorii, z kategorii do listy wszystkich. **Cofnięcie zdejmuje też filtr marki**, żeby po powrocie dało się wybrać cokolwiek.
 
 Strona sama zjeżdża do kolejnego kroku po wyborze (na dużym ekranie nie skacze — tam wszystkie poziomy widać naraz). Karty produktów idą w dwóch kolumnach.
 

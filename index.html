@@ -275,9 +275,10 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
    Każdy poziom pokazuje TYLKO to, co realnie jest w bieżącym zawężeniu, i ile
    tego jest — nie da się kliknąć w pustkę. */
 .pick { margin-bottom: 20px; }
-.pick-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.pick-h { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
 .pick-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
 .pick-hint { font-size: 13px; color: var(--ash); }
+.pick-hint.warn { color: var(--flame-600); font-weight: 600; }
 
 .ctiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .ctile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 108px; padding: 14px;
@@ -287,6 +288,10 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .ctile:active:not(:disabled) { transform: translateY(-1px); box-shadow: var(--e1); }
 .ctile.on { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: var(--e2); }
 .ctile:disabled { opacity: .38; cursor: not-allowed; }
+/* Wygaszone = „ta marka nie ma tu nic", ale wejść wolno (klik zdejmie markę).
+   Inaczej filtr marki zamyka drogę powrotną do reszty oferty. */
+.ctile.dim, .chip.dim { opacity: .45; }
+.ctile.dim:hover, .chip.dim:hover { opacity: 1; }
 .ctile-ic { color: var(--flame); display: block; }
 .ctile.on .ctile-ic { color: var(--flame-glow); }
 .ctile-t { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; line-height: 1.15; letter-spacing: -.02em; }
@@ -418,6 +423,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .ctile-t { overflow-wrap: break-word; hyphens: auto; }
   .h-base { margin-top: 10px; }
   .pick-hint { display: none; }
+  .pick-hint.warn { display: block; width: 100%; font-size: 12.5px; line-height: 1.4; }
   .base-meta { flex-wrap: wrap; gap: 10px; }
   /* Pigułki zawijają się do kolejnych linii — na telefonie nic nie może chować
      się poza krawędzią, bo nikt tego nie znajdzie. */
@@ -1360,28 +1366,39 @@ function ProductDatabase({ products, initialCatRef }) {
     });
   }, [products, term]);
 
-  // KATEGORIE — liczone po wyszukiwaniu i wybranej marce
+  /* KATEGORIE — dwa liczniki na kategorię:
+       total – ile jest po samym wyszukiwaniu (bez marki),
+       count – ile z tego zostaje przy wybranej marce.
+     Wybór wyżej w drzewie nie może być zablokowany wyborem niższym: kategorii
+     bez produktów danej marki nie wyłączamy, tylko wygaszamy — kliknięcie w nią
+     zdejmuje filtr marki i wchodzi w całą kategorię. Wyłączona jest dopiero
+     kategoria, w której nie ma nic nawet bez marki (np. po wyszukiwaniu). */
   const catOptions = useMemo(() => {
-    const base = searched.filter(p => brand === 'all' || p.brand === brand);
-    const counts = new Map();
-    for (const p of base) if (p.category) counts.set(p.category, (counts.get(p.category) || 0) + 1);
-    return CATEGORIES.map(c => ({ ...c, count: counts.get(c.id) || 0 }));
+    const total = new Map(), withBrand = new Map();
+    for (const p of searched) {
+      if (!p.category) continue;
+      total.set(p.category, (total.get(p.category) || 0) + 1);
+      if (brand === 'all' || p.brand === brand) withBrand.set(p.category, (withBrand.get(p.category) || 0) + 1);
+    }
+    return CATEGORIES.map(c => ({ ...c, total: total.get(c.id) || 0, count: withBrand.get(c.id) || 0 }));
   }, [searched, brand]);
 
   const totalInScope = useMemo(
     () => searched.filter(p => brand === 'all' || p.brand === brand).length,
     [searched, brand]);
 
-  // PODKATEGORIE — tylko z wybranej kategorii, tylko niepuste
+  // PODKATEGORIE — ta sama zasada co przy kategoriach: lista z całej kategorii,
+  // licznik uwzględnia markę, a wejście w pustą przy tej marce zdejmuje markę.
   const subOptions = useMemo(() => {
     if (cat === 'all') return [];
-    const base = searched.filter(p => p.category === cat && (brand === 'all' || p.brand === brand));
     const acc = new Map();
-    for (const p of base) {
+    for (const p of searched) {
+      if (p.category !== cat) continue;
       const key = subKey(p);
       if (!key) continue;
-      const cur = acc.get(key) || { key, label: String(p.subcategory).trim(), count: 0 };
-      cur.count++;
+      const cur = acc.get(key) || { key, label: String(p.subcategory).trim(), total: 0, count: 0 };
+      cur.total++;
+      if (brand === 'all' || p.brand === brand) cur.count++;
       acc.set(key, cur);
     }
     return [...acc.values()].sort((a, b) => a.label.localeCompare(b.label, 'pl'));
@@ -1439,20 +1456,29 @@ function ProductDatabase({ products, initialCatRef }) {
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
   });
 
-  const pickCategory = (id) => {
+  const pickCategory = (id, dropBrand) => {
     const next = cat === id ? 'all' : id;
     setCat(next);
     setSub('all');
+    if (dropBrand) setBrand('all');
     // Telefon: po wyborze kategorii pokazujemy krok 2 (albo od razu wyniki,
     // gdy kategoria nie ma podkategorii). Desktop nie skacze — tam widać wszystko.
     if (narrow) scrollTo(next === 'all' ? pickRef : resultsRef);
   };
 
-  /* Cofanie o jeden poziom — z podkategorii do kategorii, z kategorii do listy
-     wszystkich kategorii. Zawsze wraca na górę wyboru, żeby było widać, gdzie się jest. */
+  /* Cofanie o jeden poziom = zaczynasz ten poziom od nowa, więc zdejmujemy też
+     wybory z poziomów niższych. Inaczej marka zostaje przyklejona i po powrocie
+     do kategorii połowa z nich jest wygaszona — a użytkownik chciał właśnie
+     wybrać coś innego. */
   const stepBack = () => {
+    setBrand('all');
     if (sub !== 'all') { setSub('all'); scrollTo(pickRef); return; }
     setCat('all'); setSub('all'); scrollTo(pickRef);
+  };
+
+  const pickSub = (key, dropBrand) => {
+    setSub(key);
+    if (dropBrand) setBrand('all');
   };
 
   return (
@@ -1511,7 +1537,12 @@ function ProductDatabase({ products, initialCatRef }) {
           <div className="pick">
             <div className="pick-h">
               <span className="pick-k"><span className="pick-no">1</span> Wybierz kategorię</span>
-              <span className="pick-hint">Kliknij kafelek, żeby zawęzić. Drugi klik cofa wybór.</span>
+              {/* Ostrzeżenie o wygaszonych kafelkach pokazujemy też na telefonie —
+                  tam nie ma najechania kursorem, więc inaczej nikt by się nie
+                  dowiedział, że w wygaszone wolno kliknąć. */}
+              {brand !== 'all' && catOptions.some(c => c.total && !c.count)
+                ? <span className="pick-hint warn">Wygaszone kategorie nie mają produktów marki {brand} — kliknięcie zdejmie filtr marki.</span>
+                : <span className="pick-hint">Kliknij kafelek, żeby zawęzić. Drugi klik cofa wybór.</span>}
             </div>
             <div className="ctiles">
               <button className={'ctile ctile-all' + (cat === 'all' ? ' on' : '')} onClick={() => pickCategory('all')}>
@@ -1521,9 +1552,10 @@ function ProductDatabase({ products, initialCatRef }) {
               </button>
               {catOptions.map(c => (
                 <button key={c.id}
-                        className={'ctile' + (cat === c.id ? ' on' : '')}
-                        disabled={!c.count && cat !== c.id}
-                        onClick={() => pickCategory(c.id)}>
+                        className={'ctile' + (cat === c.id ? ' on' : '') + (c.total && !c.count ? ' dim' : '')}
+                        disabled={!c.total && cat !== c.id}
+                        title={c.total && !c.count ? `Marka ${brand} nie ma tu produktów — kliknięcie pokaże całą kategorię` : undefined}
+                        onClick={() => pickCategory(c.id, !c.count)}>
                   <span className="ctile-ic"><CatIcon name={c.icon} size={26}/></span>
                   <span className="ctile-t">{c.label}</span>
                   <span className="ctile-n">{c.count}</span>
@@ -1544,13 +1576,15 @@ function ProductDatabase({ products, initialCatRef }) {
                 <span className="pick-k"><span className="pick-no">2</span> Wybierz podkategorię</span>
               </div>
               <div className="ctiles">
-                <button className={'ctile ctile-all' + (sub === 'all' ? ' on' : '')} onClick={() => setSub('all')}>
+                <button className={'ctile ctile-all' + (sub === 'all' ? ' on' : '')} onClick={() => pickSub('all', false)}>
                   <span className="ctile-ic"><IGrid s={26}/></span>
                   <span className="ctile-t">Wszystkie w kategorii</span>
                   <span className="ctile-n">{subTotal}</span>
                 </button>
                 {subOptions.map(o => (
-                  <button key={o.key} className={'ctile' + (sub === o.key ? ' on' : '')} onClick={() => setSub(o.key)}>
+                  <button key={o.key}
+                          className={'ctile' + (sub === o.key ? ' on' : '') + (o.total && !o.count ? ' dim' : '')}
+                          onClick={() => pickSub(o.key, !o.count)}>
                     <span className="ctile-ic"><CatIcon name={catObj ? catObj.icon : ''} size={26}/></span>
                     <span className="ctile-t">{o.label}</span>
                     <span className="ctile-n">{o.count}</span>
@@ -1565,7 +1599,10 @@ function ProductDatabase({ products, initialCatRef }) {
                 <div className="chips">
                   <button className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>Wszystkie</button>
                   {subOptions.map(o => (
-                    <button key={o.key} className={'chip' + (sub === o.key ? ' active' : '')} onClick={() => setSub(o.key)}>
+                    <button key={o.key}
+                            className={'chip' + (sub === o.key ? ' active' : '') + (o.total && !o.count ? ' dim' : '')}
+                            title={o.total && !o.count ? `Marka ${brand} nie ma tu produktów — kliknięcie zdejmie filtr marki` : undefined}
+                            onClick={() => pickSub(o.key, !o.count)}>
                       {o.label} <span className="chip-n">{o.count}</span>
                     </button>
                   ))}
