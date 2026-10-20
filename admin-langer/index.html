@@ -368,6 +368,9 @@ async function apiCall(path, options = {}) {
   const secret = getSecret();
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (secret) headers.Authorization = `Bearer ${secret}`;
+  // Strona czyta API przez cache CDN (minuta świeżości). Panel musi widzieć
+  // bazę od razu po zapisie, więc odczyty idą z ?fresh=1 — prosto z bazy.
+  if (!options.method || options.method === 'GET') path += (path.includes('?') ? '&' : '?') + 'fresh=1';
   const res = await fetch(path, { ...options, headers });
   const text = await res.text();
   let data;
@@ -392,7 +395,7 @@ async function apiCategories()            { return apiCall('/api/categories'); }
 async function apiCategoryAdd(c)          { return apiCall('/api/categories', { method: 'POST', body: JSON.stringify(c) }); }
 async function apiCategoryDel(id)         { return apiCall(`/api/categories?id=${encodeURIComponent(id)}`, { method: 'DELETE' }); }
 
-async function apiSettings()              { return apiCall('/api/settings'); }
+async function apiSettings()              { return apiCall('/api/settings?raw=1'); }  // raw = logo jako plik, nie adres /api/img
 async function apiSettingsSave(values)    { return apiCall('/api/settings', { method: 'POST', body: JSON.stringify(values) }); }
 
 /* „farby i spraye" -> „Farby i spraye" — nazwa kategorii z pliku pisanego małymi */
@@ -771,11 +774,18 @@ function changesFor(ex, row, provided, policy) {
   return out;
 }
 
+/* Zdjęcie wgrane do bazy. Lista produktów oddaje je jako adres /api/img
+   (base64 nie jedzie w liście), a świeżo wgrane w formularzu to data URI. */
+function isUploadedImg(v) {
+  const s = String(v || '');
+  return s.startsWith('data:') || s.startsWith('/api/img?');
+}
+
 /* Skrót adresu zdjęcia do podglądu zmian: „…/zdjecie1.jpg" albo „wgrany plik"
-   dla zdjęć trzymanych w bazie jako data URI. */
+   dla zdjęć trzymanych w bazie. */
 function shortSrc(v) {
   const s = String(v || '');
-  if (s.startsWith('data:')) return 'wgrany plik';
+  if (isUploadedImg(s)) return 'wgrany plik';
   const last = s.split('?')[0].split('/').filter(Boolean).pop() || s;
   return last.length > 28 ? last.slice(0, 27) + '…' : last;
 }
@@ -1728,7 +1738,7 @@ function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = 
             value={p.image_url && /^https?:\/\//i.test(p.image_url) ? p.image_url : ''}
             onChange={e => set('image_url', e.target.value)}
             placeholder="albo wklej adres: https://..."
-            disabled={imgBusy || (!!p.image_url && p.image_url.startsWith('data:'))}
+            disabled={imgBusy || isUploadedImg(p.image_url)}
           />
         </div>
 
@@ -1945,7 +1955,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
                   <td className="chkcell"><input type="checkbox" checked={sel.has(p.sku)} onChange={() => toggleSel(p.sku)} /></td>
                   <td>
                     {p.image_url
-                      ? <img src={p.image_url} alt="" className="p-img" onError={e => e.target.style.display = 'none'} />
+                      ? <img src={p.image_url} alt="" className="p-img" loading="lazy" onError={e => e.target.style.display = 'none'} />
                       : <div className="p-img"/>}
                   </td>
                   <td className="mono">{p.sku}</td>
@@ -2051,7 +2061,7 @@ function OfferSettings({ st }) {
     <div className="adm-card">
       <h2 className="adm-card-h">Oferta dla punktów handlowych</h2>
       <p className="adm-card-d">
-        Liczby z podstrony <a href="/dla-punktow/" target="_blank" rel="noopener" className="mono">/dla-punktow/</a>.
+        Liczby z podstrony <a href="/dla-punktow/?fresh=1" target="_blank" rel="noopener" className="mono">/dla-punktow/</a>.
         Zapisane wartości podmieniają się na stronie od razu — bez wgrywania kodu.
       </p>
 
@@ -2292,7 +2302,7 @@ function HeroStatsSettings({ st }) {
     <div className="adm-card">
       <h2 className="adm-card-h">Liczby w hero</h2>
       <p className="adm-card-d">
-        Cztery liczby pod nagłówkiem na <a href="/" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
+        Cztery liczby pod nagłówkiem na <a href="/?fresh=1" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
         Produkty i marki strona liczy sama z bazy — zawsze zgadzają się z ofertą.
         Pole, którego nie wypełnisz (i którego nie da się policzyć), po prostu nie pojawi się na stronie.
       </p>
@@ -2357,7 +2367,7 @@ function ContactSettings({ st }) {
     <div className="adm-card">
       <h2 className="adm-card-h">Dane kontaktowe</h2>
       <p className="adm-card-d">
-        Telefon, e-mail i adres z sekcji „Kontakt" oraz stopki na <a href="/" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
+        Telefon, e-mail i adres z sekcji „Kontakt" oraz stopki na <a href="/?fresh=1" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
         Zapis podmienia je we wszystkich miejscach naraz.
       </p>
 
@@ -2554,7 +2564,7 @@ function App() {
           </div>
         </div>
         <div className="gap-2">
-          <a className="adm-hdr-btn" href="/" target="_blank" rel="noopener">Zobacz stronę →</a>
+          <a className="adm-hdr-btn" href="/?fresh=1" target="_blank" rel="noopener">Zobacz stronę →</a>
           <button className="adm-hdr-btn" onClick={logout}><ILogout s={14}/> Wyloguj</button>
         </div>
       </header>

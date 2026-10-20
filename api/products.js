@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { productImgUrl, resolveImageUrl, setReadCache } from './_images.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -38,17 +39,29 @@ export default async function handler(req, res) {
     const withSub = await hasSubcategory();
 
     if (req.method === 'GET') {
+      setReadCache(req, res);
+      // Zdjęcia wgrane do bazy (data URI) nie jadą w liście — w ich miejsce
+      // adres /api/img (patrz _images.js). Base64 nie wychodzi nawet z bazy:
+      // liczymy po stronie Postgresa tylko skrót, który zmienia adres zdjęcia.
       const products = withSub
         ? await sql`
-            SELECT sku, name, brand, category, subcategory, variant, pack, role, tags, image_url
+            SELECT sku, name, brand, category, subcategory, variant, pack, role, tags,
+                   CASE WHEN image_url LIKE 'data:%' THEN NULL ELSE image_url END AS image_url,
+                   CASE WHEN image_url LIKE 'data:%' THEN left(md5(image_url), 12) END AS image_v
             FROM products
             ORDER BY brand, name
           `
         : await sql`
-            SELECT sku, name, brand, category, variant, pack, role, tags, image_url
+            SELECT sku, name, brand, category, variant, pack, role, tags,
+                   CASE WHEN image_url LIKE 'data:%' THEN NULL ELSE image_url END AS image_url,
+                   CASE WHEN image_url LIKE 'data:%' THEN left(md5(image_url), 12) END AS image_v
             FROM products
             ORDER BY brand, name
           `;
+      for (const p of products) {
+        if (p.image_v) p.image_url = productImgUrl(p.sku, p.image_v);
+        delete p.image_v;
+      }
       return res.status(200).json(products);
     }
 
@@ -56,13 +69,14 @@ export default async function handler(req, res) {
       if (!requireAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
 
       const body = req.body || {};
-      const { sku, name, brand, category, subcategory, variant, pack, role, tags, image_url } = body;
+      const { sku, name, brand, category, subcategory, variant, pack, role, tags } = body;
       if (!sku || !name) {
         return res.status(400).json({ error: 'Brak wymaganych pól: sku, name' });
       }
       if (subcategory && !withSub) {
         return res.status(400).json({ error: MIGRATION_HINT });
       }
+      const image_url = await resolveImageUrl(sql, body.image_url);
 
       const result = withSub
         ? await sql`
@@ -103,6 +117,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     console.error('API /products error:', e);
     return res.status(500).json({ error: e.message || 'Internal error' });
   }

@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { setReadCache } from './_images.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -25,10 +26,13 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
+      setReadCache(req, res);
       try {
         return res.status(200).json(await list());
       } catch (e) {
         // tabela nie istnieje / brak migracji — oddaj wartości domyślne
+        // (bez cache: chwilowy błąd bazy nie może utknąć w CDN)
+        res.setHeader('Cache-Control', 'no-store');
         return res.status(200).json(DEFAULTS);
       }
     }
@@ -61,6 +65,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, POST, DELETE');
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     console.error('API /categories error:', e);
     return res.status(500).json({ error: e.message || 'Internal error' });
   }
