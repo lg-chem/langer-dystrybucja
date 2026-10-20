@@ -4,3 +4,6 @@ data/products.json
 # Zależności npm (serverless functions) — nie commitujemy
 node_modules/
 package-lock.json
+
+# Wynik `npm run build` (Vercel buduje go sam przy wdrożeniu)
+dist/

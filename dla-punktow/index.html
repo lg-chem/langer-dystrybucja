@@ -313,49 +313,49 @@ const CATS = {
 const PRODUCTS = [
   {
     id: 'l70', cat: 'piany', name: 'Langer 70', sub: '870 ml · niskoprężna', badge: 'Bestseller',
-    img: 'assets/langer-70.png',
+    img: 'assets/langer-70.webp',
     desc: 'Profesjonalna piana niskoprężna do precyzyjnego montażu. Stabilna struktura i pełna izolacja termiczno-akustyczna. Dostępna też w wersji zimowej od −10 °C.',
     specs: [{ k: 'Wydajność', v: '70 L' }, { k: 'Czas cięcia', v: '15–30′' }, { k: 'Odporność', v: '−40/+90 °C' }, { k: 'Gęstość', v: '25 kg/m³' }],
     uses: ['Okna i drzwi', 'Izolacja akustyczna', 'Szczeliny i bruzdy'],
   },
   {
     id: 'xl', cat: 'piany', name: 'Langer XL Fast', sub: '870 ml · szybkowiążąca', badge: 'Nowość',
-    img: 'assets/xl-fast.png',
+    img: 'assets/xl-fast.webp',
     desc: 'Szybkowiążąca piana do montażu stolarki. Niska rozszerzalność wtórna oznacza brak naprężeń na ościeżnicach i montaż bez korekt.',
     specs: [{ k: 'Wydajność', v: '65 L' }, { k: 'Czas obróbki', v: '20′' }, { k: 'Odporność', v: '−60/+100 °C' }, { k: 'Rozsz. wtórna', v: 'Niska' }],
     uses: ['Okna i drzwi', 'Złącza G-K', 'Przepusty'],
   },
   {
     id: 'eco', cat: 'piany', name: 'Economy Line', sub: '750 ml · pistoletowa', badge: '',
-    img: 'assets/economy-line.png',
+    img: 'assets/economy-line.webp',
     desc: 'Jednoskładnikowa piana o kontrolowanym wzroście objętości. Sprawdzona, powtarzalna formuła w codziennym montażu.',
     specs: [{ k: 'Wydajność', v: '45 L' }, { k: 'Wzrost obj.', v: '30 %' }, { k: 'Czas cięcia', v: '30–40′' }, { k: 'Odporność', v: '−50/+90 °C' }],
     uses: ['Ościeżnice', 'Okablowanie', 'Szczeliny'],
   },
   {
     id: 'ecow', cat: 'wezyk', name: 'Economy Wężykowa', sub: '700 ml · bez pistoletu', badge: '',
-    img: 'assets/economy-wezykowa.png',
+    img: 'assets/economy-wezykowa.webp',
     desc: 'Ta sama niskoprężna formuła w wersji aplikowanej przez rurkę. Gotowa do pracy od razu — do drobnych prac i szybkich napraw.',
     specs: [{ k: 'Aplikacja', v: 'Rurka' }, { k: 'Wzrost obj.', v: '30 %' }, { k: 'Odporność', v: '−50/+90 °C' }, { k: 'Opakowanie', v: '700 ml' }],
     uses: ['Drobne naprawy', 'Okablowanie', 'Małe szczeliny'],
   },
   {
     id: 'exp', cat: 'pianokleje', name: 'Express 60 s', sub: '750 ml · pianoklej', badge: '',
-    img: 'assets/express-60.png',
+    img: 'assets/express-60.webp',
     desc: 'Pianoklej poliuretanowy o błyskawicznym utwardzaniu. Chwyt w 60 sekund, bez podpierania elementów. Jedna puszka zastępuje worki kleju cementowego.',
     specs: [{ k: 'Pocz. utwardz.', v: '60 s' }, { k: 'Czas korekty', v: '2 min' }, { k: 'Odporność', v: '−20/+85 °C' }, { k: 'Gęstość', v: '20–30 kg/m³' }],
     uses: ['Płyty EPS / XPS', 'Płyty G-K', 'OSB i drewno'],
   },
   {
     id: 'sty', cat: 'pianokleje', name: 'Do styropianu', sub: '750 ml · XPS / EPS', badge: '',
-    img: 'assets/styropian.png',
+    img: 'assets/styropian.webp',
     desc: 'Pianka o niskiej ekspansji do mocowania płyt styropianowych na fasadach i fundamentach. Niska wodochłonność i doskonałe parametry cieplne.',
     specs: [{ k: 'Wydajność', v: '10 m²' }, { k: 'Przewodn.', v: 'λ 0,034' }, { k: 'Odporność', v: '−50/+90 °C' }, { k: 'Izol. akust.', v: '60 dB' }],
     uses: ['Fasady', 'Fundamenty', 'Parapety i dachówki'],
   },
   {
     id: 'tur', cat: 'kleje', name: 'Langer TUR', sub: '290 ml · MS Polimer', badge: '',
-    img: 'assets/tur.png',
+    img: 'assets/tur.webp',
     desc: 'Klej na bazie MS Polimeru o natychmiastowym mocowaniu i bardzo wysokiej przyczepności początkowej. Bez rozpuszczalników i izocyjanianów.',
     specs: [{ k: 'Przyczep. pocz.', v: '500 kg/m²' }, { k: 'Wytrzym. końc.', v: '22 kg/cm²' }, { k: 'Odporność', v: '−40/+95 °C' }, { k: 'Elastyczność', v: '±25 %' }],
     uses: ['Parapety', 'Listwy i panele', 'Lustra'],
@@ -371,7 +371,8 @@ function useOffer() {
   const [offer, setOffer] = useState(OFFER_DEFAULTS);
   useEffect(() => {
     let alive = true;
-    fetch('/api/settings')
+    // ?fresh (link z panelu) omija cache CDN — zmiany widać od razu po zapisie
+    fetch('/api/settings' + (/[?&]fresh\b/.test(location.search) ? '?fresh=1' : ''))
       .then(r => (r.ok ? r.json() : null))
       .then(d => { if (alive && d && typeof d === 'object') setOffer(o => ({ ...o, ...d })); })
       .catch(() => {});
@@ -563,7 +564,7 @@ function ProductShowcase() {
 
       <Reveal className="pshow">
         <div className="pshow-img">
-          <img src={cur.img} alt={cur.name} />
+          <img src={cur.img} alt={cur.name} decoding="async" />
           {cur.badge && <span className="pshow-badge">{cur.badge}</span>}
           <span className="pshow-count">{pad(i + 1)} / {pad(PRODUCTS.length)}</span>
         </div>
@@ -592,7 +593,7 @@ function ProductShowcase() {
                 aria-label={p.name}
                 aria-current={k === i}
               >
-                <img src={p.img} alt="" />
+                <img src={p.img} alt="" loading="lazy" decoding="async" />
               </button>
             ))}
           </div>
@@ -615,7 +616,7 @@ function ProductScroller() {
         {PRODUCTS.map(p => (
           <article key={p.id} className="pcard">
             <div className="pcard-img">
-              <img src={p.img} alt={p.name} />
+              <img src={p.img} alt={p.name} loading="lazy" decoding="async" />
               {p.badge && <span className="pcard-badge">{p.badge}</span>}
             </div>
             <div className="pcard-body">

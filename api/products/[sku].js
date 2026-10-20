@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { resolveImageUrl } from '../_images.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -70,6 +71,9 @@ export default async function handler(req, res) {
         const v = body[k];
         return (v === '' || v === undefined) ? null : v;
       };
+      // Formularz w panelu odsyła zdjęcie pod adresem /api/img, w jakim je
+      // dostał z listy — podstawiamy to, na co ten adres wskazuje.
+      const image_url = has('image_url') ? await resolveImageUrl(sql, val('image_url')) : cur.image_url;
       const tags = has('tags')
         ? (Array.isArray(body.tags) ? body.tags : String(body.tags || '').split(/[|;]/).map(t => t.trim()).filter(Boolean))
         : (cur.tags ?? []);
@@ -85,7 +89,7 @@ export default async function handler(req, res) {
               pack        = ${val('pack')},
               role        = ${val('role')},
               tags        = ${tags},
-              image_url   = ${val('image_url')}
+              image_url   = ${image_url}
             WHERE sku = ${sku}
             RETURNING *
           `
@@ -98,7 +102,7 @@ export default async function handler(req, res) {
               pack      = ${val('pack')},
               role      = ${val('role')},
               tags      = ${tags},
-              image_url = ${val('image_url')}
+              image_url = ${image_url}
             WHERE sku = ${sku}
             RETURNING *
           `;

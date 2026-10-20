@@ -1,6 +1,6 @@
 # Langer Dystrybucja — strona firmowa
 
-Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML — bez build'a, bez konfiguracji, gotowy do wgrania gdziekolwiek.
+Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML, który edytujesz bezpośrednio — Vercel przy wdrożeniu sam go kompiluje, żeby strona ładowała się szybko.
 
 **Live:** wdrażane przez Vercel (zobacz sekcję [Wdrożenie](#wdrożenie))
 
@@ -18,6 +18,7 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML — b
 - [Jak działa strona główna](#jak-działa-strona-główna)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
 - [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
+- [Szybkość ładowania](#szybkość-ładowania)
 - [Wdrożenie na Vercel](#wdrożenie)
 - [Struktura plików](#struktura-plików)
 
@@ -32,7 +33,7 @@ Cała strona to **jeden plik** — `index.html`. Wszystko jest w środku:
 - Ikony SVG (kategorie produktów, sygnet marki)
 - Dane produktów (lista, marki, kategorie)
 
-React i Babel ładują się z CDN (unpkg) — nie trzeba nic kompilować.
+Kod piszesz w JSX prosto w `index.html` (`<script type="text/babel">`). Otwarty z dysku działa od razu — React i Babel dociągają się wtedy z CDN (unpkg). Na produkcji kompilację robi Vercel przy wdrożeniu (`build.mjs`), więc odwiedzający nie pobiera Babela — patrz [Szybkość ładowania](#szybkość-ładowania).
 
 **Folder `project/`** zawiera oryginalne pliki źródłowe rozbite na osobne pliki — jako referencja i archiwum. Strona ich nie używa; działa wyłącznie na `index.html`.
 
@@ -108,7 +109,7 @@ Wartości domyślne, gdy baza nie odpowiada, siedzą w `api/settings.js` (obiekt
 | Jednostka sprzedaży | Stopka karty, np. „12 szt. / karton". |
 | Oznaczenie | Odznaka na zdjęciu: Bestseller (pomarańczowa), Marka własna (niebieska), Premium (granatowa) albo bez. |
 | Tagi | Pigułki pod nazwą, oddzielane pionową kreską. |
-| Zdjęcie | Wgrywasz z dysku (panel zmniejsza je i zapisuje w bazie) albo wklejasz adres URL. |
+| Zdjęcie | Wgrywasz z dysku (panel zmniejsza je i zapisuje w bazie) albo wklejasz adres URL. Wgrane zdjęcie strona pobiera spod adresu `/api/img?sku=…` — patrz [Szybkość ładowania](#szybkość-ładowania). |
 
 Marek i kategorii nie dopisuje się w kodzie — **Panel → Ustawienia → Marki / Kategorie**. Nowa kategoria bez własnej ikony SVG dostaje na stronie neutralną ikonę zastępczą.
 
@@ -255,8 +256,8 @@ Osobny landing sprzedażowy skierowany do sklepów i hurtowni. Sedno oferty:
 podlinkowana w nawigacji i stopce strony głównej.
 
 Powstała z projektu z Claude Design (wariant „1b" na desktopie, „1c" na
-telefonie), przepisanego na ten sam stack co reszta serwisu — React 18 z CDN,
-bez build'a — i na tokeny kolorów z `index.html`.
+telefonie), przepisanego na ten sam stack co reszta serwisu — React 18 i JSX
+prosto w pliku HTML (kompilowany przy wdrożeniu) — i na tokeny kolorów z `index.html`.
 
 ### Co zmienisz z panelu
 
@@ -288,7 +289,9 @@ wiersze, a bez niej wszystko działa na wartościach domyślnych.
 Opisy produktów, parametry techniczne i zastosowania siedzą w stałej
 `PRODUCTS` w `dla-punktow/index.html` — to osobny zestaw od bazy produktów na
 stronie głównej, bo tutaj liczą się parametry techniczne, a nie SKU i jednostka
-sprzedaży. Zdjęcia leżą w `dla-punktow/assets/`.
+sprzedaży. Zdjęcia leżą w `dla-punktow/assets/`: strona używa plików `.webp`
+(840 px, kilkanaście–kilkadziesiąt kB), a `.png` obok to oryginały 1080 px do
+ponownego eksportu. Nowe zdjęcie? Wrzuć je jako WebP i podmień `img:` w `PRODUCTS`.
 
 ### Czego jeszcze nie ma
 
@@ -296,6 +299,36 @@ sprzedaży. Zdjęcia leżą w `dla-punktow/assets/`.
   demonstracyjna. Podpięcie wysyłki wymaga osobnego endpointu.
 - **Przycisk „Pobierz ulotkę PDF"** z projektu nie został przeniesiony — ulotka
   nie leży w repo. Gdy wrzucisz plik, dopnie się w minutę.
+
+---
+
+## Szybkość ładowania
+
+Na stronie było widać najpierw biały ekran, a zdjęcia doładowywały się długo. Przyczyny i co je teraz usuwa:
+
+| Co spowalniało | Jak jest teraz |
+|---|---|
+| **Wszystkie zdjęcia jechały w jednym JSON-ie.** `/api/products` zwracał każde wgrane zdjęcie jako base64 — przy 150 zdjęciach ok. 5 MB, pobierane w całości przy każdym wejściu, zanim pojawiła się pierwsza karta. (Vercel nie wyśle odpowiedzi większej niż 4,5 MB — przy kolejnych zdjęciach lista przestałaby się ładować w ogóle.) | Lista ma same dane (~75 kB), a w miejscu zdjęcia adres `/api/img?sku=…&v=…`. Przeglądarka ładuje zdjęcie dopiero, gdy karta jest na ekranie, i trzyma je w cache. `v` to skrót zawartości — nowe zdjęcie = nowy adres, więc podmianę widać od razu. To samo dotyczy logo z panelu. |
+| **Babel w przeglądarce.** Każdy odwiedzający pobierał ~3 MB kompilatora i tłumaczył cały kod strony — do tego czasu ekran był biały. | Vercel kompiluje JSX przy wdrożeniu (`npm run build` → `build.mjs` → `dist/`). React idzie z naszej domeny (`/vendor/`), z cache na rok. |
+| **Czekanie po kolei.** Najpierw skrypty, potem ustawienia, dopiero po wyświetleniu strony — produkty. | Wszystkie zapytania do API startują w `<head>`, równolegle ze skryptami. Do czasu narysowania strony widać granatowe tło z paskiem ładowania zamiast białej kartki. |
+| **Każde wejście budziło bazę.** Neon usypia się po kilku minutach ciszy, a odpowiedzi API miały zakaz cache. | Publiczne odczyty API idą przez cache CDN Vercela (patrz niżej). |
+| **Zdjęcia na `/dla-punktow/`** — PNG 1080 px, razem 1,3 MB. | WebP 840 px, razem ok. 140 kB. |
+
+Pomiar lokalny (300 produktów, 150 ze zdjęciami, symulowany telefon na LTE): strona pojawiała się po ~9,8 s, a pierwsze zdjęcia po ~16,5 s — teraz odpowiednio ~1,4 s i ~1,6 s.
+
+### Cache — kiedy widać zmiany z panelu
+
+Strona czyta produkty, marki, kategorie i ustawienia przez CDN: odpowiedź jest świeża przez **minutę**, potem CDN oddaje ostatnią wersję natychmiast i w tle pobiera nową z bazy. Zmiana zapisana w panelu pojawia się więc u odwiedzających w ciągu mniej więcej minuty (czasem trzeba odświeżyć stronę dwa razy).
+
+**Chcesz zobaczyć zmianę od razu?** Wejdź na stronę z panelu — przyciskiem „Zobacz stronę →" albo linkami w Ustawieniach. Prowadzą na `/?fresh=1`, które omija cache. Sam panel zawsze czyta prosto z bazy.
+
+Nagłówki ustawia `setReadCache` w `api/_images.js` — tam zmienisz czas świeżości (`s-maxage`).
+
+### Build
+
+`vercel.json` uruchamia `npm run build`, a Vercel publikuje katalog `dist/`. Skrypt kopiuje stronę, kompiluje każdy `<script type="text/babel">` (esbuild) i podmienia Reacta z unpkg na `/vendor/`. Pliki w repo się nie zmieniają — edytujesz je jak dotąd. Błąd w JSX zatrzyma wdrożenie z komunikatem, gdzie jest błąd, zamiast opublikować zepsutą stronę (zostaje poprzednia wersja).
+
+Lokalnie: `npm install`, potem `npm run build` — wynik w `dist/` (nie trafia do repo). Wersja Reacta w adresach unpkg w HTML musi się zgadzać z tą w `package.json`; jeśli nie, build zatrzyma się z czytelnym komunikatem.
 
 ---
 
@@ -307,7 +340,7 @@ sprzedaży. Zdjęcia leżą w `dla-punktow/assets/`.
 2. Wybierz repo `langer-dystrybucja` → kliknij **Deploy**
 3. Po ~30 sekundach dostaniesz URL typu `langer-dystrybucja.vercel.app`
 
-Od tej chwili każdy commit w repo → strona aktualizuje się automatycznie.
+Od tej chwili każdy commit w repo → strona aktualizuje się automatycznie. Ustawień builda nie trzeba wpisywać w panelu Vercela — są w `vercel.json` (`npm run build`, katalog `dist/`).
 
 ### Własna domena
 
@@ -321,15 +354,19 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 .
 ├── index.html              # ⭐ Strona główna
 ├── README.md               # Ten plik
+├── build.mjs               # Build na Vercelu: kompilacja JSX -> dist/
+├── vercel.json             # Komenda builda, katalog dist/, cache /vendor/
 ├── dla-punktow/            # Landing dla punktów handlowych (/dla-punktow/)
 │   ├── index.html          # Cała podstrona w jednym pliku
-│   └── assets/             # Zdjęcia produktów linii Langer (7 szt.)
+│   └── assets/             # Zdjęcia produktów linii Langer (WebP + oryginały PNG)
 ├── admin-langer/           # Panel admina (/admin-langer/)
 ├── api/                    # Funkcje serverless Vercela (Neon DB)
 │   ├── products.js         # Lista i zapis produktów
 │   ├── brands.js           # Marki
 │   ├── categories.js       # Kategorie
-│   └── settings.js         # Ustawienia: logo, kolory, kontakt, oferta
+│   ├── settings.js         # Ustawienia: logo, kolory, kontakt, oferta
+│   ├── img.js              # Zdjęcia i logo z bazy jako pliki (/api/img)
+│   └── _images.js          # Wspólne: adresy /api/img, nagłówki cache
 ├── migrations/             # Migracje SQL — uruchamiane ręcznie w Neon
 └── project/                # Archiwum — oryginalne pliki źródłowe (rozbite)
     ├── brand.css           # Tokeny kolorów, fonty, spacing
@@ -347,7 +384,7 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 
 ## Stack technologiczny
 
-- **HTML** + **React 18** (UMD z CDN, bez build'a)
-- **Babel Standalone** — kompiluje JSX w przeglądarce
+- **HTML** + **React 18** (UMD — na produkcji z `/vendor/`, lokalnie z CDN)
+- **esbuild** — kompiluje JSX przy wdrożeniu (`build.mjs`); **Babel Standalone** tylko przy otwieraniu pliku prosto z dysku
 - **Google Fonts** — Space Grotesk, Hanken Grotesk, JetBrains Mono
 - **Vercel** — hosting statyczny

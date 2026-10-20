@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { imgVersion, isDataUri, logoImgUrl, parseImgUrl, setReadCache } from './_images.js';
 
 const sql = neon(process.env.DATABASE_URL);
 
@@ -58,24 +59,42 @@ async function list() {
   return rows.reduce((acc, r) => ({ ...acc, [r.key]: r.value }), { ...DEFAULTS });
 }
 
+/* Wersja dla strony: wgrane logo (data URI, nawet kilkaset kB) zamieniamy na
+   adres /api/img — strona czeka na ustawienia przed pierwszym wyświetleniem,
+   więc nie mogą ważyć więcej niż kilka kB. Panel prosi o ?raw=1 i dostaje
+   oryginał (podgląd rozmiaru pliku, zapis). */
+function forPage(values) {
+  const out = { ...values };
+  for (const key of ['logo_light', 'logo_dark', 'logo_mark']) {
+    if (isDataUri(out[key])) out[key] = logoImgUrl(key, imgVersion(out[key]));
+  }
+  return out;
+}
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   try {
     if (req.method === 'GET') {
+      setReadCache(req, res);
+      let values;
       try {
-        return res.status(200).json(await list());
+        values = await list();
       } catch (e) {
         // tabela nie istnieje / brak migracji — oddaj wartości domyślne
-        return res.status(200).json(DEFAULTS);
+        // (bez cache: chwilowy błąd bazy nie może utknąć w CDN)
+        res.setHeader('Cache-Control', 'no-store');
+        values = { ...DEFAULTS };
       }
+      return res.status(200).json(req.query.raw ? values : forPage(values));
     }
 
     if (req.method === 'POST') {
       if (!requireAdmin(req)) return res.status(401).json({ error: 'Unauthorized' });
 
       const body = req.body || {};
-      const entries = Object.entries(body).filter(([k]) => ALLOWED.includes(k));
+      // Adres /api/img w miejscu logo = „bez zmian" (logo już jest w bazie).
+      const entries = Object.entries(body).filter(([k, v]) => ALLOWED.includes(k) && !parseImgUrl(v));
       if (!entries.length) {
         return res.status(400).json({ error: 'Brak znanych ustawień do zapisania' });
       }
@@ -100,6 +119,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (e) {
+    res.setHeader('Cache-Control', 'no-store');
     console.error('API /settings error:', e);
     return res.status(500).json({ error: e.message || 'Internal error' });
   }
