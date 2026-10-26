@@ -143,6 +143,8 @@ Przy aktualizacji dochodzi drugi wybór: **nadpisz wartościami z pliku** albo *
 
 Trzy szablony do pobrania w nagłówku karty: **pełny** (wszystkie kolumny), **aktualizacji** (`sku,image_url`) i **kategorii** (`sku,category,subcategory`).
 
+**Eksport.** Przycisk **„Eksport CSV"** na liście produktów pobiera plik z tymi samymi kolumnami co pełny szablon (`sku`, nazwa, marka, kategoria, podkategoria, wariant, opakowanie, oznaczenie, tagi, zdjęcie). Bierze to, co widać: zaznaczone produkty, a bez zaznaczenia — wynik wyszukiwania (pusta wyszukiwarka = wszystko). Separator to średnik, więc polski Excel od razu rozkłada kolumny. Poprawiony plik wraca przez Import CSV; zdjęcia wgrane do bazy mają w pliku adres `/api/img?…` i import ich nie rusza. Uwaga na zera wiodące w SKU (patrz niżej) — przed zapisem w Excelu ustaw kolumnę `sku` jako tekst.
+
 ---
 
 ## Kategorie i podkategorie
