@@ -199,12 +199,12 @@ Dwa rodzaje wyboru, każdy z jednym, standardowym zachowaniem — takim samym na
 
 | Element | Jak wygląda | Jak działa |
 |---|---|---|
-| **Kategoria** | Zakładki-pigułki z liczbą | Nawigacja („gdzie jestem"). Zawsze **dokładnie jedna aktywna**, „Wszystkie" jest pierwszą zakładką. Klik w aktywną nic nie robi. Puste kategorie (bez żadnego produktu w bazie) się nie pokazują. |
-| **Rodzaj** (podkategoria) | Komputer: rząd pigułek pod zakładkami. Telefon: w panelu „Filtry" | Pojawia się dopiero w wybranej kategorii. Jeden wybór plus „Wszystkie". |
-| **Marka** | Komputer: przycisk „Marka ▾" z listą pól wyboru. Telefon: w panelu „Filtry" | **Można zaznaczyć kilka** (Soudal + Den Braven). Przy każdej liczba produktów; marka bez produktów w bieżącym widoku jest nieaktywna. |
-| **Wybrane filtry** | Chipy z ✕ | Jedno kliknięcie zdejmuje filtr. Na komputerze chipy pokazują wybrane marki (rodzaj widać w rzędzie pigułek), na telefonie — rodzaj i marki (bo oba siedzą w panelu). |
+| **Kategoria** | Pigułki z liczbą, zawijane do kolejnych linii | Nawigacja („gdzie jestem"). Zawsze **dokładnie jedna aktywna**, „Wszystkie" jest pierwszą zakładką. Klik w aktywną nic nie robi. Puste kategorie (bez żadnego produktu w bazie) się nie pokazują. |
+| **Rodzaj** (podkategoria) | Rząd pigułek pod kategoriami (komputer i telefon) | Pojawia się dopiero w wybranej kategorii. Jeden wybór plus „Wszystkie". |
+| **Marka** | Przycisk „Marka ▾": na komputerze rozwija listę pól wyboru, na telefonie otwiera panel od dołu | **Można zaznaczyć kilka** (Soudal + Den Braven). Przy każdej liczba produktów; marka bez produktów w bieżącym widoku jest nieaktywna. |
+| **Wybrane marki** | Chipy z ✕ | Jedno kliknięcie zdejmuje markę. Kategorię i rodzaj widać w pigułkach, więc nie dublujemy ich chipami. |
 
-**Liczniki zawsze mówią, ile zostanie po kliknięciu** — uwzględniają wyszukiwanie i pozostałe filtry. Wybierzesz markę Soudal → na zakładkach widać, ile produktów Soudal jest w każdej kategorii.
+**Liczniki zawsze mówią, ile zostanie po kliknięciu** — uwzględniają wyszukiwanie i pozostałe filtry. Wybierzesz markę Soudal → na pigułkach kategorii widać, ile produktów Soudal jest w każdej kategorii.
 
 **Żaden wybór nie zmienia po cichu innego.** Zmiana kategorii kasuje tylko rodzaj (bo rodzaje należą do kategorii); wybrane marki zostają. Jeśli filtry się wykluczają (np. Bostik + Akryle), pusty stan mówi to wprost — „Marka Bostik nie ma produktów w kategorii Akryle" — i daje jeden przycisk naprawy („Pokaż wszystkie marki").
 
@@ -212,7 +212,7 @@ Dwa rodzaje wyboru, każdy z jednym, standardowym zachowaniem — takim samym na
 
 Zaznaczenie = wypełnienie (granat), najechanie = tylko ramka. Nic nie podskakuje pod kursorem, więc najechanego nie da się pomylić z wybranym.
 
-Wyszukiwarka działa równolegle do filtrów: przeszukuje nazwę, markę, SKU, wariant, podkategorię i tagi, a liczniki na zakładkach od razu pokazują, gdzie są trafienia.
+Wyszukiwarka działa równolegle do filtrów: przeszukuje nazwę, markę, SKU, wariant, podkategorię i tagi, a liczniki na pigułkach od razu pokazują, gdzie są trafienia.
 
 Produkty ładują się po **24 sztuki** (przycisk „Pokaż kolejne") — 300 kart naraz potrafiło zapchać przewijanie na telefonie.
 
@@ -220,11 +220,13 @@ Produkty ładują się po **24 sztuki** (przycisk „Pokaż kolejne") — 300 ka
 
 ### Na telefonie
 
-- Pod nagłówkiem przykleja się **pasek**: zakładki kategorii (przewijane w poziomie — brzeg, za którym coś jeszcze jest, wygasa, a aktywna zakładka sama wjeżdża w pole widzenia), pod nimi przycisk **„Filtry"** z liczbą wybranych filtrów, sortowanie i liczba wyników.
-- **„Filtry"** otwiera panel od dołu: rodzaj i marka. Zmiany działają od razu, a przycisk na dole na żywo mówi, ile zostanie („Pokaż 37 produktów"). Panel zamyka ✕, tapnięcie w tło, ten przycisk albo systemowe „wstecz".
+Układ jak na komputerze, tylko etykiety (KATEGORIA, RODZAJ) są nad pigułkami. **Nic nie chowa się poza krawędzią ekranu** — kategorie i rodzaje zawijają się do kolejnych linii, wszystko widać naraz. Poziomo przewijany pasek wyglądał jak skończona lista i nikt go nie przesuwał.
+
+- Pod pigułkami jest **pasek narzędzi** (marka, liczba wyników, sortowanie), który przykleja się pod nagłówkiem. Przyklejony pokazuje po lewej **bieżącą kategorię i rodzaj** — tapnięcie przewija z powrotem do wyboru kategorii, więc z głębi listy zmiana kategorii to jedno tapnięcie.
+- **„Marka"** otwiera panel od dołu z listą pól wyboru. Zmiany działają od razu, a przycisk na dole na żywo mówi, ile zostanie („Pokaż 37 produktów"). Panel zamyka ✕, tapnięcie w tło, ten przycisk albo systemowe „wstecz".
 - Po zmianie kategorii czy filtra, gdy jesteś przewinięty głęboko w listę, strona wraca na początek wyników (tuż pod przyklejony pasek). Gdy początek wyników jest widoczny — nic nie skacze.
 
-**Gest wstecz telefonu cofa o jeden widok**, zamiast wyrzucać ze strony. Zmiana kategorii i rodzaju zapisuje się w historii przeglądarki; marka tylko odświeża bieżący wpis. Otwarty panel filtrów to osobny wpis — „wstecz" go zamyka, a filtry wybrane w panelu zostają.
+**Gest wstecz telefonu cofa o jeden widok**, zamiast wyrzucać ze strony. Zmiana kategorii i rodzaju zapisuje się w historii przeglądarki; marka tylko odświeża bieżący wpis. Otwarty panel marek to osobny wpis — „wstecz" go zamyka, a marki wybrane w panelu zostają.
 
 Karty produktów idą w dwóch kolumnach.
 

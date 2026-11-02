@@ -305,9 +305,13 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
    Rodzaj i marka = filtry wewnątrz kategorii.
    Zaznaczenie to wypełnienie, najechanie to tylko ramka — nic nie podskakuje,
    więc najechanego nie da się pomylić z wybranym. */
-.cbar { margin-bottom: 16px; }
-.cbar-sentinel { height: 1px; margin-bottom: -1px; }
-.ctabs { position: relative; display: flex; flex-wrap: wrap; gap: 8px; }
+/* Wiersz wyboru: etykieta (KATEGORIA / RODZAJ) + pigułki. Na komputerze
+   etykieta po lewej, na telefonie nad pigułkami. */
+.frow { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: baseline; gap: 16px; margin-bottom: 14px; }
+.frow-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ash-700); font-weight: 600; }
+.frow .chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.ctabs { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
 .ctab { flex: none; display: inline-flex; align-items: center; gap: 9px; height: 44px; padding: 0 18px;
   border: 1.5px solid var(--line-2); border-radius: var(--r-full); background: var(--white); color: var(--navy);
   font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: -.01em; white-space: nowrap;
@@ -317,16 +321,11 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .ctab-n { font-size: 11.5px; color: var(--ash); font-weight: 500; }
 .ctab.on .ctab-n { color: rgb(255 255 255 / 0.62); }
 .ctab.zero:not(.on) { color: var(--ash-700); }
-.ctab:focus-visible, .chip:focus-visible, .tbtn:focus-visible, .fchip:focus-visible, .fclear:focus-visible,
+.ctab:focus-visible, .chip:focus-visible, .tbtn:focus-visible, .tback:focus-visible, .fchip:focus-visible, .fclear:focus-visible,
 .sheet-x:focus-visible, .bmenu-ok:focus-visible, .bmenu-clear:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
 
-/* Rodzaj (komputer) — rząd pigułek pod zakładkami, tylko w wybranej kategorii */
-.subrow { display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px; }
-.subrow .chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
-.subrow-k { flex: none; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--ash-700); font-weight: 600; }
-
 /* Pasek narzędzi: marka, wybrane marki, licznik, sortowanie */
+.tools-sentinel { height: 1px; margin-bottom: -1px; }
 .tools { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; padding-top: 16px;
   border-top: 1px solid var(--line-2); }
 .tools-r { margin-left: auto; display: flex; align-items: center; gap: 20px; }
@@ -477,28 +476,30 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .pcard-foot { flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; }
   .base-head { grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
   .h-base { margin-top: 10px; }
-  /* Katalog na telefonie: pasek kategorii + „Filtry" przykleja się pod
-     nagłówkiem. Zakładki przewijają się w poziomie od krawędzi do krawędzi
-     ekranu; brzeg, za którym coś jest, wygasa — widać, że pasek idzie dalej. */
-  .cbar { position: sticky; top: var(--header-h); z-index: 20; margin: 0 -20px 14px; padding: 10px 0;
-    background: var(--light); border-bottom: 1px solid transparent; transition: background .2s, box-shadow .2s, border-color .2s; }
-  .cbar.stuck { background: var(--white); border-bottom-color: var(--line); box-shadow: 0 10px 20px -16px rgb(14 21 51 / 0.5); }
-  .ctabs { flex-wrap: nowrap; gap: 7px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; padding-left: 20px; }
-  .ctabs::-webkit-scrollbar { display: none; }
-  .ctabs::after { content: ''; flex: 0 0 13px; }
-  .ctabs.fr { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
-              mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent); }
-  .ctabs.fl { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent);
-              mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent); }
-  .ctabs.fl.fr { -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
-                 mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
-  .ctab { height: 40px; padding: 0 15px; gap: 7px; font-size: 14.5px; }
-  .cbar-tools { display: flex; align-items: center; gap: 8px; padding: 10px 20px 0; }
-  .cbar-tools .tbtn { height: 40px; padding: 0 12px; font-size: 14px; }
-  .cbar-tools .sortbox label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .cbar-tools .sortbox select { height: 40px; padding: 0 8px; font-size: 14px; }
-  .cbar-tools .res-count { margin-left: auto; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
-  .cbar-tools .res-count .num { font-size: 14px; }
+  /* Katalog na telefonie: kategorie i rodzaje zawijają się do kolejnych linii —
+     wszystko widać naraz, nic nie trzeba przesuwać. Etykieta nad pigułkami. */
+  .frow { grid-template-columns: 1fr; gap: 8px; margin-bottom: 16px; }
+  .ctabs { gap: 7px; }
+  .ctab { height: 40px; padding: 0 14px; gap: 7px; font-size: 14px; }
+  .chip { padding: 9px 13px; }
+  /* Pasek narzędzi przykleja się pod nagłówkiem. Przyklejony dostaje białe tło
+     i przycisk z bieżącą kategorią (powrót do wyboru). */
+  .tools { position: sticky; top: var(--header-h); z-index: 20; flex-wrap: nowrap; gap: 8px; margin: 4px -20px 14px;
+    padding: 10px 20px; background: var(--light); border-top: none; border-bottom: 1px solid transparent;
+    transition: background .2s, box-shadow .2s, border-color .2s; }
+  .tools.stuck { background: var(--white); border-bottom-color: var(--line); box-shadow: 0 10px 20px -16px rgb(14 21 51 / 0.5); }
+  .tools .tbtn { height: 40px; padding: 0 12px; font-size: 14px; }
+  .tools-r { gap: 10px; min-width: 0; }
+  .tools .sortbox label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tools .sortbox select { height: 40px; padding: 0 8px; font-size: 14px; }
+  .tools .res-count { font-size: 13px; }
+  .tools .res-count .num { font-size: 14px; }
+  .tback { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    height: 40px; padding: 0 10px 0 12px; border-radius: var(--r-sm); background: var(--navy); color: #fff; text-align: left; }
+  .tback-txt { min-width: 0; display: flex; flex-direction: column; line-height: 1.1; }
+  .tback-k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: rgb(255 255 255 / 0.6); }
+  .tback-v { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tools.stuck .tools-r { margin-left: 0; }
   .fchip { height: 34px; font-size: 13.5px; }
   .hero-navy { padding: calc(var(--header-h) + 28px) 0 32px; }
   .hero-cats { margin-top: 22px; gap: 7px; }
@@ -804,7 +805,6 @@ const ICheck = (p) => <Svg {...p}><path d="M20 6L9 17l-5-5"/></Svg>;
 const IMenu  = (p) => <Svg {...p}><path d="M3 6h18M3 12h18M3 18h18"/></Svg>;
 const IX     = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
 const IChevron = (p) => <Svg {...p}><path d="M6 9l6 6 6-6"/></Svg>;
-const IFilter  = (p) => <Svg {...p}><path d="M4 6h16M7 12h10M10 18h4"/></Svg>;
 
 /* Category icon SVGs (inline, stroke-based, currentColor) */
 function CatIcon({ name, size = 48 }) {
@@ -1438,42 +1438,13 @@ function writeHistory(mode, state) {
   try { history[mode]({ langer: state }, '', filterUrl(state)); } catch (e) { /* np. strona z dysku */ }
 }
 
-/* ZAKŁADKI KATEGORII — zawsze dokładnie jedna aktywna („Wszystkie" też jest
-   zakładką), klik w aktywną nic nie robi. Na dużym ekranie zawijają się do
-   kolejnej linii; na telefonie przewijają w poziomie, a brzeg, za którym coś
-   jeszcze jest, wygasa — widać, że pasek idzie dalej. Aktywna zakładka sama
-   wjeżdża w pole widzenia (np. po wejściu z linku albo z hero). */
+/* KATEGORIE — pigułki, zawsze dokładnie jedna aktywna („Wszystkie" też jest
+   pigułką), klik w aktywną nic nie robi. Zawijają się do kolejnych linii także
+   na telefonie: nic nie chowa się poza krawędzią ekranu, bo poziomo przewijany
+   pasek wygląda jak skończona lista i nikt go nie przesuwa. */
 function CatTabs({ tabs, active, onPick }) {
-  const ref = useRef(null);
-  const [edge, setEdge] = useState('');
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => {
-      const l = el.scrollLeft > 2;
-      const r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
-      setEdge((l ? ' fl' : '') + (r ? ' fr' : ''));
-    };
-    measure();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-    el.addEventListener('scroll', measure, { passive: true });
-    window.addEventListener('resize', measure);
-    return () => { el.removeEventListener('scroll', measure); window.removeEventListener('resize', measure); };
-  }, [tabs]);
-
-  useEffect(() => {
-    const el = ref.current;
-    const btn = el && el.querySelector('.ctab.on');
-    if (!btn || el.scrollWidth <= el.clientWidth) return;
-    const pad = 40;
-    const l = btn.offsetLeft, r = l + btn.offsetWidth;
-    if (l - pad < el.scrollLeft) el.scrollTo({ left: Math.max(0, l - pad), behavior: 'smooth' });
-    else if (r + pad > el.scrollLeft + el.clientWidth) el.scrollTo({ left: r + pad - el.clientWidth, behavior: 'smooth' });
-  }, [active, tabs.length]);
-
   return (
-    <nav className={'ctabs' + edge} ref={ref} aria-label="Kategorie produktów">
+    <nav className="ctabs" aria-label="Kategorie produktów">
       {tabs.map(t => {
         const on = active === t.id;
         return (
@@ -1552,10 +1523,11 @@ function BrandMenu({ options, selected, onToggle, onClear }) {
   );
 }
 
-/* FILTRY na telefonie — panel od dołu. Zmiany działają od razu, a przycisk na
-   dole na żywo mówi, ile produktów zostanie. Systemowe „wstecz" go zamyka
-   (patrz historia w ProductDatabase), tak jak przycisk ✕ i tapnięcie w tło. */
-function FilterSheet({ onClose, count, catLabel, subOpts, subAll, sub, onSub, brandOpts, brands, onBrand, onClear }) {
+/* MARKA na telefonie — panel od dołu z listą pól wyboru. Zmiany działają od
+   razu, a przycisk na dole na żywo mówi, ile produktów zostanie. Systemowe
+   „wstecz" go zamyka (patrz historia w ProductDatabase), tak jak ✕ i tapnięcie
+   w tło. Kategoria i rodzaj nie siedzą w panelu — są widoczne na stronie. */
+function BrandSheet({ onClose, count, brandOpts, brands, onBrand, onClear }) {
   const closeRef = useRef(null);
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -1565,36 +1537,19 @@ function FilterSheet({ onClose, count, catLabel, subOpts, subAll, sub, onSub, br
     if (closeRef.current) closeRef.current.focus();
     return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey); };
   }, []);
-  const active = sub !== 'all' || brands.length > 0;
   return (
     <div className="sheet-wrap">
       <div className="sheet-bg" onClick={onClose} />
-      <div className="sheet" role="dialog" aria-modal="true" aria-label="Filtry">
+      <div className="sheet" role="dialog" aria-modal="true" aria-label="Marka">
         <div className="sheet-h">
-          <strong>Filtry</strong>
-          <button type="button" ref={closeRef} className="sheet-x" onClick={onClose} aria-label="Zamknij filtry"><IX s={22}/></button>
+          <strong>Marka</strong>
+          <button type="button" ref={closeRef} className="sheet-x" onClick={onClose} aria-label="Zamknij"><IX s={22}/></button>
         </div>
         <div className="sheet-body">
-          {subOpts.length > 0 && (
-            <div className="sheet-sec">
-              <div className="sheet-k">Rodzaj · {catLabel}</div>
-              <OptionRows name="pod-m"
-                          options={[{ key: 'all', label: 'Wszystkie', count: subAll }, ...subOpts]}
-                          isOn={k => k === sub} onPick={onSub} />
-            </div>
-          )}
-          {brandOpts.length > 0 && (
-            <div className="sheet-sec">
-              <div className="sheet-k">Marka</div>
-              <OptionRows name="marka-m" multi options={brandOpts} isOn={k => brands.includes(k)} onPick={onBrand} />
-            </div>
-          )}
-          {!subOpts.length && !brandOpts.length && (
-            <p className="sheet-empty">W tym widoku nie ma czego zawężać.</p>
-          )}
+          <OptionRows name="marka-m" multi options={brandOpts} isOn={k => brands.includes(k)} onPick={onBrand} />
         </div>
         <div className="sheet-f">
-          <button type="button" className="btn btn-ghost" onClick={onClear} disabled={!active}>Wyczyść</button>
+          <button type="button" className="btn btn-ghost" onClick={onClear} disabled={!brands.length}>Wyczyść</button>
           <button type="button" className="btn btn-dark" onClick={onClose}>
             Pokaż {count} {plProducts(count)}
           </button>
@@ -1630,6 +1585,7 @@ function ProductDatabase({ products, initialCatRef }) {
   const resultsRef = useRef(null);
   const barRef = useRef(null);
   const sentinelRef = useRef(null);
+  const pickRef = useRef(null);
   const sheetRef = useRef(false);
   const stateRef = useRef(null);
   stateRef.current = { cat, sub, brands };
@@ -1640,7 +1596,6 @@ function ProductDatabase({ products, initialCatRef }) {
 
   const goCat = (id) => { setCat(id); setSub('all'); };
   const toggleBrand = (k) => setBrands(bs => bs.includes(k) ? bs.filter(x => x !== k) : [...bs, k]);
-  const clearFilters = () => { setSub('all'); setBrands([]); };
   const clearAll = () => { setQ(''); setCat('all'); setSub('all'); setBrands([]); };
 
   const term = q.trim().toLowerCase();
@@ -1815,11 +1770,18 @@ function ProductDatabase({ products, initialCatRef }) {
     sheetRef.current = false;
     setSheet(false);
   };
+  const scrollToPick = () => {
+    const el = pickRef.current;
+    if (!el) return;
+    const hdr = document.querySelector('.hdr');
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - (hdr ? hdr.offsetHeight : 76) - 16, behavior: 'smooth' });
+  };
   // Obrót telefonu / poszerzenie okna do układu komputerowego — panel znika.
   useEffect(() => { if (!narrow && sheetRef.current) closeSheet(); }, [narrow]);
 
-  /* Pasek kategorii przykleja się na telefonie pod nagłówkiem. Kiedy jest
-     przyklejony, dostaje białe tło i cień — odcina się od przewijanej listy. */
+  /* Pasek narzędzi przykleja się na telefonie pod nagłówkiem. Kiedy jest
+     przyklejony, dostaje białe tło i cień — odcina się od przewijanej listy —
+     i pokazuje bieżącą kategorię z powrotem do wyboru. */
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el || !narrow || !window.IntersectionObserver) { setStuck(false); return; }
@@ -1853,7 +1815,6 @@ function ProductDatabase({ products, initialCatRef }) {
   const catObj = CATEGORIES.find(c => c.id === cat);
   const subObj = subOpts.find(o => o.key === sub);
   const brandName = (k) => brandLabels.get(k) || k;
-  const nFilters = (sub !== 'all' ? 1 : 0) + brands.length;
   const showBrandMenu = brandOpts.length > 1 || brands.length > 0;
 
   // Pusty wynik: mówimy dlaczego i dajemy jeden przycisk naprawy.
@@ -1906,24 +1867,15 @@ function ProductDatabase({ products, initialCatRef }) {
           </div>
         </div>
 
-        <div ref={sentinelRef} className="cbar-sentinel" />
-        <div ref={barRef} className={'cbar' + (stuck ? ' stuck' : '')}>
+        {/* Kategoria i rodzaj — widoczne zawsze, na komputerze i na telefonie.
+            Rodzaj pojawia się dopiero w wybranej kategorii. */}
+        <div ref={pickRef} className="frow">
+          <span className="frow-k">Kategoria</span>
           <CatTabs tabs={catTabs} active={cat} onPick={goCat} />
-          {narrow && (
-            <div className="cbar-tools">
-              <button type="button" className={'tbtn' + (nFilters ? ' on' : '')} onClick={openSheet}>
-                <IFilter s={17}/> Filtry {nFilters > 0 && <span className="tbtn-n">{nFilters}</span>}
-              </button>
-              {sortBox}
-              {count}
-            </div>
-          )}
         </div>
-
-        {/* Komputer: rodzaj jako rząd pigułek pod zakładkami, marka w menu. */}
-        {!narrow && subOpts.length > 0 && (
-          <div className="subrow">
-            <span className="subrow-k">Rodzaj</span>
+        {subOpts.length > 0 && (
+          <div className="frow">
+            <span className="frow-k">Rodzaj</span>
             <div className="chips">
               <button type="button" className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>
                 Wszystkie <span className="chip-n">{subAll}</span>
@@ -1937,28 +1889,39 @@ function ProductDatabase({ products, initialCatRef }) {
             </div>
           </div>
         )}
-        {!narrow && (
-          <div className="tools">
-            {showBrandMenu && (
-              <BrandMenu options={brandOpts} selected={brands} onToggle={toggleBrand} onClear={() => setBrands([])} />
-            )}
+
+        {/* Pasek narzędzi: marka, wybrane marki, licznik, sortowanie. Na telefonie
+            przykleja się pod nagłówkiem; gdy jest przyklejony, po lewej pokazuje,
+            w jakiej kategorii jesteś — tapnięcie wraca do wyboru kategorii. */}
+        <div ref={sentinelRef} className="tools-sentinel" />
+        <div ref={barRef} className={'tools' + (stuck ? ' stuck' : '')}>
+          {narrow && stuck && (
+            <button type="button" className="tback" onClick={scrollToPick}>
+              <span className="tback-txt">
+                <span className="tback-k">Kategoria</span>
+                <span className="tback-v">{catObj ? catObj.label : 'Wszystkie'}{subObj ? ' · ' + subObj.label : ''}</span>
+              </span>
+              <IChevron s={16} style={{ transform: 'rotate(180deg)', flex: 'none' }}/>
+            </button>
+          )}
+          {showBrandMenu && (narrow ? (
+            <button type="button" className={'tbtn' + (brands.length ? ' on' : '')} onClick={openSheet}>
+              Marka {brands.length > 0 && <span className="tbtn-n">{brands.length}</span>}
+              <IChevron s={16}/>
+            </button>
+          ) : (
+            <BrandMenu options={brandOpts} selected={brands} onToggle={toggleBrand} onClear={() => setBrands([])} />
+          ))}
+          {!narrow && brandChips}
+          {!narrow && brands.length > 1 && <button type="button" className="fclear" onClick={() => setBrands([])}>Wyczyść marki</button>}
+          <div className="tools-r">{!(narrow && stuck) && count}{sortBox}</div>
+        </div>
+
+        {/* Telefon: wybrane marki pod paskiem jako chipy z ✕. */}
+        {narrow && brands.length > 0 && (
+          <div className="applied">
             {brandChips}
             {brands.length > 1 && <button type="button" className="fclear" onClick={() => setBrands([])}>Wyczyść marki</button>}
-            <div className="tools-r">{count}{sortBox}</div>
-          </div>
-        )}
-
-        {/* Telefon: rodzaj i marka siedzą w panelu, więc to, co wybrane, widać
-            tutaj jako chipy z ✕ — jedno tapnięcie zdejmuje filtr. */}
-        {narrow && nFilters > 0 && (
-          <div className="applied">
-            {subObj && (
-              <button type="button" className="fchip" onClick={() => setSub('all')} aria-label={`Usuń filtr: ${subObj.label}`}>
-                {subObj.label} <IX s={14}/>
-              </button>
-            )}
-            {brandChips}
-            {nFilters > 1 && <button type="button" className="fclear" onClick={clearFilters}>Wyczyść filtry</button>}
           </div>
         )}
 
@@ -1993,11 +1956,9 @@ function ProductDatabase({ products, initialCatRef }) {
       {/* Portal do <body> — panel ma przykryć cały ekran, łącznie z nagłówkiem,
           niezależnie od tego, w czym siedzi sekcja. */}
       {sheet && ReactDOM.createPortal(
-        <FilterSheet onClose={closeSheet} count={results.length}
-                     catLabel={catObj ? catObj.label : ''} subOpts={subOpts} subAll={subAll}
-                     sub={sub} onSub={setSub}
-                     brandOpts={brandOpts} brands={brands} onBrand={toggleBrand}
-                     onClear={clearFilters} />,
+        <BrandSheet onClose={closeSheet} count={results.length}
+                    brandOpts={brandOpts} brands={brands} onBrand={toggleBrand}
+                    onClear={() => setBrands([])} />,
         document.body
       )}
     </section>
