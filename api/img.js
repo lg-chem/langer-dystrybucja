@@ -4,7 +4,7 @@ import { decodeDataUri, isDataUri } from './_images.js';
 const sql = neon(process.env.DATABASE_URL);
 
 // Logo, które wolno wydać pod tym adresem — reszta ustawień to nie obrazki.
-const LOGO_KEYS = ['logo_light', 'logo_dark', 'logo_mark'];
+const LOGO_KEYS = ['logo_light', 'logo_dark', 'logo_mark', 'favicon'];
 
 /* GET /api/img?sku=…&v=…   zdjęcie produktu z bazy
    GET /api/img?logo=…&v=…  logo z ustawień

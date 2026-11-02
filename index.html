@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Langer Dystrybucja — hurtowa dystrybucja chemii budowlanej</title>
+  <link rel="icon" href="/api/favicon" />
+  <link rel="apple-touch-icon" href="/api/favicon" />
   <meta name="description" content="Hurtowa dystrybucja chemii budowlanej: piany montażowe, silikony, akryle, kleje i akcesoria dla sklepów, hurtowni i ekip wykonawczych." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -105,7 +107,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; letter-spacing: -0.03em; font-weight: 700; }
 .display { font-size: clamp(44px, 7vw, 92px); line-height: 0.94; letter-spacing: -0.04em; }
-.h-sec   { font-size: clamp(32px, 4.4vw, 56px); letter-spacing: -0.035em; }
+.h-sec   { font-size: clamp(29px, 3.5vw, 46px); letter-spacing: -0.035em; text-wrap: balance; }
 .lead { font-size: clamp(17px, 2vw, 21px); line-height: 1.55; color: var(--ash-700); font-weight: 400; }
 .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
@@ -136,10 +138,12 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 @media (prefers-reduced-motion: reduce){ .reveal { opacity:1; transform:none; transition:none; } html{scroll-behavior:auto;} }
 
 /* ===== HEADER ===== */
-.hdr { position: fixed; inset: 0 0 auto 0; height: var(--header-h); z-index: 100;
-  display: flex; align-items: center; transition: background .25s, box-shadow .25s, border-color .25s;
-  border-bottom: 1px solid transparent; }
-.hdr-solid { background: rgba(246,247,249,.86); backdrop-filter: blur(12px); border-bottom-color: var(--line); }
+/* Nagłówek zawsze jasny — strona zaczyna się od jasnego hero, więc nie ma
+   przeskoku z białych napisów na ciemne w trakcie przewijania. */
+.hdr { position: fixed; inset: 0 0 auto 0; height: var(--header-h); z-index: 100; color: var(--navy);
+  display: flex; align-items: center; transition: box-shadow .25s;
+  background: rgb(255 255 255 / 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+.hdr-solid { box-shadow: 0 10px 30px -18px rgb(14 21 51 / 0.35); }
 .hdr-in { display: flex; align-items: center; gap: 24px; width: 100%; }
 .logo { display: inline-flex; align-items: center; gap: 12px; }
 .logo-words { display: flex; flex-direction: column; line-height: 1; }
@@ -147,69 +151,92 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .logo-sub { font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: 0.28em; margin-top: 3px; }
 .hdr-nav { display: flex; gap: 4px; margin-left: auto; }
 .hdr-link { font-weight: 600; font-size: 15px; padding: 9px 14px; border-radius: var(--r-sm); color: inherit; transition: background .12s, color .12s; }
-.hdr:not(.hdr-solid) .hdr-link { color: #fff; }
-.hdr:not(.hdr-solid) .logo { color: #fff !important; }
 .hdr-link:hover { color: var(--flame); }
 .hdr-cta { display: flex; }
 .hdr-burger { display: none; color: inherit; padding: 6px; }
-.hdr:not(.hdr-solid) .hdr-burger { color: #fff; }
-.mobile-menu { position: fixed; inset: 0; background: rgba(8,12,34,.5); z-index: 200; }
-.mobile-sheet { position: absolute; top: 0; right: 0; height: 100%; width: min(320px, 86vw); background: var(--white);
-  padding: 24px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--e2); }
-.mm-close { align-self: flex-end; padding: 8px; color: var(--navy); margin-bottom: 12px; }
-.mm-link { font-family: var(--font-display); font-weight: 600; font-size: 20px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+/* Menu na telefonie — renderowane w <body> (portal), nie w nagłówku: nagłówek
+   po przewinięciu ma backdrop-filter, a wtedy position: fixed w jego środku
+   liczy się względem nagłówka (76 px), nie ekranu. */
+.mobile-menu { position: fixed; inset: 0; z-index: 200; }
+.mm-bg { position: absolute; inset: 0; background: rgb(8 12 34 / 0.55); animation: sheet-fade .2s ease-out; }
+.mobile-sheet { position: absolute; top: 0; right: 0; bottom: 0; width: min(340px, 88vw); background: var(--white); color: var(--navy);
+  display: flex; flex-direction: column; box-shadow: var(--e2); overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 20px calc(20px + env(safe-area-inset-bottom)); animation: mm-in .26s cubic-bezier(.2,.8,.2,1); }
+.mm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.mm-close { flex: none; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--navy); }
+.mm-close:active { background: var(--light); }
+.mm-links { display: flex; flex-direction: column; padding: 6px 0; }
+.mm-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-family: var(--font-display); font-weight: 600; font-size: 20px; padding: 14px 4px; border-bottom: 1px solid var(--line); color: var(--navy); }
+.mm-link svg { color: var(--ash); flex: none; }
+.mm-link:hover, .mm-link:active { color: var(--flame); }
+.mm-foot { margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.mm-contact { display: inline-flex; align-items: center; gap: 10px; font-size: 15.5px; font-weight: 600; color: var(--ash-700); word-break: break-word; }
+.mm-contact svg { flex: none; color: var(--flame); }
+@keyframes mm-in { from { transform: translateX(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .mobile-sheet, .mm-bg { animation: none; } }
 
-/* ===== HERO (kompaktowy) =====
-   Zamiast pełnoekranowego plakatu: jedno zdanie o tym, co sprzedajemy, twarde
-   liczby z bazy i pasek kategorii — żeby od pierwszego ekranu było wiadomo,
-   po co tu jesteś, i dało się jednym kliknięciem wejść w katalog. */
-.hero { position: relative; overflow: hidden; }
-.hero-navy { background: var(--navy); padding: calc(var(--header-h) + 44px) 0 44px; }
-.hero-navy-in { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 20px 48px; align-items: center; }
+/* ===== HERO =====
+   Jasne tło i prawdziwy towar zamiast granatowego „kosmosu": od pierwszego
+   ekranu widać, co sprzedajemy (Langer i reszta chemii), co z tego ma klient
+   i jaki jest następny krok. Katalog jest jeden — niżej; hero go nie dubluje. */
+.hero { position: relative; overflow: hidden; padding: calc(var(--header-h) + 56px) 0 0;
+  background: radial-gradient(1000px 520px at 88% -10%, var(--flame-tint), transparent 62%), var(--white); }
+.hero-in { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 32px 48px; align-items: center; }
 .hero-copy { min-width: 0; }
-.hero-h { color: #fff; font-size: clamp(31px, 3.9vw, 48px); line-height: 1.05; letter-spacing: -0.035em; max-width: 21ch; margin: 14px 0 0; }
-.hero-lead { font-size: clamp(16px, 1.5vw, 19px); line-height: 1.5; color: rgb(255 255 255 / 0.72); max-width: 620px; margin: 14px 0 0; }
-.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+.hero-h { font-size: clamp(32px, 3.7vw, 50px); line-height: 1.04; letter-spacing: -0.035em; margin: 16px 0 0; color: var(--navy); text-wrap: balance; }
+.hero-h em { font-style: normal; color: var(--flame); }
+.hero-lead { font-size: clamp(16.5px, 1.5vw, 19px); line-height: 1.55; color: var(--ash-700); max-width: 600px; margin: 18px 0 0; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 
-/* Liczby jako panel po prawej — wypełniają kolumnę, której nagłówek nie potrzebuje,
-   i od razu mówią, jaka jest skala oferty. */
-.hero-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;
-  padding: 24px 26px; border-radius: var(--r-lg);
-  background: rgb(255 255 255 / 0.05); border: 1px solid rgb(255 255 255 / 0.1); }
-.hero-fact b { display: block; font-family: var(--font-display); font-weight: 700; font-size: clamp(24px, 2.4vw, 32px);
-  line-height: 1; letter-spacing: -.03em; color: #fff; }
-.hero-fact span { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.35; color: rgb(255 255 255 / 0.55); }
+/* Lista korzyści z „ptaszkami" — w hero i w kartach „Dla kogo" */
+.ticks { list-style: none; padding: 0; margin: 22px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.ticks li { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; align-items: start; font-size: 16px; line-height: 1.45; color: var(--ash-700); }
+.ticks li b { color: var(--navy); font-weight: 700; }
+.tick { width: 24px; height: 24px; border-radius: 50%; background: var(--flame); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.tick svg { stroke-width: 3px; }
 
-/* Pasek kategorii w hero — przewijalny w poziomie na telefonie */
-.hero-cats-wrap { position: relative; z-index: 2; }
-.hero-cats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; min-width: 0; }
-.hero-cats::-webkit-scrollbar { display: none; }
-.hcat { flex: none; display: inline-flex; align-items: center; gap: 8px; padding: 9px 15px; border-radius: var(--r-full);
-  border: 1px solid rgb(255 255 255 / 0.18); background: rgb(255 255 255 / 0.06); color: #fff;
-  font-size: 13.5px; font-weight: 600; white-space: nowrap; transition: transform .14s, background .14s, border-color .14s; }
-.hcat:hover { background: rgb(255 255 255 / 0.14); border-color: rgb(255 255 255 / 0.42); transform: translateY(-1px); }
-.hcat:active { transform: translateY(0); }
-.hcat-n { font-family: var(--font-mono); font-size: 11px; color: rgb(255 255 255 / 0.5); }
-.hcat-all { background: var(--flame); border-color: var(--flame); }
-.hcat-all:hover { background: var(--flame-600); border-color: var(--flame-600); }
+/* Puszki Langera: środkowa z przodu, boczne lekko z tyłu i pod kątem */
+.hero-vis { position: relative; min-width: 0; }
+.hero-stage { --hv-gap: clamp(76px, 8.4vw, 122px); position: relative; height: clamp(340px, 36vw, 500px); }
+.hero-stage::before { content: ''; position: absolute; left: 16%; right: 16%; bottom: 3%; height: 46px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(14 21 51 / 0.2), transparent); }
+.hv { position: absolute; left: 50%; top: 50%; height: 100%; width: auto; aspect-ratio: 1; pointer-events: none;
+  transform: translate(-49%, -50%); filter: drop-shadow(0 18px 22px rgb(14 21 51 / 0.2)); z-index: 2; }
+.hv-l { transform: translate(calc(-49% - var(--hv-gap)), -47%) scale(.84) rotate(-7deg); z-index: 1; }
+.hv-r { transform: translate(calc(-49% + var(--hv-gap)), -47%) scale(.84) rotate(7deg); z-index: 1; }
+.hv-tag { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; padding: 10px 14px; border-radius: var(--r-md);
+  background: var(--white); box-shadow: var(--e2); font-size: 12.5px; color: var(--ash-700); line-height: 1.25; max-width: 170px; }
+.hv-tag b { font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--navy); letter-spacing: -.02em; }
+.hv-tag-1 { left: 0; top: 4%; }
+.hv-tag-2 { right: 0; bottom: 6%; }
 
-.hero-grid-bg { position: absolute; inset: 0; opacity: .5;
-  background-image: linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
-  background-size: 56px 56px; -webkit-mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000, transparent 75%); mask-image: radial-gradient(ellipse 80% 70% at 70% 0%, #000, transparent 75%); }
-.hero-navy::after { content:''; position:absolute; top:-200px; right:-120px; width:480px; height:480px; border-radius:50%;
-  background: radial-gradient(circle, rgba(240,78,35,.26), transparent 65%); filter: blur(20px); }
+/* Pasek zaufania pod hero: liczby z bazy/panelu i marki w ofercie */
+.trust { margin-top: 44px; border-top: 1px solid var(--line); background: rgb(255 255 255 / 0.75); }
+.trust-in { display: flex; align-items: center; justify-content: space-between; gap: 14px 40px; flex-wrap: wrap; padding-block: 18px; }
+.trust-facts { display: flex; flex-wrap: wrap; gap: 8px 30px; }
+.tf { display: inline-flex; align-items: baseline; gap: 7px; font-size: 14.5px; color: var(--ash-700); white-space: nowrap; }
+.tf b { font-family: var(--font-display); font-size: 22px; letter-spacing: -.02em; color: var(--navy); }
+.trust-brands { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; }
+.trust-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
+.tb { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--ash-700); letter-spacing: -.01em; }
+.tb-l { color: var(--flame); }
 
-/* ===== MARQUEE ===== */
-.marquee { background: var(--navy-900); color: #fff; overflow: hidden; padding: 18px 0; }
-.marquee-track { display: flex; gap: 0; white-space: nowrap; width: max-content; animation: marq 34s linear infinite; }
-.marquee-item { font-family: var(--font-display); font-weight: 700; font-size: 26px; letter-spacing: 0.02em; padding: 0 6px; display: inline-flex; align-items: center; gap: 28px; color: rgba(255,255,255,.85); }
-.marquee-dot { color: var(--flame); font-size: 22px; }
-@keyframes marq { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce){ .marquee-track { animation: none; } }
+/* ===== DLA KOGO ===== */
+.aud-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.aud { border-radius: var(--r-xl); padding: 36px; display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--line); background: var(--white); }
+.aud-shop { background: var(--navy); color: #fff; border-color: var(--navy); }
+.aud-k { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--flame); }
+.aud-shop .aud-k { color: var(--flame-glow); }
+.aud-t { font-size: clamp(24px, 2.4vw, 30px); letter-spacing: -.025em; line-height: 1.12; }
+.aud .ticks { margin: 4px 0 10px; }
+.aud-shop .ticks li { color: rgb(255 255 255 / 0.72); }
+.aud-shop .ticks li b { color: #fff; }
+.aud .btn { align-self: flex-start; margin-top: auto; max-width: 100%; white-space: normal; text-align: center; }
+.aud-grid > * { min-width: 0; }
 
 /* ===== SECTIONS ===== */
 .sec { padding: 104px 0; }
-.sec-head { max-width: 760px; margin-bottom: 56px; }
+.sec-head { max-width: 820px; margin-bottom: 48px; }
 .sec-head .eyebrow { margin-bottom: 20px; }
 .sec-dark { background: var(--navy); }
 .sec-base { background: var(--light); }
@@ -229,50 +256,26 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .proc-d { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.55; }
 
 
-/* ===== LANGER SHOWCASE (karuzela marki własnej) ===== */
-.sec-langer { background: var(--paper); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); position: relative; overflow: hidden; }
-.sec-langer::before { content:''; position:absolute; top:-180px; left:-120px; width:520px; height:520px; border-radius:50%;
-  background: radial-gradient(circle, rgba(240,78,35,.10), transparent 65%); pointer-events:none; }
-.sec-langer::after { content:''; position:absolute; bottom:-200px; right:-160px; width:540px; height:540px; border-radius:50%;
-  background: radial-gradient(circle, rgba(30,63,181,.08), transparent 65%); pointer-events:none; }
-.lshow-head { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: end; margin-bottom: 48px; position: relative; z-index: 2; }
-.lshow-head .h-sec { margin-top: 20px; }
-.lshow-lead { max-width: 480px; margin: 0; }
-.lcarousel { position: relative; z-index: 2; }
-.lcar-nav { position: absolute; top: 40%; transform: translateY(-50%); z-index: 3;
-  width: 52px; height: 52px; border-radius: 50%; background: var(--white); color: var(--navy);
-  display: inline-flex; align-items: center; justify-content: center;
-  border: 1px solid var(--line); box-shadow: var(--e2); transition: background .15s, color .15s, transform .15s, opacity .15s; }
-.lcar-nav:hover { background: var(--flame); color: #fff; border-color: var(--flame); }
-.lcar-nav.disabled { opacity: .35; pointer-events: none; }
-.lcar-prev { left: -22px; }
-.lcar-next { right: -22px; }
-.lcar-track { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(280px, 300px);
-  gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
-  padding: 8px 4px 24px; margin: -8px -4px 0;
-  scrollbar-width: thin; scrollbar-color: var(--line-2) transparent; }
-.lcar-track::-webkit-scrollbar { height: 8px; }
-.lcar-track::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 999px; }
-.lcar-track::-webkit-scrollbar-track { background: transparent; }
-.lcard { scroll-snap-align: start; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg);
-  overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
-.lcard:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
-.lcard-img { position: relative; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; padding: 16px; min-height: 0; overflow: hidden; border-bottom: 1px solid var(--line); }
-.lcard-photo { width: 100%; height: 100%; object-fit: contain; object-position: center; }
-.lcard-imgtag { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: currentColor; opacity: .55; }
-.lcard-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.lcard-brand { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--flame); font-weight: 600; }
-.lcard-name { font-size: 18px; line-height: 1.2; letter-spacing: -0.02em; }
-.lcard-variant { font-size: 13.5px; color: var(--ash-700); margin-top: -2px; }
-.lcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.lcard-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.lcard-pack { font-size: 13px; font-weight: 600; color: var(--navy); }
-.lshow-foot { display: flex; align-items: center; gap: 20px; margin-top: 36px; position: relative; z-index: 2; flex-wrap: wrap; }
-.lshow-count { color: var(--ash-700); font-size: 14px; font-weight: 600; }
+/* ===== LANGER =====
+   Sekcja odpowiada na „i co z tego?": liczby z produktów zamiast hasła
+   o marce własnej, potem towar z bazy i jedno przejście do katalogu. */
+.sec-langer { background: var(--white); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.lhead { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 20px 56px; align-items: end; margin-bottom: 40px; }
+.lhead .h-sec { margin-top: 20px; }
+.lhead .lead { margin: 0; max-width: 540px; }
+.lfacts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 40px; }
+.lfact { border-radius: var(--r-lg); padding: 22px; background: var(--paper); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.lfact b { font-family: var(--font-display); font-size: clamp(30px, 3vw, 40px); color: var(--flame); letter-spacing: -.03em; line-height: 1; }
+.lfact span { font-size: 15px; color: var(--navy); font-weight: 600; line-height: 1.35; }
+.lfact small { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); margin-top: auto; padding-top: 6px; }
+.lfoot { display: flex; align-items: center; gap: 14px 24px; flex-wrap: wrap; margin-top: 32px; }
+.tlink { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15.5px; color: var(--flame); }
+.tlink:hover { color: var(--flame-600); }
 
 /* ===== CONTACT ===== */
 .sec-contact { background: var(--white); border-top: 1px solid var(--line); }
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: start; }
+.form-row > * { min-width: 0; }
 .contact-list { list-style: none; padding: 0; margin: 36px 0 0; display: flex; flex-direction: column; gap: 18px; }
 .contact-list li { display: flex; align-items: center; gap: 16px; }
 .ci { flex: none; width: 48px; height: 48px; border-radius: var(--r-md); background: var(--navy); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
@@ -282,12 +285,21 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field span { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
-.field input, .field textarea { font-family: var(--font-text); font-size: 16px; color: var(--navy); background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 13px 15px; transition: border-color .15s, box-shadow .15s; resize: vertical; }
+.field input, .field textarea { width: 100%; min-width: 0; font-family: var(--font-text); font-size: 16px; color: var(--navy); background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 13px 15px; transition: border-color .15s, box-shadow .15s; resize: vertical; }
 .field input:focus, .field textarea:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
 .field input::placeholder, .field textarea::placeholder { color: var(--ash); }
-.form-note { font-size: 12.5px; color: var(--ash); text-align: center; margin: 4px 0 0; }
+.form-note { font-size: 12.5px; color: var(--ash); text-align: center; margin: 4px 0 0; line-height: 1.5; }
+.form-note b { color: var(--ash-700); }
 .form-done { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 48px 32px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .form-done-ic { width: 64px; height: 64px; border-radius: 50%; background: var(--flame-tint); color: var(--flame); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+.form-done-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
+.who { display: flex; flex-wrap: wrap; gap: 8px; }
+.who-o { display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: var(--r-full); border: 1.5px solid var(--line-2);
+  background: var(--white); font-size: 14.5px; font-weight: 600; color: var(--ash-700); cursor: pointer; transition: border-color .12s, background .12s, color .12s; }
+.who-o:hover { border-color: var(--navy); color: var(--navy); }
+.who-o.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+.contact-alt { margin-top: 28px; padding: 18px 20px; border-radius: var(--r-md); background: var(--flame-tint); color: var(--navy); font-size: 15px; line-height: 1.5; }
+.contact-alt a { font-weight: 700; color: var(--flame-600); }
 
 /* ===== FOOTER ===== */
 .footer { background: var(--navy-900); color: #fff; padding: 72px 0 32px; }
@@ -431,7 +443,23 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .pcard-photo { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .pcard-imgtag { position: absolute; bottom: 10px; right: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: currentColor; opacity: .55; }
 .pbadge { position: absolute; top: 12px; left: 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 5px 9px; border-radius: var(--r-full); color: #fff; }
+.pbadges { position: absolute; top: 12px; left: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.pbadges .pbadge { position: static; }
 .role-magnet { background: var(--flame); }
+.pbadge-langer { background: var(--navy); display: inline-flex; align-items: center; gap: 6px; }
+.pbadge-langer i { width: 10px; height: 3px; border-radius: 2px; background: var(--flame); }
+/* Karta Langera: ciepła ramka i marka w kolorze akcentu — widać ją w siatce od razu */
+.pcard-langer { border-color: rgb(240 78 35 / 0.45); border-color: color-mix(in srgb, var(--flame) 45%, var(--line)); }
+.pcard-langer .pcard-brand { color: var(--flame); }
+/* Nagłówki grup w wynikach: najpierw Langer, potem pozostałe marki */
+.pgrid-sep { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; margin: 8px 0 -4px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ash-700); }
+.pgrid-sep::after { content: ''; flex: 1; height: 1px; background: var(--line-2); }
+.pgrid-sep:first-child { margin-top: 0; }
+.pgrid-sep b { color: var(--flame); font-weight: 600; }
+.tbtn-langer { gap: 9px; }
+.tbtn-langer i { width: 12px; height: 4px; border-radius: 2px; background: var(--flame); }
+.tbtn-langer.on { background: var(--navy); border-color: var(--navy); color: #fff; }
 .role-margin { background: var(--cobalt); }
 .role-premium { background: var(--navy); }
 .pcard-body { padding: 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
@@ -454,18 +482,21 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .why-grid { grid-template-columns: repeat(2, 1fr); }
   .proc-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 24px; }
   .pgrid { grid-template-columns: repeat(3, 1fr); }
-  .lshow-head { grid-template-columns: 1fr; gap: 20px; align-items: start; }
-  .lcar-prev { left: 8px; }
-  .lcar-next { right: 8px; }
+  .lhead { grid-template-columns: 1fr; align-items: start; }
+  .lfacts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 900px){
   .hdr-nav, .hdr-cta { display: none; }
   .hdr-burger { display: inline-flex; }
-  .hero-navy-in { grid-template-columns: 1fr; gap: 28px; }
-  .hero-facts { padding: 18px 20px; gap: 16px; }
+  .hero-in { grid-template-columns: 1fr; gap: 8px; }
+  .hero-vis { order: -1; max-width: 560px; width: 100%; justify-self: center; }
+  .hero-stage { height: 300px; --hv-gap: 84px; }
+  .aud-grid { grid-template-columns: 1fr; }
   .contact-grid, .footer-in { grid-template-columns: 1fr; gap: 40px; }
 }
 @media (max-width: 680px){
+  /* Przyciski mogą zawinąć tekst, zamiast wypychać stronę poza ekran */
+  .btn { white-space: normal; text-align: center; max-width: 100%; }
   .sec { padding: 72px 0; }
   .why-grid, .proc-grid { grid-template-columns: 1fr; }
   /* Dwie kolumny kart produktów zamiast jednej — mniej przewijania na telefonie */
@@ -501,16 +532,24 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .tback-v { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tools.stuck .tools-r { margin-left: 0; }
   .fchip { height: 34px; font-size: 13.5px; }
-  .hero-navy { padding: calc(var(--header-h) + 28px) 0 32px; }
-  .hero-cats { margin-top: 22px; gap: 7px; }
-  .hcat { padding: 8px 13px; font-size: 13px; }
+  .hero { padding-top: calc(var(--header-h) + 16px); }
+  .hero-stage { height: 240px; --hv-gap: 66px; }
+  .hv-tag { padding: 8px 11px; font-size: 11.5px; max-width: 150px; }
+  .hv-tag b { font-size: 18px; }
+  .hv-tag-1 { top: 2%; } .hv-tag-2 { bottom: 4%; }
+  .hero-cta .btn { flex: 1 1 100%; }
+  .trust { margin-top: 32px; }
+  .trust-facts { gap: 6px 20px; }
+  .tf b { font-size: 19px; }
+  .aud { padding: 24px 20px; border-radius: var(--r-lg); }
+  .lfacts { gap: 10px; }
+  .lfact { padding: 16px; }
+  .pbadges { top: 8px; left: 8px; gap: 4px; }
+  .pbadges .pbadge { font-size: 9px; padding: 4px 7px; }
   .pcard-sub { display: none; }
-  .lcar-track { grid-auto-columns: 78%; }
-  .lcar-nav { display: none; }
   .form-row { grid-template-columns: 1fr; }
   .footer-cols { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; gap: 8px; }
-  .marquee-item { font-size: 20px; }
 }
   </style>
 </head>
@@ -558,6 +597,9 @@ let SITE = {
   stat_brands:     '',   // puste = liczymy z bazy
   stat_delivery:   '48 h',
   stat_points:     '',   // puste = kafel się nie pokazuje
+  // Warunki z /dla-punktow/ — powtarzamy je w sekcji „Dla kogo"
+  landing_discount_text: 'kilka procent',
+  landing_pistol_price:  '1',
 };
 
 /* Logo dla danego tła. Gdy wgrano tylko jedną wersję — używamy jej wszędzie,
@@ -599,7 +641,9 @@ function applyAccent(hex) {
 
 const ROLE_LABEL = {
   magnet:  { t:'Bestseller',   cls:'role-magnet' },
-  margin:  { t:'Marka własna', cls:'role-margin' },
+  // „Marka własna" to w praktyce Langer — karty Langera dostają własną
+  // plakietkę (patrz ProductTile), więc ta etykieta nic by nie dodała.
+  margin:  null,
   premium: { t:'Premium',      cls:'role-premium' },
   neutral: null,
 };
@@ -917,159 +961,221 @@ function Header() {
     on(); window.addEventListener('scroll', on, { passive: true });
     return () => window.removeEventListener('scroll', on);
   }, []);
-  const links = [['#baza','Produkty'],['#langer','Marka Langer'],['/dla-punktow/','Dla punktów'],['#dlaczego','Dlaczego my'],['#proces','Proces'],['#kontakt','Kontakt']];
+  const links = [['#langer','Langer'],['#baza','Katalog'],['/dla-punktow/','Oferta dla sklepów'],['#jak-zaczac','Jak zacząć'],['#kontakt','Kontakt']];
   return (
     <header className={'hdr' + (scrolled ? ' hdr-solid' : '')}>
       <div className="wrap hdr-in">
-        <LangerLogo onDark={!scrolled} size={38} />
+        <LangerLogo onDark={false} size={38} />
         <nav className="hdr-nav">
           {links.map(([h,l]) => <a key={h} href={h} className="hdr-link">{l}</a>)}
         </nav>
         <div className="hdr-cta">
-          <a href="#kontakt" className="btn btn-flame" style={{ padding:'12px 20px', fontSize:15 }}>Zostań partnerem <IArrow s={17}/></a>
+          <a href="#kontakt" className="btn btn-flame" style={{ padding:'12px 20px', fontSize:15 }}>Zapytaj o cennik <IArrow s={17}/></a>
         </div>
-        <button className="hdr-burger" onClick={() => setOpen(true)} aria-label="Menu"><IMenu s={24}/></button>
+        <button className="hdr-burger" onClick={() => setOpen(true)} aria-label="Menu" aria-expanded={open}><IMenu s={24}/></button>
       </div>
-      {open && (
-        <div className="mobile-menu" onClick={() => setOpen(false)}>
-          <div className="mobile-sheet" onClick={e => e.stopPropagation()}>
-            <button className="mm-close" onClick={() => setOpen(false)} aria-label="Zamknij"><IX s={24}/></button>
-            {links.map(([h,l]) => <a key={h} href={h} className="mm-link" onClick={() => setOpen(false)}>{l}</a>)}
-            <a href="#kontakt" className="btn btn-flame" onClick={() => setOpen(false)} style={{ marginTop:16 }}>Zostań partnerem <IArrow/></a>
-          </div>
-        </div>
-      )}
+      {open && ReactDOM.createPortal(<MobileMenu links={links} onClose={() => setOpen(false)} />, document.body)}
     </header>
   );
 }
 
-/* ===== HERO =====
-   Kompaktowy: nagłówek mówi wprost, czym handlujemy, liczby lecą z bazy,
-   a pasek kategorii wrzuca prosto do katalogu. Bez pełnoekranowego plakatu —
-   pierwszy ekran ma odpowiadać „co tu jest", nie robić wrażenie. */
-const HERO = {
-  eyebrow: 'Hurtowa dystrybucja chemii budowlanej',
-  h1a: 'Piany, silikony, akryle, kleje',
-  h1b: ' i cała reszta',
-  h1c: ' — hurtowo.',
-  lead: 'Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze. Sprawdzone marki, własna linia Langer i zamówienia bez pełnych kartonów.',
-};
-
-/* Fakty w hero: produkty i marki liczymy z bazy, czas realizacji i liczbę
-   punktów bierzemy z panelu (Ustawienia → „Liczby w hero"). Pusta wartość =
-   fakt się nie pokazuje. Żadnej liczby nie wpisujemy „na oko" w kodzie. */
-function HeroFacts({ products = [], catCount = 0 }) {
-  const facts = [
-    [SITE.stat_products || (products.length ? String(products.length) : ''), 'produktów'],
-    [catCount ? String(catCount) : '', 'kategorii'],
-    [SITE.stat_brands || (BRANDS.length ? String(BRANDS.length) : ''), 'marek'],
-    [SITE.stat_delivery, 'średni czas realizacji'],
-    [SITE.stat_points, 'zaopatrywanych punktów'],
-  ].filter(([n]) => String(n || '').trim());
-
-  if (!facts.length) return null;
+/* Menu na telefonie — panel z prawej na całą wysokość ekranu. Przewijanie
+   strony pod spodem jest zablokowane; zamyka ✕, tapnięcie w tło, Esc albo
+   wybór linku. */
+function MobileMenu({ links, onClose }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    if (closeRef.current) closeRef.current.focus();
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey); };
+  }, []);
   return (
-    <div className="hero-facts">
-      {facts.map(([n, l]) => (
-        <div className="hero-fact" key={l}>
-          <b className="num">{n}</b>
-          <span>{l}</span>
+    <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu">
+      <div className="mm-bg" onClick={onClose} />
+      <nav className="mobile-sheet">
+        <div className="mm-head">
+          <div onClick={onClose}><LangerLogo onDark={false} size={34} /></div>
+          <button type="button" ref={closeRef} className="mm-close" onClick={onClose} aria-label="Zamknij menu"><IX s={24}/></button>
         </div>
-      ))}
+        <div className="mm-links">
+          {links.map(([h,l]) => <a key={h} href={h} className="mm-link" onClick={onClose}>{l}<IArrow s={18}/></a>)}
+        </div>
+        <div className="mm-foot">
+          <a href="#kontakt" className="btn btn-flame" onClick={onClose}>Zapytaj o cennik <IArrow/></a>
+          {SITE.contact_phone && <a href={telHref(SITE.contact_phone)} className="mm-contact"><IPhone s={18}/> {SITE.contact_phone}</a>}
+          {SITE.contact_email && <a href={'mailto:' + SITE.contact_email} className="mm-contact"><IMail s={18}/> {SITE.contact_email}</a>}
+        </div>
+      </nav>
     </div>
   );
 }
 
-function Hero({ products, onPick }) {
-  const narrow = useNarrow();
+/* ===== HERO =====
+   Pierwszy ekran odpowiada na trzy pytania: co tu jest (chemia budowlana,
+   na czele Langer), co z tego masz (trzy korzyści) i co dalej (jedno główne
+   wezwanie). Do katalogu prowadzi nawigacja i dalsza część strony — hero nie
+   dubluje go własnym paskiem kategorii. */
+const LANGER_IMG = (name) => `dla-punktow/assets/${name}.webp`;
+const isLangerName = (b) => String(b || '').trim().toLowerCase() === 'langer';
 
-  /* Kategorie w pasku układamy wg liczby produktów — na wierzchu to, czego
-     realnie mamy najwięcej. Puste kategorie się nie pokazują. */
-  const cats = useMemo(() => {
-    const counts = new Map();
-    for (const p of products) if (p.category) counts.set(p.category, (counts.get(p.category) || 0) + 1);
-    return CATEGORIES
-      .map(c => ({ ...c, count: counts.get(c.id) || 0 }))
-      .filter(c => c.count > 0)
-      .sort((a, b) => b.count - a.count);
-  }, [products]);
+/* Odmiana: 1 marka, 2–4 marki, 5+ marek. Wartość nieliczbowa (np. „400+")
+   dostaje formę „wielu". */
+function plural(n, one, few, many) {
+  const num = Number(String(n).replace(/\s/g, ''));
+  if (!Number.isInteger(num)) return many;
+  if (num === 1) return one;
+  const t = num % 10, h = num % 100;
+  return (t >= 2 && t <= 4 && !(h >= 12 && h <= 14)) ? few : many;
+}
 
+/* Pasek zaufania pod hero. Produkty, kategorie i marki liczymy z bazy (panel
+   może nadpisać), czas realizacji i liczbę punktów bierzemy z panelu
+   (Ustawienia → „Liczby w hero"). Pusta wartość = fakt się nie pokazuje. */
+function TrustBar({ products = [] }) {
+  const catCount = CATEGORIES.filter(c => products.some(p => p.category === c.id)).length;
+  const nProd = String(SITE.stat_products || (products.length ? products.length : '')).trim();
+  const nBrands = String(SITE.stat_brands || (BRANDS.length ? BRANDS.length : '')).trim();
+  const points = String(SITE.stat_points || '').trim();
+  const facts = [
+    [nProd, plural(nProd, 'produkt', 'produkty', 'produktów') + ' w katalogu'],
+    [catCount ? String(catCount) : '', plural(catCount, 'kategoria', 'kategorie', 'kategorii')],
+    [nBrands, plural(nBrands, 'marka', 'marki', 'marek')],
+    [String(SITE.stat_delivery || '').trim(), 'średni czas realizacji'],
+    [points, plural(points, 'zaopatrywany punkt', 'zaopatrywane punkty', 'zaopatrywanych punktów')],
+  ].filter(([n]) => n);
+  const brands = [...BRANDS].sort((a, b) => isLangerName(b) - isLangerName(a));
+
+  if (!facts.length && !brands.length) return null;
   return (
-    <section id="top" className="hero hero-navy">
-      <div className="hero-grid-bg" />
-      <div className="wrap hero-navy-in">
-        <div className="hero-copy">
-          <span className="eyebrow on-dark">{HERO.eyebrow}</span>
-          <h1 className="hero-h">
-            {HERO.h1a}<span style={{ color: 'var(--flame)' }}>{HERO.h1b}</span>{HERO.h1c}
-          </h1>
-          <p className="hero-lead">{HERO.lead}</p>
-          <div className="hero-cta">
-            <a href="#baza" className="btn btn-flame">Przeglądaj produkty <IArrow/></a>
-            <a href="#kontakt" className="btn btn-ghost on-dark">Zostań partnerem</a>
+    <div className="trust">
+      <div className="wrap trust-in">
+        {facts.length > 0 && (
+          <div className="trust-facts">
+            {facts.map(([n, l]) => <span className="tf" key={l}><b>{n}</b>{l}</span>)}
           </div>
-        </div>
-        <HeroFacts products={products} catCount={cats.length} />
+        )}
+        {brands.length > 0 && (
+          <div className="trust-brands">
+            <span className="trust-k">Marki w ofercie</span>
+            {brands.map(b => <span key={b} className={'tb' + (isLangerName(b) ? ' tb-l' : '')}>{b}</span>)}
+          </div>
+        )}
       </div>
-      {cats.length > 0 && (
-        <div className="wrap hero-cats-wrap">
-          <div className="hero-cats">
-            {/* Na telefonie skracamy pasek do sześciu pozycji — reszta jest jedno
-                tapnięcie dalej, w katalogu, gdzie i tak widać wszystkie kategorie. */}
-            {(narrow ? cats.slice(0, 6) : cats).map(c => (
-              <a key={c.id} href="#baza" className="hcat" onClick={() => onPick && onPick(c.id)}>
-                {c.label} <span className="hcat-n">{c.count}</span>
-              </a>
-            ))}
-            <a href="#baza" className="hcat hcat-all" onClick={() => onPick && onPick('all')}>
-              {narrow && cats.length > 6 ? `+${cats.length - 6} kategorii` : 'Cała baza'} <IArrow s={15}/>
-            </a>
+    </div>
+  );
+}
+
+function Hero({ products }) {
+  const others = BRANDS.filter(b => !isLangerName(b));
+  const delivery = String(SITE.stat_delivery || '').trim().replace(/ /g, '\u00a0');
+  return (
+    <section id="top" className="hero">
+      <div className="wrap hero-in">
+        <div className="hero-copy">
+          <span className="eyebrow">Hurtowa dystrybucja chemii budowlanej</span>
+          <h1 className="hero-h">Piany i kleje <em>Langer</em> plus cała chemia budowlana — w{' '}jednym zamówieniu.</h1>
+          <p className="hero-lead">
+            Zaopatrujemy sklepy, hurtownie i ekipy wykonawcze. Langera i resztę asortymentu bierzesz
+            od nas naraz — mniej dostawców, mniej telefonów i lepsze warunki na całym zamówieniu.
+          </p>
+          <ul className="ticks">
+            <li><span className="tick"><ICheck s={14}/></span><span><b>Langer w hurtowej cenie</b> — piany, pianokleje i kleje z parametrami do profesjonalnej pracy.</span></li>
+            <li><span className="tick"><ICheck s={14}/></span><span><b>{others.length ? others.slice(0, 3).join(', ') + ' i inne marki' : 'Pozostałe marki'}</b> w tym samym zamówieniu — jedna dostawa, jeden opiekun.</span></li>
+            <li><span className="tick"><ICheck s={14}/></span><span><b>Bez pełnych kartonów</b> — zamawiasz tyle, ile sprzedasz{delivery ? `, z dostawą średnio w\u00a0${delivery}` : ''}.</span></li>
+          </ul>
+          <div className="hero-cta">
+            <a href="#langer" className="btn btn-flame">Zobacz produkty Langer <IArrow/></a>
+            <a href="#kontakt" className="btn btn-ghost">Zapytaj o cennik</a>
           </div>
         </div>
-      )}
+        <div className="hero-vis" aria-hidden="true">
+          <div className="hero-stage">
+            <img className="hv hv-l" src={LANGER_IMG('xl-fast')} alt="" decoding="async" />
+            <img className="hv hv-r" src={LANGER_IMG('express-60')} alt="" decoding="async" />
+            <img className="hv" src={LANGER_IMG('langer-70')} alt="" fetchpriority="high" />
+            <span className="hv-tag hv-tag-1"><b>70 L</b>wydajności · Langer 70</span>
+            <span className="hv-tag hv-tag-2"><b>60 s</b>do chwytu · Express 60</span>
+          </div>
+        </div>
+      </div>
+      <TrustBar products={products} />
     </section>
   );
 }
 
-/* ===== MARQUEE ===== */
-function Marquee() {
-  // Marki bierzemy z bazy — pasek nie może obiecywać marek, których nie mamy.
-  const base = (BRANDS.length ? BRANDS : ['Langer']).map(b => b.toUpperCase());
-  const items = base.length >= 5 ? base : [...base, ...base, ...base].slice(0, 10);
+/* ===== DLA KOGO =====
+   Dwa wejścia zamiast jednego „dla wszystkich": sklep od razu widzi swoje
+   warunki (te same co na /dla-punktow/, z panelu), wykonawca — swoje. */
+function Audience() {
+  const price = String(SITE.landing_pistol_price || '').trim() || '1';
+  const pistol = Number(price.replace(',', '.')) === 0 ? 'gratis' : `za ${price} zł`;
+  const discount = String(SITE.landing_discount_text || '').trim() || 'kilka procent';
+  const delivery = String(SITE.stat_delivery || '').trim();
+  const Tick = () => <span className="tick"><ICheck s={14}/></span>;
   return (
-    <div className="marquee" aria-hidden="true">
-      <div className="marquee-track">
-        {items.concat(items).map((b,i) => (
-          <span className="marquee-item" key={i}>{b}<span className="marquee-dot">/</span></span>
-        ))}
+    <section id="dla-kogo" className="sec">
+      <div className="wrap">
+        <div className="sec-head reveal">
+          <span className="eyebrow">Dla kogo</span>
+          <h2 className="h-sec">Prowadzisz sklep czy pracujesz na budowie? Zobacz, co{'\u00a0'}zyskujesz.</h2>
+        </div>
+        <div className="aud-grid">
+          <article className="aud aud-shop reveal">
+            <span className="aud-k">Sklep · hurtownia · punkt handlowy</span>
+            <h3 className="aud-t">Bierzesz Langera — zyskujesz na całym zamówieniu.</h3>
+            <ul className="ticks">
+              <li><Tick/><span><b>Pistolet {pistol}</b> do zamówionych kartonów Langera</span></li>
+              <li><Tick/><span><b>Nawet {discount} taniej</b> na pozostałe marki w tym samym zamówieniu</span></li>
+              <li><Tick/><span><b>Wsparcie marketingowe</b> — wideo, reklamy, wizytówka Google (po spełnieniu warunków)</span></li>
+            </ul>
+            <a href="/dla-punktow/" className="btn btn-flame">Zobacz ofertę dla sklepów <IArrow/></a>
+          </article>
+          <article className="aud aud-pro reveal">
+            <span className="aud-k">Wykonawca · ekipa montażowa</span>
+            <h3 className="aud-t">Profesjonalna chemia w hurtowej cenie — bez zapasów na lata.</h3>
+            <ul className="ticks">
+              <li><Tick/><span><b>Bez pełnych kartonów</b> — bierzesz tyle, ile zużyjesz</span></li>
+              <li><Tick/><span>{delivery ? <><b>Dostawa średnio w {delivery}</b> — od paczki po paletę</> : <><b>Od paczki po paletę</b> — wysyłamy tyle, ile zamówisz</>}</span></li>
+              <li><Tick/><span><b>Stały opiekun</b>, który podpowie, czego użyć do konkretnej roboty</span></li>
+            </ul>
+            <a href="#baza" className="btn btn-dark">Przejdź do katalogu <IArrow/></a>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 
-/* ===== WHY US ===== */
+/* ===== CO ZYSKUJESZ =====
+   Każda karta zaczyna się od skutku dla klienta, nie od cechy hurtowni —
+   odpowiada na „i co z tego?". Czas dostawy bierzemy z panelu. */
 function WhyUs() {
+  const delivery = String(SITE.stat_delivery || '').trim();
   const items = [
-    [IClock,'Krótkie terminy','Średnio 48 h od zamówienia do rozładunku. Zamówienia do 13:00 kompletujemy tego samego dnia.'],
-    [IBox,'Pełen asortyment','Piany, silikony, akryle, kleje i akcesoria w jednym miejscu — bez żonglowania kilkoma hurtowniami.'],
-    [ITag,'Marka własna Langer','Pełna linia pian, klejów i silikonów pod naszą marką — jakość premium w hurtowej cenie.'],
-    [ITruck,'Elastyczne zamówienia','Nie musisz brać pełnych kartonów ani zbierać całej palety. Wysyłamy tyle, ile realnie potrzebujesz.'],
-    [IHead,'Doradztwo handlowca','Stały opiekun, który zna Twój asortyment i podpowiada, co dobrać do zamówienia.'],
-    [IShield,'Stała jakość','Tylko sprawdzone marki i partie z atestami. Reklamacje załatwiamy bez przepychanek.'],
+    [IClock, 'Towar na półce na czas', `${delivery ? `Średnio ${delivery} od zamówienia do rozładunku. ` : ''}Zamówienia do 13:00 kompletujemy tego samego dnia.`],
+    [IBox, 'Jeden dostawca zamiast kilku', 'Piany, silikony, akryle, kleje, farby i akcesoria w jednym zamówieniu — mniej telefonów i mniej dostaw do odebrania.'],
+    [ITruck, 'Nie zamrażasz gotówki w magazynie', 'Bez pełnych kartonów i zbierania palety. Zamawiasz tyle, ile realnie sprzedasz albo zużyjesz.'],
+    [ITag, 'Więcej za Langera', 'Bierzesz Langera — pozostałe marki kupujesz taniej, a do kartonów dostajesz pistolet.', ['/dla-punktow/', 'Oferta dla sklepów']],
+    [IHead, 'Opiekun, który zna Twój asortyment', 'Podpowie, co dobrać do zamówienia, i przypomni o uzupełnieniu, zanim zabraknie towaru.'],
+    [IShield, 'Spokój z reklamacjami', 'Sprawdzone marki i partie z atestami. Jeśli coś nie gra, załatwiamy to szybko i bez przepychanek.'],
   ];
   return (
-    <section id="dlaczego" className="sec">
+    <section id="korzysci" className="sec">
       <div className="wrap">
         <div className="sec-head reveal">
-          <span className="eyebrow">Dlaczego Langer</span>
-          <h2 className="h-sec">Hurtownia, która gra<br/>do jednej bramki z Tobą.</h2>
+          <span className="eyebrow">Co zyskujesz</span>
+          <h2 className="h-sec">Mniej zachodu z{'\u00a0'}zaopatrzeniem, więcej czasu na sprzedaż.</h2>
         </div>
         <div className="why-grid">
-          {items.map(([Ic,t,d],i) => (
-            <div className="why-card reveal" key={t} style={{ transitionDelay:(i*60)+'ms' }}>
+          {items.map(([Ic, t, d, link], i) => (
+            <div className="why-card reveal" key={t} style={{ transitionDelay: (i * 60) + 'ms' }}>
               <span className="why-ic"><Ic s={26}/></span>
               <h3 className="why-t">{t}</h3>
               <p className="why-d">{d}</p>
+              {link && <a href={link[0]} className="tlink" style={{ marginTop: 12 }}>{link[1]} <IArrow s={16}/></a>}
             </div>
           ))}
         </div>
@@ -1078,182 +1184,205 @@ function WhyUs() {
   );
 }
 
-/* ===== PROCESS ===== */
+/* ===== JAK ZACZĄĆ =====
+   Cztery kroki od pierwszego kontaktu do towaru — klient wie, co się stanie,
+   zanim wypełni formularz. */
 function Process() {
+  const delivery = String(SITE.stat_delivery || '').trim();
   const steps = [
-    ['01','Składasz zamówienie','Online z bazy produktów, mailem lub przez swojego handlowca. Bez sztywnych minimów — także pojedyncze opakowania.'],
-    ['02','Kompletujemy i pakujemy','Magazyn zbiera towar tego samego dnia. Kontrola ilości i partii przed wysyłką.'],
-    ['03','Wysyłka i transport','Transport własny w regionie lub spedycja w całej Polsce. Od paczki po paletę — pod sam sklep.'],
-    ['04','Rozładunek i rozliczenie','Dostawa w 48 h, faktura z terminem, a Twój handlowiec pilnuje kolejnego uzupełnienia.'],
+    ['01', 'Zostaw kontakt', 'Formularz poniżej, telefon albo e-mail. Bez zobowiązań.'],
+    ['02', 'Dostajesz cennik i opiekuna', 'W ciągu jednego dnia roboczego handlowiec odezwie się z ofertą dopasowaną do Twojego asortymentu.'],
+    ['03', 'Zamawiasz, jak Ci wygodnie', 'Mailem, telefonem albo przez opiekuna. Bez sztywnych minimów — także pojedyncze opakowania.'],
+    ['04', 'Odbierasz towar', `${delivery ? `Dostawa średnio w ${delivery}` : 'Dostawa'} — od paczki po paletę, pod sam sklep. Faktura z terminem płatności.`],
   ];
   return (
-    <section id="proces" className="sec sec-dark">
+    <section id="jak-zaczac" className="sec sec-dark">
       <div className="wrap">
         <div className="sec-head reveal">
-          <span className="eyebrow on-dark">Proces dystrybucji</span>
-          <h2 className="h-sec" style={{ color:'#fff' }}>Od zamówienia do rozładunku<br/>w czterech krokach.</h2>
+          <span className="eyebrow on-dark">Jak zacząć</span>
+          <h2 className="h-sec" style={{ color: '#fff' }}>Od pierwszego telefonu do towaru na półce — w{'\u00a0'}czterech krokach.</h2>
         </div>
         <div className="proc-grid">
-          {steps.map(([n,t,d],i) => (
-            <div className="proc-step reveal" key={n} style={{ transitionDelay:(i*70)+'ms' }}>
+          {steps.map(([n, t, d], i) => (
+            <div className="proc-step reveal" key={n} style={{ transitionDelay: (i * 70) + 'ms' }}>
               <div className="proc-n num">{n}</div>
               <h3 className="proc-t">{t}</h3>
               <p className="proc-d">{d}</p>
             </div>
           ))}
         </div>
+        <div className="reveal" style={{ marginTop: 44 }}>
+          <a href="#kontakt" className="btn btn-flame">Zacznij od kroku 1 <IArrow/></a>
+        </div>
       </div>
     </section>
   );
 }
 
-/* Pojedyncza karta w karuzeli Langer (własny stan koloru tła kafla) */
-function LangerCard({ p }) {
-  const cat = CATEGORIES.find(c => c.id === p.category);
-  const [tint, fg] = CAT_TINT[p.category] || ['#eee', '#333'];
-  const role = ROLE_LABEL[p.role];
-  const src = p.image || p.image_url;
-  const [imgBg, setImgBg] = useState(null);
-  return (
-    <article className="lcard">
-      <div className="lcard-img" style={{ background: src ? (imgBg || 'var(--white)') : tint, color: fg }}>
-        {src
-          ? <ProductImage src={src} alt={p.name} className="lcard-photo" onBg={setImgBg} />
-          : (<>{cat && <CatIcon name={cat.icon} size={72} />}<span className="lcard-imgtag">Zdjęcie wkrótce</span></>)
-        }
-        {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
-      </div>
-      <div className="lcard-body">
-        <div className="lcard-brand">Langer · {cat ? cat.label : ''}</div>
-        <h3 className="lcard-name">{p.name}</h3>
-        <div className="lcard-variant">{p.variant}</div>
-        <div className="lcard-tags">
-          {(p.tags || []).map(t => <span className="ptag" key={t}>{t}</span>)}
-        </div>
-        <div className="lcard-foot">
-          <div className="lcard-pack">{p.pack}</div>
-          <a href="#kontakt" className="pcard-ask">Zapytaj o cenę <IArrow s={16}/></a>
-        </div>
-      </div>
-    </article>
-  );
-}
+/* ===== LANGER =====
+   Zamiast hasła o „marce własnej" — konkrety, które klient może sprawdzić:
+   liczby z kart produktów (te same co na /dla-punktow/ — przy zmianie linii
+   popraw je tutaj), a pod nimi produkty Langer prosto z bazy. */
+const LANGER_FACTS = [
+  ['70 L',   'wydajności z jednej puszki 870 ml',      'Langer 70'],
+  ['60 s',   'do chwytu — bez podpierania elementów',  'Express 60 s'],
+  ['−10 °C', 'wersja zimowa do pracy w chłodzie',      'Langer 70 zimowa'],
+  ['0',      'rozpuszczalników i izocyjanianów',       'Langer TUR'],
+];
 
-/* ===== LANGER SHOWCASE (karuzela marki własnej) ===== */
-function LangerShowcase({ products }) {
-  const trackRef = useRef(null);
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(true);
+/* Kolejność w sekcji: bestsellery, potem produkty ze zdjęciem, potem reszta.
+   Pokazujemy jeden rząd — pełna lista Langera otwiera katalog tuż pod spodem. */
+const langerRank = (p) => (p.role === 'magnet' ? 0 : 1) + ((p.image || p.image_url) ? 0 : 2);
 
-  const items = (products || []).filter(p => p.brand === 'Langer');
-
-  const updateNav = () => {
-    const t = trackRef.current;
-    if (!t) return;
-    setCanPrev(t.scrollLeft > 4);
-    setCanNext(t.scrollLeft + t.clientWidth < t.scrollWidth - 4);
-  };
-
-  useEffect(() => {
-    const t = trackRef.current;
-    if (!t) return;
-    updateNav();
-    t.addEventListener('scroll', updateNav, { passive: true });
-    window.addEventListener('resize', updateNav);
-    return () => {
-      t.removeEventListener('scroll', updateNav);
-      window.removeEventListener('resize', updateNav);
-    };
-  }, [items.length]);
-
-  const scrollByStep = (dir) => {
-    const t = trackRef.current;
-    if (!t) return;
-    const card = t.querySelector('.lcard');
-    const step = card ? card.offsetWidth + 20 : 320;
-    t.scrollBy({ left: dir * step, behavior: 'smooth' });
-  };
-
-  if (!items.length) return null;
+function LangerSection({ products, onShowAll }) {
+  const all = products.filter(isLanger);
+  const featured = [...all]
+    .sort((a, b) => langerRank(a) - langerRank(b) || (a.name || '').localeCompare(b.name || '', 'pl'))
+    .slice(0, 4);
 
   return (
     <section id="langer" className="sec sec-langer">
       <div className="wrap">
-        <div className="lshow-head reveal">
+        <div className="lhead reveal">
           <div>
-            <span className="eyebrow">Marka własna</span>
-            <h2 className="h-sec">Linia Langer —<br/>jakość pod własną marką.</h2>
+            <span className="eyebrow">Langer</span>
+            <h2 className="h-sec">Profesjonalne parametry. Hurtowa{'\u00a0'}cena.</h2>
           </div>
-          <p className="lead lshow-lead">
-            Pełna gama pian, klejów, silikonów i akcesoriów pod naszą marką. Jakość premium w hurtowej cenie, prosto z naszego magazynu.
+          <p className="lead">
+            Piany, pianokleje i kleje montażowe Langer prosto z naszego magazynu. Co z tego masz?
+            Na budowie — produkt, na którym możesz polegać. W sklepie — towar w dobrej cenie
+            i lepsze warunki na resztę zamówienia.
           </p>
         </div>
 
-        <div className="lcarousel reveal">
-          <button className={'lcar-nav lcar-prev' + (canPrev ? '' : ' disabled')}
-                  onClick={() => scrollByStep(-1)} aria-label="Poprzednie">
-            <IArrow s={20} style={{ transform: 'rotate(180deg)' }} />
-          </button>
-
-          <div className="lcar-track" ref={trackRef}>
-            {items.map(p => <LangerCard key={p.sku} p={p} />)}
-          </div>
-
-          <button className={'lcar-nav lcar-next' + (canNext ? '' : ' disabled')}
-                  onClick={() => scrollByStep(1)} aria-label="Następne">
-            <IArrow s={20} />
-          </button>
+        <div className="lfacts reveal">
+          {LANGER_FACTS.map(([n, d, src]) => (
+            <div className="lfact" key={src}><b>{n}</b><span>{d}</span><small>{src}</small></div>
+          ))}
         </div>
 
-        <div className="lshow-foot reveal">
-          <a href="#baza" className="btn btn-dark">Zobacz całą linię Langer <IArrow/></a>
-          <span className="lshow-count num">{items.length} produktów</span>
+        {featured.length > 0 && (
+          <div className="pgrid reveal">
+            {featured.map(p => <ProductTile key={p.sku} p={p} />)}
+          </div>
+        )}
+
+        <div className="lfoot reveal">
+          {all.length > 0 && (
+            <button type="button" className="btn btn-dark" onClick={onShowAll}>
+              Wszystkie produkty Langer ({all.length}) <IArrow/>
+            </button>
+          )}
+          <a href="/dla-punktow/" className="tlink">Prowadzisz sklep? Zobacz, co zyskujesz na Langerze <IArrow s={16}/></a>
         </div>
       </div>
     </section>
   );
 }
 
-/* ===== CONTACT ===== */
+/* ===== KONTAKT =====
+   Formularz nie ma jeszcze własnego serwera do wysyłki. Zamiast udawać
+   wysyłkę, składa gotową wiadomość i otwiera ją w poczcie klienta na adres
+   z panelu (Ustawienia → Dane kontaktowe) — tak samo jak na /dla-punktow/. */
+const WHO = ['Sklep / hurtownia', 'Wykonawca', 'Inne'];
+
 function Contact() {
-  const [sent, setSent] = useState(false);
+  const [f, setF] = useState({ company: '', nip: '', person: '', phone: '', email: '', msg: '' });
+  const [who, setWho] = useState('');
+  const [sent, setSent] = useState(null);       // { href, text } po wysłaniu
+  const [copied, setCopied] = useState(false);
+  const set = (k) => (e) => setF(v => ({ ...v, [k]: e.target.value }));
+  const to = String(SITE.contact_email || '').trim();
+
+  function submit(e) {
+    e.preventDefault();
+    const subject = `Zapytanie o cennik — ${f.company}`;
+    const body = [
+      'Dzień dobry,', '', 'proszę o ofertę i cennik hurtowy.', '',
+      `Firma: ${f.company}`,
+      `NIP: ${f.nip || '—'}`,
+      `Rodzaj działalności: ${who || '—'}`,
+      `Osoba kontaktowa: ${f.person}`,
+      `Telefon: ${f.phone}`,
+      `E-mail: ${f.email}`,
+      '',
+      ...(f.msg.trim() ? ['Wiadomość:', f.msg.trim(), ''] : []),
+      'Pozdrawiam',
+    ].join('\r\n');
+    const href = to ? `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : '';
+    setSent({ href, text: (to ? `Do: ${to}\r\n` : '') + `Temat: ${subject}\r\n\r\n${body}` });
+    setCopied(false);
+    if (href) window.location.href = href;
+  }
+
+  async function copy() {
+    try { await navigator.clipboard.writeText(sent.text); setCopied(true); }
+    catch (e) { window.prompt('Skopiuj treść zapytania:', sent.text); }
+  }
+
   return (
     <section id="kontakt" className="sec sec-contact">
       <div className="wrap contact-grid">
         <div className="reveal">
           <span className="eyebrow">Kontakt</span>
-          <h2 className="h-sec">Zostań partnerem<br/>{SITE.contact_company || 'Langer Dystrybucja'}.</h2>
-          <p className="lead" style={{ maxWidth:440, marginTop:16 }}>
-            Zostaw dane — handlowiec odezwie się w ciągu jednego dnia roboczego z ofertą i cennikiem hurtowym.
+          <h2 className="h-sec">Zapytaj o cennik hurtowy.</h2>
+          <p className="lead" style={{ maxWidth: 460, marginTop: 16 }}>
+            Zostaw dane — handlowiec odezwie się w ciągu jednego dnia roboczego z ofertą
+            i cennikiem dopasowanym do Twojego asortymentu.
           </p>
           <ul className="contact-list">
-            <li><span className="ci"><IPhone/></span><div><div className="ci-k">Telefon</div><a href={telHref(SITE.contact_phone)} className="ci-v num">{SITE.contact_phone}</a></div></li>
-            <li><span className="ci"><IMail/></span><div><div className="ci-k">E-mail</div><a href={'mailto:' + SITE.contact_email} className="ci-v">{SITE.contact_email}</a></div></li>
-            <li><span className="ci"><IPin/></span><div><div className="ci-k">Magazyn i biuro</div><div className="ci-v">{[SITE.contact_street, SITE.contact_city].filter(Boolean).join(', ')}</div></div></li>
+            {SITE.contact_phone && <li><span className="ci"><IPhone/></span><div><div className="ci-k">Telefon</div><a href={telHref(SITE.contact_phone)} className="ci-v num">{SITE.contact_phone}</a></div></li>}
+            {to && <li><span className="ci"><IMail/></span><div><div className="ci-k">E-mail</div><a href={'mailto:' + to} className="ci-v">{to}</a></div></li>}
+            {(SITE.contact_street || SITE.contact_city) && <li><span className="ci"><IPin/></span><div><div className="ci-k">Magazyn i biuro</div><div className="ci-v">{[SITE.contact_street, SITE.contact_city].filter(Boolean).join(', ')}</div></div></li>}
           </ul>
+          <p className="contact-alt">
+            <b>Prowadzisz sklep lub hurtownię?</b> Biorąc Langera, pozostałe marki kupujesz taniej.{' '}
+            <a href="/dla-punktow/">Zobacz ofertę dla sklepów →</a>
+          </p>
         </div>
         <div className="reveal">
           {sent ? (
-            <div className="form-done">
+            <div className="form-done" role="status">
               <span className="form-done-ic"><ICheck s={32}/></span>
-              <h3 className="why-t" style={{ fontSize:24 }}>Dziękujemy!</h3>
-              <p className="why-d">Odezwiemy się w ciągu jednego dnia roboczego.</p>
-              <button className="btn btn-ghost" onClick={() => setSent(false)} style={{ marginTop:12 }}>Wyślij kolejne</button>
+              <h3 className="why-t" style={{ fontSize: 24 }}>{sent.href ? 'Wiadomość jest gotowa' : 'Prawie gotowe'}</h3>
+              <p className="why-d" style={{ maxWidth: 420 }}>
+                {sent.href
+                  ? <>Otworzyliśmy Twoją pocztę z gotowym zapytaniem do <b>{to}</b> — wystarczy kliknąć „Wyślij". Poczta się nie otworzyła? Skopiuj treść albo zadzwoń.</>
+                  : <>Skopiuj treść zapytania i wyślij ją nam albo po prostu zadzwoń.</>}
+              </p>
+              <div className="form-done-acts">
+                {sent.href && <a href={sent.href} className="btn btn-flame"><IMail/> Otwórz ponownie</a>}
+                <button type="button" className="btn btn-ghost" onClick={copy}>{copied ? 'Skopiowano' : 'Kopiuj treść'}</button>
+              </div>
+              {SITE.contact_phone && <a href={telHref(SITE.contact_phone)} className="ci-v num" style={{ marginTop: 10 }}>{SITE.contact_phone}</a>}
+              <button type="button" className="fclear" onClick={() => setSent(null)} style={{ marginTop: 4 }}>← Popraw dane</button>
             </div>
           ) : (
-            <form className="form" onSubmit={e => { e.preventDefault(); setSent(true); }}>
-              <div className="form-row">
-                <label className="field"><span>Firma</span><input required placeholder="Nazwa firmy"/></label>
-                <label className="field"><span>NIP</span><input placeholder="000-000-00-00" inputMode="numeric"/></label>
+            <form className="form" onSubmit={submit}>
+              <div className="field">
+                <span>Kim jesteś?</span>
+                <div className="who" role="radiogroup" aria-label="Kim jesteś">
+                  {WHO.map(o => (
+                    <button key={o} type="button" role="radio" aria-checked={who === o}
+                            className={'who-o' + (who === o ? ' on' : '')} onClick={() => setWho(w => (w === o ? '' : o))}>{o}</button>
+                  ))}
+                </div>
               </div>
               <div className="form-row">
-                <label className="field"><span>Osoba kontaktowa</span><input required placeholder="Imię i nazwisko"/></label>
-                <label className="field"><span>Telefon</span><input required placeholder="+48 000 000 000" inputMode="tel"/></label>
+                <label className="field"><span>Firma</span><input required value={f.company} onChange={set('company')} placeholder="Nazwa firmy" autoComplete="organization"/></label>
+                <label className="field"><span>NIP</span><input value={f.nip} onChange={set('nip')} placeholder="000-000-00-00" inputMode="numeric"/></label>
               </div>
-              <label className="field"><span>E-mail</span><input required type="email" placeholder="firma@email.pl"/></label>
-              <label className="field"><span>Wiadomość</span><textarea rows="3" placeholder="Czego potrzebujesz? Jaki asortyment Cię interesuje?"></textarea></label>
-              <button className="btn btn-flame" type="submit" style={{ width:'100%' }}>Wyślij zapytanie <IArrow/></button>
-              <p className="form-note">Wysyłając formularz akceptujesz kontakt handlowy. To wersja demonstracyjna — dane nie są zapisywane.</p>
+              <div className="form-row">
+                <label className="field"><span>Osoba kontaktowa</span><input required value={f.person} onChange={set('person')} placeholder="Imię i nazwisko" autoComplete="name"/></label>
+                <label className="field"><span>Telefon</span><input required type="tel" value={f.phone} onChange={set('phone')} placeholder="+48 000 000 000" inputMode="tel" autoComplete="tel"/></label>
+              </div>
+              <label className="field"><span>E-mail</span><input required type="email" value={f.email} onChange={set('email')} placeholder="firma@email.pl" autoComplete="email"/></label>
+              <label className="field"><span>Wiadomość</span><textarea rows="3" value={f.msg} onChange={set('msg')} placeholder="Czego potrzebujesz? Jaki asortyment Cię interesuje?"></textarea></label>
+              <button className="btn btn-flame" type="submit" style={{ width: '100%' }}>Wyślij zapytanie <IArrow/></button>
+              <p className="form-note">
+                {to && <>Otworzy się Twoja poczta z gotową wiadomością do <b>{to}</b>. </>}
+                Kontakt wyłącznie w sprawie współpracy handlowej.
+              </p>
             </form>
           )}
         </div>
@@ -1263,34 +1392,36 @@ function Contact() {
 }
 
 /* ===== FOOTER ===== */
-function Footer() {
+function Footer({ products = [], onPick }) {
+  const cats = CATEGORIES.filter(c => !products.length || products.some(p => p.category === c.id));
   return (
     <footer className="footer">
       <div className="wrap footer-in">
         <div className="footer-brand">
           <LangerLogo onDark size={42}/>
-          <p className="footer-tag">Hurtowa dystrybucja chemii budowlanej. Piany, silikony, akryle, kleje i akcesoria dla handlu i ekip wykonawczych.</p>
+          <p className="footer-tag">Hurtowa dystrybucja chemii budowlanej. Piany i kleje Langer oraz cały asortyment dla sklepów, hurtowni i ekip wykonawczych.</p>
         </div>
         <div className="footer-cols">
           <div className="footer-col">
             <div className="footer-h">Nawigacja</div>
-            <a href="#proces">Proces</a><a href="#oferta">Oferta</a><a href="#baza">Baza produktów</a><a href="/dla-punktow/">Dla punktów handlowych</a><a href="#dlaczego">Dlaczego my</a><a href="#kontakt">Kontakt</a>
+            <a href="#langer">Langer</a><a href="#baza">Katalog</a><a href="/dla-punktow/">Oferta dla sklepów</a>
+            <a href="#korzysci">Co zyskujesz</a><a href="#jak-zaczac">Jak zacząć</a><a href="#kontakt">Kontakt</a>
           </div>
           <div className="footer-col">
-            <div className="footer-h">Oferta</div>
-            {CATEGORIES.map(c => <a key={c.id} href="#baza">{c.label}</a>)}
+            <div className="footer-h">Katalog</div>
+            {cats.map(c => <a key={c.id} href="#baza" onClick={() => onPick && onPick(c.id, { brands: [] })}>{c.label}</a>)}
           </div>
           <div className="footer-col">
             <div className="footer-h">Kontakt</div>
-            <a href={telHref(SITE.contact_phone)} className="num">{SITE.contact_phone}</a>
-            <a href={'mailto:' + SITE.contact_email}>{SITE.contact_email}</a>
-            <span style={{ color:'rgba(255,255,255,.5)' }}>{SITE.contact_street}<br/>{SITE.contact_city}</span>
+            {SITE.contact_phone && <a href={telHref(SITE.contact_phone)} className="num">{SITE.contact_phone}</a>}
+            {SITE.contact_email && <a href={'mailto:' + SITE.contact_email}>{SITE.contact_email}</a>}
+            <span style={{ color: 'rgba(255,255,255,.5)' }}>{SITE.contact_street}<br/>{SITE.contact_city}</span>
           </div>
         </div>
       </div>
       <div className="wrap footer-bottom">
         <span>© {new Date().getFullYear()} {SITE.contact_company || 'Langer Dystrybucja'}</span>
-        <span>Wersja beta · dane kontaktowe do uzupełnienia</span>
+        <a href="/dla-punktow/">Oferta dla sklepów i hurtowni →</a>
       </div>
     </footer>
   );
@@ -1346,19 +1477,25 @@ function ProductImage({ src, alt, className, onBg }) {
 }
 
 function ProductTile({ p }) {
+  const langer = isLanger(p);
   const cat = CATEGORIES.find(c => c.id === p.category);
   const [tint, fg] = CAT_TINT[p.category] || ['#eee','#333'];
   const role = ROLE_LABEL[p.role];
   const src = p.image || p.image_url;
   const [imgBg, setImgBg] = useState(null);
   return (
-    <article className="pcard">
+    <article className={'pcard' + (langer ? ' pcard-langer' : '')}>
       <div className="pcard-img" style={{ background: src ? (imgBg || 'var(--white)') : tint, color: fg }}>
         {src
           ? <ProductImage src={src} alt={p.name} className="pcard-photo" onBg={setImgBg} />
           : (<><CatIcon name={cat ? cat.icon : ''} size={64} /><span className="pcard-imgtag">Zdjęcie wkrótce</span></>)
         }
-        {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
+        {(langer || role) && (
+          <div className="pbadges">
+            {langer && <span className="pbadge pbadge-langer"><i aria-hidden="true"/>Langer</span>}
+            {role && <span className={'pbadge ' + role.cls}>{role.t}</span>}
+          </div>
+        )}
       </div>
       <div className="pcard-body">
         <div className="pcard-brand">{p.brand}{p.subcategory ? <span className="pcard-sub"> · {p.subcategory}</span> : null}</div>
@@ -1409,6 +1546,10 @@ const joinPl = (arr) => arr.length < 2 ? arr.join('') : arr.slice(0, -1).join(',
 
 const subKey = (p) => String(p.subcategory || '').trim().toLowerCase();
 const brandKey = (p) => String(p.brand || '').trim().toLowerCase();
+/* Langer jest zawsze na początku: w wynikach katalogu (przy każdym
+   sortowaniu), na liście marek i w wyszukiwaniu. */
+const isLanger = (p) => brandKey(p) === 'langer';
+const langerFirst = (a, b) => (isLanger(b) ? 1 : 0) - (isLanger(a) ? 1 : 0);
 const sameList = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 /* STAN KATALOGU W ADRESIE STRONY
@@ -1591,7 +1732,12 @@ function ProductDatabase({ products, initialCatRef }) {
   stateRef.current = { cat, sub, brands };
 
   useEffect(() => {
-    if (initialCatRef) initialCatRef.current = (c) => { setCat(c || 'all'); setSub('all'); };
+    // Wejście z innych sekcji: kategoria, a opcjonalnie też marki
+    // („Wszystkie produkty Langer" ustawia filtr marki Langer).
+    if (initialCatRef) initialCatRef.current = (c, opts = {}) => {
+      setCat(c || 'all'); setSub('all');
+      if (opts.brands) setBrands(opts.brands);
+    };
   }, [initialCatRef]);
 
   const goCat = (id) => { setCat(id); setSub('all'); };
@@ -1677,14 +1823,15 @@ function ProductDatabase({ products, initialCatRef }) {
       const o = acc.get(brandKey(p));
       if (o) o.count++;
     }
-    return [...acc.values()].sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+    return [...acc.values()].sort((a, b) =>
+      (b.key === 'langer') - (a.key === 'langer') || a.label.localeCompare(b.label, 'pl'));
   }, [products, searched, cat, sub, brands, brandLabels]);
 
   const results = useMemo(() => {
-    let r = searched.filter(p => inCat(p) && inSub(p) && inBrand(p));
-    if (sort === 'name') r = [...r].sort((a,b) => (a.name || '').localeCompare(b.name || '','pl'));
-    if (sort === 'brand') r = [...r].sort((a,b) => (a.brand || '').localeCompare(b.brand || '','pl') || (a.name || '').localeCompare(b.name || '','pl'));
-    return r;
+    const byName = (a, b) => (a.name || '').localeCompare(b.name || '', 'pl');
+    const byBrand = (a, b) => (a.brand || '').localeCompare(b.brand || '', 'pl');
+    const r = searched.filter(p => inCat(p) && inSub(p) && inBrand(p));
+    return r.sort((a, b) => langerFirst(a, b) || (sort === 'brand' ? byBrand(a, b) : 0) || byName(a, b));
   }, [searched, cat, sub, brands, sort]);
 
   useEffect(() => { setShown(PAGE); }, [q, cat, sub, brands, sort]);
@@ -1816,6 +1963,14 @@ function ProductDatabase({ products, initialCatRef }) {
   const subObj = subOpts.find(o => o.key === sub);
   const brandName = (k) => brandLabels.get(k) || k;
   const showBrandMenu = brandOpts.length > 1 || brands.length > 0;
+  const onlyLanger = brands.length === 1 && brands[0] === 'langer';
+  const canLanger = onlyLanger || brandOpts.some(o => o.key === 'langer' && o.count > 0);
+  const langerToggle = canLanger && (
+    <button type="button" className={'tbtn tbtn-langer' + (onlyLanger ? ' on' : '')} aria-pressed={onlyLanger}
+            onClick={() => setBrands(onlyLanger ? [] : ['langer'])}>
+      <i aria-hidden="true"/>Tylko Langer
+    </button>
+  );
 
   // Pusty wynik: mówimy dlaczego i dajemy jeden przycisk naprawy.
   let emptyMsg = 'Nie znaleźliśmy produktów dla tych filtrów.';
@@ -1846,6 +2001,11 @@ function ProductDatabase({ products, initialCatRef }) {
   const count = (
     <span className="res-count"><span className="num">{results.length}</span> {plProducts(results.length)}</span>
   );
+  // Nagłówki grup „Langer" / „Pozostałe marki" — tylko gdy w wynikach są obie
+  const visible = results.slice(0, shown);
+  const nLanger = results.filter(isLanger).length;
+  const mixed = nLanger > 0 && nLanger < results.length;
+  const firstOther = visible.findIndex(p => !isLanger(p));
   const brandChips = brands.map(k => (
     <button key={'b:' + k} type="button" className="fchip" onClick={() => toggleBrand(k)} aria-label={`Usuń filtr: ${brandName(k)}`}>
       {brandName(k)} <IX s={14}/>
@@ -1857,8 +2017,8 @@ function ProductDatabase({ products, initialCatRef }) {
       <div className="wrap">
         <div className="base-head">
           <div>
-            <span className="eyebrow">Baza produktów</span>
-            <h2 className="h-base">Przeglądaj ofertę.</h2>
+            <span className="eyebrow">Katalog</span>
+            <h2 className="h-base">Cały asortyment — Langer na{'\u00a0'}początku.</h2>
           </div>
           <div className="search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
@@ -1912,7 +2072,8 @@ function ProductDatabase({ products, initialCatRef }) {
           ) : (
             <BrandMenu options={brandOpts} selected={brands} onToggle={toggleBrand} onClear={() => setBrands([])} />
           ))}
-          {!narrow && brandChips}
+          {!narrow && langerToggle}
+          {!narrow && !onlyLanger && brandChips}
           {!narrow && brands.length > 1 && <button type="button" className="fclear" onClick={() => setBrands([])}>Wyczyść marki</button>}
           <div className="tools-r">{!(narrow && stuck) && count}{sortBox}</div>
         </div>
@@ -1930,7 +2091,13 @@ function ProductDatabase({ products, initialCatRef }) {
         {results.length ? (
           <>
             <div className="pgrid">
-              {results.slice(0, shown).map(p => <ProductTile key={p.sku} p={p} />)}
+              {visible.map((p, i) => (
+                <React.Fragment key={p.sku}>
+                  {mixed && i === 0 && <div className="pgrid-sep"><span><b>Langer</b> · {nLanger} {plProducts(nLanger)}</span></div>}
+                  {mixed && i === firstOther && <div className="pgrid-sep">Pozostałe marki · {results.length - nLanger} {plProducts(results.length - nLanger)}</div>}
+                  <ProductTile p={p} />
+                </React.Fragment>
+              ))}
             </div>
             {results.length > shown && (
               <div className="load-more">
@@ -1966,7 +2133,7 @@ function ProductDatabase({ products, initialCatRef }) {
 }
 
 /* ===== APP ===== */
-const TWEAK_DEFAULTS = { accent: '#F04E23', marquee: true };
+const TWEAK_DEFAULTS = { accent: '#F04E23' };
 
 function useReveal() {
   useEffect(() => {
@@ -2000,8 +2167,8 @@ function App() {
 
   useReveal();
 
-  const pickCat = (c) => {
-    if (catRef.current) catRef.current(c);
+  const pickCat = (c, opts) => {
+    if (catRef.current) catRef.current(c, opts);
     requestAnimationFrame(() => {
       const el = document.getElementById('baza');
       if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 60, behavior: 'smooth' });
@@ -2011,21 +2178,21 @@ function App() {
   return (
     <React.Fragment>
       <Header />
-      {/* Kolejność sekcji: najpierw towar (hero -> katalog), dopiero potem
-          argumenty sprzedażowe. Kto wchodzi po produkt, ma go od razu. */}
-      <Hero products={products} onPick={pickCat} />
-      {t.marquee && <Marquee />}
+      {/* Kolejność sekcji = kolejność pytań klienta: co to jest i co z tego
+          mam (hero) → co konkretnie dla mnie (dla kogo) → czym jest Langer →
+          cały katalog → co jeszcze zyskuję → jak zacząć → kontakt. */}
+      <Hero products={products} />
+      <Audience />
+      <LangerSection products={products} onShowAll={() => pickCat('all', { brands: ['langer'] })} />
       <ProductDatabase products={products} initialCatRef={catRef} />
-      <LangerShowcase products={products} />
       <WhyUs />
       <Process />
       <Contact />
-      <Footer />
+      <Footer products={products} onPick={pickCat} />
 
       <TweaksPanel>
         <TweakSection label="Strona główna" />
         <TweakColor label="Kolor akcentu" value={t.accent} options={['#F04E23', '#E5421A', '#1E3FB5', '#0E1533']} onChange={(v) => setTweak('accent', v)} />
-        <TweakToggle label="Pasek marek (marquee)" value={t.marquee} onChange={(v) => setTweak('marquee', v)} />
       </TweaksPanel>
     </React.Fragment>
   );

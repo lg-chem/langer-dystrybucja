@@ -63,15 +63,18 @@ Z brand booka Langer. Żeby zmienić jakikolwiek kolor — edytuj sekcję `:root
 
 **Panel → Ustawienia → „Logo i kolory marki".** Nie trzeba ruszać kodu — wgrane pliki lądują w bazie (tabela `settings`, jako data URI) i podmieniają się na stronie głównej, na `/dla-punktow/` i w samym panelu.
 
-**Trzy sloty:**
+**Cztery sloty:**
 
 | Slot | Gdzie się pokazuje | Jaka wersja |
 |---|---|---|
 | Logo na jasne tło | Nagłówek po przewinięciu strony | Kolorowa / ciemna |
 | Logo na ciemne tło | Nagłówek na samej górze, stopka | Jasna (biała) |
 | Sygnet (kwadrat) | Znak wodny w hero (wariant „Plakat") | Sam znak, bez napisu |
+| Favicon (ikona karty) | Karta przeglądarki, zakładki, ekran telefonu — na wszystkich stronach i w panelu | Kwadrat: SVG albo PNG 512×512 |
 
 Wgrasz tylko jedną wersję — użyjemy jej wszędzie. Nie wgrasz żadnej — strona rysuje dotychczasowy sygnet SVG, dokładnie jak dotąd.
+
+**Favicon.** Każda strona ma w nagłówku HTML stały adres `/api/favicon` (a `/favicon.ico` prowadzi tam samo przez `vercel.json`), więc ikonę widzą też wyszukiwarki. Kolejność: favicon z panelu → sygnet z panelu → wbudowany znak Langera na granatowym kwadracie w kolorze akcentu — strona nigdy nie zostaje bez ikony. Prostokątny plik panel sam dopełnia do kwadratu przezroczystym tłem. Przeglądarki trzymają favicony w pamięci, więc po zmianie nowa ikona może pojawić się dopiero po kilku minutach (albo po Ctrl+F5). Podgląd karty przeglądarki jest w panelu pod podglądem nagłówka.
 
 **Format:** najlepiej **SVG** (ostry na każdym ekranie, waży kilka kB). PNG/JPG/WebP też zadziała — panel sam zmniejsza plik i zachowuje przezroczystość. Limit to ~700 kB po zmniejszeniu; jeśli plik nie wejdzie, panel powie o tym wprost.
 
@@ -185,13 +188,35 @@ Podkategoria pokazuje się na karcie produktu obok marki i buduje drugi poziom f
 
 ## Jak działa strona główna
 
-### Hero — krótkie, konkretne
+### Układ — kolejność pytań klienta
 
-Pierwszy ekran mieści się w pół wysokości okna: nagłówek mówi wprost, czym handlujemy, obok panel z liczbami (produkty i kategorie liczone z bazy, marki z listy marek, czas realizacji i liczba punktów z panelu), a pod spodem **pasek wszystkich kategorii z licznikami** — kliknięcie wrzuca prosto w katalog z tą kategorią. Puste kategorie się nie pokazują, więc pasek zawsze mówi prawdę o ofercie.
+Strona prowadzi od „co to jest i co z tego mam" do „jak zacząć". Każda sekcja odpowiada na jedno pytanie i kończy się jednym następnym krokiem:
 
-Pasek marek pod hero też jedzie z bazy (Ustawienia → Marki) — nie da się już zostawić w kodzie marki, której nie ma w ofercie.
+| Sekcja | Na jakie pytanie odpowiada | Następny krok |
+|---|---|---|
+| **Hero** (jasne tło, puszki Langera) | Co tu jest? Piany i kleje Langer plus cała chemia budowlana w jednym zamówieniu. Trzy korzyści: Langer w hurtowej cenie, pozostałe marki w tym samym zamówieniu, bez pełnych kartonów. | „Zobacz produkty Langer" albo „Zapytaj o cennik" |
+| **Pasek pod hero** | Jaka to skala? Liczby (produkty, kategorie, marki, czas realizacji, punkty — patrz [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)) i wszystkie marki z panelu, Langer pierwszy. | — |
+| **Dla kogo** | Co z tego mam ja? Dwie karty: sklep/hurtownia (warunki z `/dla-punktow/`: pistolet, rabat, marketing — liczby z panelu) i wykonawca. | „Oferta dla sklepów" / „Przejdź do katalogu" |
+| **Langer** | Czemu akurat Langer? Cztery liczby z kart produktów (70 L, 60 s, −10 °C, 0 rozpuszczalników) i jeden rząd produktów Langer z bazy (bestsellery i te ze zdjęciem najpierw). | „Wszystkie produkty Langer (N)" — otwiera katalog z filtrem Langer |
+| **Katalog** | Co jeszcze macie? Pełna baza, Langer zawsze na początku. | „Zapytaj o cenę" na karcie |
+| **Co zyskujesz** | I co z tego? Sześć korzyści sformułowanych jako skutek dla klienta (towar na czas, jeden dostawca, brak zamrożonej gotówki, więcej za Langera, opiekun, reklamacje). | — |
+| **Jak zacząć** | Co się stanie, jak się odezwę? Cztery kroki od kontaktu do dostawy. | „Zacznij od kroku 1" |
+| **Kontakt** | Formularz z wyborem „Kim jesteś?" | „Wyślij zapytanie" |
 
-Kolejność sekcji: **hero → baza produktów → linia Langer → dlaczego my → proces → kontakt**. Kto wchodzi po produkt, ma go od razu; argumenty sprzedażowe są niżej, dla tych, którzy przewijają.
+Do katalogu prowadzą nawigacja, sekcja Langer i karta wykonawcy — hero nie ma już własnego paska kategorii, więc nie ma dwóch równoległych wejść do tego samego.
+
+**Gdzie zmienić teksty:** wszystko w `index.html` — komponenty `Hero`, `Audience`, `LangerSection` (liczby w stałej `LANGER_FACTS`; to te same parametry co w `PRODUCTS` na `/dla-punktow/`, przy zmianie linii popraw je w obu miejscach), `WhyUs`, `Process`, `Contact`. Czas dostawy w tekstach („średnio 48 h") bierze się z panelu (Ustawienia → Liczby w hero → Średni czas realizacji); puste pole = zdania o czasie dostawy po prostu znikają. Warunki dla sklepów (pistolet, rabat) — z karty „Oferta dla punktów handlowych".
+
+Zdjęcia puszek w hero to pliki z `dla-punktow/assets/` (przezroczyste WebP).
+
+**Formularz kontaktowy** działa jak na `/dla-punktow/`: składa gotową wiadomość i otwiera ją w poczcie klienta na e-mail z „Danych kontaktowych" (z opcją skopiowania treści, gdy poczta się nie otworzy).
+
+### Langer w katalogu
+
+- **Zawsze na początku listy** — przy każdym sortowaniu (nazwa, marka), w każdej kategorii i w wynikach wyszukiwania. Gdy w wynikach są i Langer, i inne marki, nad grupami stoją nagłówki „Langer · N produktów" / „Pozostałe marki · N produktów".
+- **Wyróżniona karta** — ciepła ramka, nazwa marki w kolorze akcentu i plakietka „Langer" (obok ewentualnego „Bestseller"). Oznaczenie „Marka własna" z panelu nie wyświetla się osobno — to właśnie Langer.
+- **„Tylko Langer"** — przełącznik obok „Marka" (na komputerze). Na telefonie Langer jest pierwszy na liście w panelu marek.
+- Langer jest też pierwszy na liście marek i w pasku marek pod hero.
 
 ### Baza produktów — kategoria to nawigacja, reszta to filtry
 
@@ -230,13 +255,11 @@ Układ jak na komputerze, tylko etykiety (KATEGORIA, RODZAJ) są nad pigułkami.
 
 Karty produktów idą w dwóch kolumnach.
 
-Pasek kategorii w hero jest na telefonie skrócony do sześciu pozycji plus `+N kategorii` — reszta jest w katalogu, jedno tapnięcie dalej.
-
 ---
 
 ## Zmiana statystyk w hero
 
-**Panel → Ustawienia → „Liczby w hero".** Żadna z tych liczb nie jest już wpisana na sztywno w kodzie:
+**Panel → Ustawienia → „Liczby w hero".** Liczby stoją w pasku pod hero. Żadna z nich nie jest wpisana na sztywno w kodzie:
 
 | Liczba | Skąd bierze wartość |
 |---|---|
@@ -400,6 +423,7 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 │   ├── categories.js       # Kategorie
 │   ├── settings.js         # Ustawienia: logo, kolory, kontakt, oferta
 │   ├── img.js              # Zdjęcia i logo z bazy jako pliki (/api/img)
+│   ├── favicon.js          # Ikona karty przeglądarki (/api/favicon, /favicon.ico)
 │   └── _images.js          # Wspólne: adresy /api/img, nagłówki cache
 ├── migrations/             # Migracje SQL — uruchamiane ręcznie w Neon
 └── project/                # Archiwum — oryginalne pliki źródłowe (rozbite)

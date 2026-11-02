@@ -41,6 +41,7 @@ const DEFAULTS = {
   logo_light:     '',   // wersja na CIEMNE tło (header na górze, stopka)
   logo_dark:      '',   // wersja na JASNE tło (header po przewinięciu)
   logo_mark:      '',   // sam sygnet (kwadrat) — znak wodny w hero
+  favicon:        '',   // ikona w karcie przeglądarki; puste = sygnet / wbudowany znak (api/favicon.js)
   logo_height:    '38', // wysokość logo w headerze, px
   logo_show_text: '1',  // '1' = pokaż napis LANGER / DYSTRYBUCJA obok znaku
   brand_accent:   '#F04E23', // kolor akcentu (--flame) — przyciski, odznaki
@@ -72,7 +73,7 @@ async function list() {
    oryginał (podgląd rozmiaru pliku, zapis). */
 function forPage(values) {
   const out = { ...values };
-  for (const key of ['logo_light', 'logo_dark', 'logo_mark']) {
+  for (const key of ['logo_light', 'logo_dark', 'logo_mark', 'favicon']) {
     if (isDataUri(out[key])) out[key] = logoImgUrl(key, imgVersion(out[key]));
   }
   return out;
