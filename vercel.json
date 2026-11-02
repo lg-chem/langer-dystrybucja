@@ -2,6 +2,9 @@
   "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/favicon.ico", "destination": "/api/favicon" }
+  ],
   "headers": [
     {
       "source": "/vendor/(.*)",

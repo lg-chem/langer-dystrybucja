@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Langer Dystrybucja — hurtowa dystrybucja chemii budowlanej</title>
+  <link rel="icon" href="/api/favicon" />
+  <link rel="apple-touch-icon" href="/api/favicon" />
   <meta name="description" content="Hurtowa dystrybucja chemii budowlanej: piany montażowe, silikony, akryle, kleje i akcesoria dla sklepów, hurtowni i ekip wykonawczych." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -153,11 +155,26 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .hdr-cta { display: flex; }
 .hdr-burger { display: none; color: inherit; padding: 6px; }
 .hdr:not(.hdr-solid) .hdr-burger { color: #fff; }
-.mobile-menu { position: fixed; inset: 0; background: rgba(8,12,34,.5); z-index: 200; }
-.mobile-sheet { position: absolute; top: 0; right: 0; height: 100%; width: min(320px, 86vw); background: var(--white);
-  padding: 24px; display: flex; flex-direction: column; gap: 6px; box-shadow: var(--e2); }
-.mm-close { align-self: flex-end; padding: 8px; color: var(--navy); margin-bottom: 12px; }
-.mm-link { font-family: var(--font-display); font-weight: 600; font-size: 20px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+/* Menu na telefonie — renderowane w <body> (portal), nie w nagłówku: nagłówek
+   po przewinięciu ma backdrop-filter, a wtedy position: fixed w jego środku
+   liczy się względem nagłówka (76 px), nie ekranu. */
+.mobile-menu { position: fixed; inset: 0; z-index: 200; }
+.mm-bg { position: absolute; inset: 0; background: rgb(8 12 34 / 0.55); animation: sheet-fade .2s ease-out; }
+.mobile-sheet { position: absolute; top: 0; right: 0; bottom: 0; width: min(340px, 88vw); background: var(--white); color: var(--navy);
+  display: flex; flex-direction: column; box-shadow: var(--e2); overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 20px calc(20px + env(safe-area-inset-bottom)); animation: mm-in .26s cubic-bezier(.2,.8,.2,1); }
+.mm-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.mm-close { flex: none; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--navy); }
+.mm-close:active { background: var(--light); }
+.mm-links { display: flex; flex-direction: column; padding: 6px 0; }
+.mm-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-family: var(--font-display); font-weight: 600; font-size: 20px; padding: 14px 4px; border-bottom: 1px solid var(--line); color: var(--navy); }
+.mm-link svg { color: var(--ash); flex: none; }
+.mm-link:hover, .mm-link:active { color: var(--flame); }
+.mm-foot { margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+.mm-contact { display: inline-flex; align-items: center; gap: 10px; font-size: 15.5px; font-weight: 600; color: var(--ash-700); word-break: break-word; }
+.mm-contact svg { flex: none; color: var(--flame); }
+@keyframes mm-in { from { transform: translateX(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .mobile-sheet, .mm-bg { animation: none; } }
 
 /* ===== HERO (kompaktowy) =====
    Zamiast pełnoekranowego plakatu: jedno zdanie o tym, co sprzedajemy, twarde
@@ -928,18 +945,44 @@ function Header() {
         <div className="hdr-cta">
           <a href="#kontakt" className="btn btn-flame" style={{ padding:'12px 20px', fontSize:15 }}>Zostań partnerem <IArrow s={17}/></a>
         </div>
-        <button className="hdr-burger" onClick={() => setOpen(true)} aria-label="Menu"><IMenu s={24}/></button>
+        <button className="hdr-burger" onClick={() => setOpen(true)} aria-label="Menu" aria-expanded={open}><IMenu s={24}/></button>
       </div>
-      {open && (
-        <div className="mobile-menu" onClick={() => setOpen(false)}>
-          <div className="mobile-sheet" onClick={e => e.stopPropagation()}>
-            <button className="mm-close" onClick={() => setOpen(false)} aria-label="Zamknij"><IX s={24}/></button>
-            {links.map(([h,l]) => <a key={h} href={h} className="mm-link" onClick={() => setOpen(false)}>{l}</a>)}
-            <a href="#kontakt" className="btn btn-flame" onClick={() => setOpen(false)} style={{ marginTop:16 }}>Zostań partnerem <IArrow/></a>
-          </div>
-        </div>
-      )}
+      {open && ReactDOM.createPortal(<MobileMenu links={links} onClose={() => setOpen(false)} />, document.body)}
     </header>
+  );
+}
+
+/* Menu na telefonie — panel z prawej na całą wysokość ekranu. Przewijanie
+   strony pod spodem jest zablokowane; zamyka ✕, tapnięcie w tło, Esc albo
+   wybór linku. */
+function MobileMenu({ links, onClose }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    if (closeRef.current) closeRef.current.focus();
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey); };
+  }, []);
+  return (
+    <div className="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu">
+      <div className="mm-bg" onClick={onClose} />
+      <nav className="mobile-sheet">
+        <div className="mm-head">
+          <div onClick={onClose}><LangerLogo onDark={false} size={34} /></div>
+          <button type="button" ref={closeRef} className="mm-close" onClick={onClose} aria-label="Zamknij menu"><IX s={24}/></button>
+        </div>
+        <div className="mm-links">
+          {links.map(([h,l]) => <a key={h} href={h} className="mm-link" onClick={onClose}>{l}<IArrow s={18}/></a>)}
+        </div>
+        <div className="mm-foot">
+          <a href="#kontakt" className="btn btn-flame" onClick={onClose}>Zostań partnerem <IArrow/></a>
+          {SITE.contact_phone && <a href={telHref(SITE.contact_phone)} className="mm-contact"><IPhone s={18}/> {SITE.contact_phone}</a>}
+          {SITE.contact_email && <a href={'mailto:' + SITE.contact_email} className="mm-contact"><IMail s={18}/> {SITE.contact_email}</a>}
+        </div>
+      </nav>
+    </div>
   );
 }
 

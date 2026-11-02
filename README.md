@@ -63,15 +63,18 @@ Z brand booka Langer. Żeby zmienić jakikolwiek kolor — edytuj sekcję `:root
 
 **Panel → Ustawienia → „Logo i kolory marki".** Nie trzeba ruszać kodu — wgrane pliki lądują w bazie (tabela `settings`, jako data URI) i podmieniają się na stronie głównej, na `/dla-punktow/` i w samym panelu.
 
-**Trzy sloty:**
+**Cztery sloty:**
 
 | Slot | Gdzie się pokazuje | Jaka wersja |
 |---|---|---|
 | Logo na jasne tło | Nagłówek po przewinięciu strony | Kolorowa / ciemna |
 | Logo na ciemne tło | Nagłówek na samej górze, stopka | Jasna (biała) |
 | Sygnet (kwadrat) | Znak wodny w hero (wariant „Plakat") | Sam znak, bez napisu |
+| Favicon (ikona karty) | Karta przeglądarki, zakładki, ekran telefonu — na wszystkich stronach i w panelu | Kwadrat: SVG albo PNG 512×512 |
 
 Wgrasz tylko jedną wersję — użyjemy jej wszędzie. Nie wgrasz żadnej — strona rysuje dotychczasowy sygnet SVG, dokładnie jak dotąd.
+
+**Favicon.** Każda strona ma w nagłówku HTML stały adres `/api/favicon` (a `/favicon.ico` prowadzi tam samo przez `vercel.json`), więc ikonę widzą też wyszukiwarki. Kolejność: favicon z panelu → sygnet z panelu → wbudowany znak Langera na granatowym kwadracie w kolorze akcentu — strona nigdy nie zostaje bez ikony. Prostokątny plik panel sam dopełnia do kwadratu przezroczystym tłem. Przeglądarki trzymają favicony w pamięci, więc po zmianie nowa ikona może pojawić się dopiero po kilku minutach (albo po Ctrl+F5). Podgląd karty przeglądarki jest w panelu pod podglądem nagłówka.
 
 **Format:** najlepiej **SVG** (ostry na każdym ekranie, waży kilka kB). PNG/JPG/WebP też zadziała — panel sam zmniejsza plik i zachowuje przezroczystość. Limit to ~700 kB po zmniejszeniu; jeśli plik nie wejdzie, panel powie o tym wprost.
 
@@ -400,6 +403,7 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 │   ├── categories.js       # Kategorie
 │   ├── settings.js         # Ustawienia: logo, kolory, kontakt, oferta
 │   ├── img.js              # Zdjęcia i logo z bazy jako pliki (/api/img)
+│   ├── favicon.js          # Ikona karty przeglądarki (/api/favicon, /favicon.ico)
 │   └── _images.js          # Wspólne: adresy /api/img, nagłówki cache
 ├── migrations/             # Migracje SQL — uruchamiane ręcznie w Neon
 └── project/                # Archiwum — oryginalne pliki źródłowe (rozbite)

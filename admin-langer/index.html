@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel — Langer Dystrybucja</title>
+  <link rel="icon" href="/api/favicon" />
+  <link rel="apple-touch-icon" href="/api/favicon" />
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -204,6 +206,12 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
 .logo-prev-empty { font-size: 12.5px; color: var(--ash); text-align: center; line-height: 1.4; }
 .logo-prev.on-dark .logo-prev-empty { color: rgba(255,255,255,.5); }
 .logo-slot-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+/* podgląd karty przeglądarki z faviconem */
+.tab-prev { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.tab-prev-bar { background: #DEE1E6; padding: 8px 10px 0; display: flex; }
+.tab-prev-tab { display: inline-flex; align-items: center; gap: 8px; background: var(--white); border-radius: 8px 8px 0 0; padding: 8px 12px; font-size: 12.5px; min-width: 220px; }
+.tab-prev-tab span:nth-child(2) { flex: 1; }
+.tab-prev-big { display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--white); }
 
 .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
 .swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--line-2); padding: 0; }
@@ -283,6 +291,7 @@ const DEFAULT_BRANDING = {
   logo_light:     '',
   logo_dark:      '',
   logo_mark:      '',
+  favicon:        '',
   logo_height:    '38',
   logo_show_text: '1',
   brand_accent:   '#F04E23',
@@ -322,6 +331,11 @@ const LOGO_SLOTS = [
   { key: 'logo_dark',  label: 'Logo na jasne tło',  bg: 'light', hint: 'Wersja kolorowa/ciemna. Header po przewinięciu strony.' },
   { key: 'logo_light', label: 'Logo na ciemne tło', bg: 'dark',  hint: 'Wersja jasna (biała). Header na samej górze i stopka.' },
   { key: 'logo_mark',  label: 'Sygnet (kwadrat)',   bg: 'light', hint: 'Sam znak bez napisu — znak wodny w hero. Opcjonalny.' },
+  // Favicon: kwadrat do 512 px (tyle chcą telefony na ekranie głównym);
+  // panel sam dopełnia prostokątny plik do kwadratu przezroczystym tłem.
+  { key: 'favicon',    label: 'Favicon (ikona karty)', bg: 'light', square: true, sizes: [512, 384, 256, 192],
+    hint: 'Ikona w karcie przeglądarki, zakładkach i na ekranie telefonu. Kwadrat — SVG albo PNG 512×512.',
+    empty: 'używamy sygnetu' },
 ];
 
 /* Gotowe warianty kolorystyczne akcentu (--flame): przyciski, odznaki,
@@ -462,7 +476,7 @@ function fileToDataURL(file, maxSize = 640, quality = 0.82) {
    • przy za dużym pliku próbujemy kolejno mniejszych rozmiarów, zamiast
      od razu odrzucać.
    Limit `maxBytes` musi zostawać poniżej limitu z api/settings.js. */
-function logoFileToDataURL(file, { sizes = [640, 480, 360, 256], maxBytes = 700000 } = {}) {
+function logoFileToDataURL(file, { sizes = [640, 480, 360, 256], maxBytes = 700000, square = false } = {}) {
   return new Promise((resolve, reject) => {
     if (!file || !/^image\//.test(file.type)) {
       reject(new Error('To nie jest plik graficzny. Wgraj SVG, PNG, JPG lub WebP.')); return;
@@ -493,10 +507,12 @@ function logoFileToDataURL(file, { sizes = [640, 480, 360, 256], maxBytes = 7000
               w = Math.max(1, Math.round(w * scale));
               h = Math.max(1, Math.round(h * scale));
             }
+            // square: obraz na środku kwadratowego płótna (favicon), reszta przezroczysta
+            const cw = square ? Math.max(w, h) : w, ch = square ? Math.max(w, h) : h;
             const canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
+            canvas.width = cw; canvas.height = ch;
             // brak fillRect — przezroczystość logo zostaje nietknięta
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            canvas.getContext('2d').drawImage(img, Math.round((cw - w) / 2), Math.round((ch - h) / 2), w, h);
             const out = canvas.toDataURL('image/png');
             if (out.length <= maxBytes) { resolve(out); return; }
           }
@@ -2195,6 +2211,32 @@ function LogoPreview({ values, onDark }) {
   );
 }
 
+/* Podgląd karty przeglądarki z faviconem — ta sama kolejność co w
+   api/favicon.js: favicon → sygnet → wbudowany znak na granatowym kwadracie. */
+function FaviconPreview({ values }) {
+  const src = values.favicon || values.logo_mark;
+  const accent = values.brand_accent || '#F04E23';
+  const icon = (size) => src
+    ? <img src={src} alt="" style={{ width: size, height: size, objectFit: 'contain', display: 'block', flex: 'none' }} />
+    : <span style={{ width: size, height: size, borderRadius: size * 0.22, background: '#0E1533', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
+        <BuiltInMark size={size * 0.85} accent={accent} color="#fff" />
+      </span>;
+  return (
+    <div className="tab-prev">
+      <div className="tab-prev-bar">
+        <span className="tab-prev-tab">{icon(16)}<span>Langer Dystrybucja</span><span className="muted">×</span></span>
+      </div>
+      <div className="tab-prev-big">
+        {icon(48)}
+        <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+          Tak ikona wygląda w karcie (16 px) i na ekranie telefonu (48 px).
+          {!values.favicon && (values.logo_mark ? ' Bez faviconu używamy sygnetu.' : ' Bez pliku używamy wbudowanego znaku w kolorze akcentu.')}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* Jeden slot logo: podgląd na właściwym tle + wgrywanie z dysku + usuwanie. */
 function LogoSlot({ slot, value, onChange, onError }) {
   const inputRef = useRef(null);
@@ -2205,7 +2247,8 @@ function LogoSlot({ slot, value, onChange, onError }) {
     e.target.value = '';           // ten sam plik da się wgrać ponownie
     if (!file) return;
     setBusy(true);
-    try { onChange(await logoFileToDataURL(file)); onError(''); }
+    const opts = { square: !!slot.square, ...(slot.sizes ? { sizes: slot.sizes } : {}) };
+    try { onChange(await logoFileToDataURL(file, opts)); onError(''); }
     catch (e2) { onError(e2.message); }
     finally { setBusy(false); }
   }
@@ -2218,7 +2261,7 @@ function LogoSlot({ slot, value, onChange, onError }) {
       <div className={'logo-prev ' + (slot.bg === 'dark' ? 'on-dark' : 'on-light')}>
         {value
           ? <img src={value} alt="" onError={() => onError('Nie udało się wyświetlić tego pliku.')} />
-          : <span className="logo-prev-empty">Brak pliku —<br/>zostaje wbudowany sygnet</span>}
+          : <span className="logo-prev-empty">Brak pliku —<br/>{slot.empty || 'zostaje wbudowany sygnet'}</span>}
       </div>
 
       <div className="logo-slot-foot">
@@ -2229,7 +2272,7 @@ function LogoSlot({ slot, value, onChange, onError }) {
             {busy ? <span className="spinner"/> : <IUpload s={14}/>} Wgraj
           </button>
           {value && (
-            <button type="button" className="btn-icon" title="Usuń logo" onClick={() => onChange('')}>
+            <button type="button" className="btn-icon" title={'Usuń: ' + slot.label} onClick={() => onChange('')}>
               <ITrash s={18}/>
             </button>
           )}
@@ -2261,7 +2304,8 @@ function BrandingSettings({ st }) {
     <div className="adm-card">
       <h2 className="adm-card-h">Logo i kolory marki</h2>
       <p className="adm-card-d">
-        Wgraj oryginalne logo — podmieni wbudowany sygnet w nagłówku, stopce i na całej stronie.
+        Wgraj oryginalne logo — podmieni wbudowany sygnet w nagłówku, stopce i na całej stronie,
+        a favicon — ikonę w karcie przeglądarki.
         Najlepiej <strong>SVG</strong> (ostre na każdym ekranie, waży najmniej); PNG z przezroczystym tłem też zadziała.
         Puste sloty = strona rysuje dotychczasowy sygnet.
       </p>
@@ -2325,11 +2369,16 @@ function BrandingSettings({ st }) {
           {!hasLogo && <span className="muted" style={{ fontSize: 12.5 }}>Nie wgrano jeszcze logo — strona rysuje wbudowany sygnet w kolorze akcentu.</span>}
         </div>
 
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <span style={{ fontSize: 13, fontWeight: 700 }}>Podgląd faviconu</span>
+          <FaviconPreview values={values} />
+        </div>
+
         <div className="gap-2" style={{ alignItems: 'center' }}>
           <button type="submit" className="btn btn-flame" disabled={busy || loading}>
             {busy ? <span className="spinner"/> : <IUpload s={16}/>} Zapisz logo i kolory
           </button>
-          {saved && !busy && <span className="muted">Zapisano. Odśwież stronę, żeby zobaczyć zmianę.</span>}
+          {saved && !busy && <span className="muted">Zapisano. Odśwież stronę, żeby zobaczyć zmianę (favicon przeglądarki odświeżają do kilku minut).</span>}
           {loading && <span className="muted">Wczytywanie…</span>}
         </div>
       </form>
