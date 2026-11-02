@@ -88,7 +88,7 @@ Wgrasz tylko jedną wersję — użyjemy jej wszędzie. Nie wgrasz żadnej — s
 
 **Panel → Ustawienia → „Dane kontaktowe".** Telefon, e-mail, adres i nazwa firmy w jednym miejscu — zapis podmienia je naraz w sekcji „Kontakt" i w stopce strony głównej. Link `tel:` tworzy się automatycznie.
 
-Telefon na podstronie `/dla-punktow/` jest osobny (karta „Oferta dla punktów handlowych") — landing bywa używany w kampaniach z innym numerem.
+Podstrona `/dla-punktow/` ma własny telefon, e-mail, osobę kontaktową i godziny (karta „Oferta dla punktów handlowych") — landing bywa używany w kampaniach z innym numerem. Puste pola telefonu i e-maila na podstronie biorą wartości z „Danych kontaktowych".
 
 Wartości domyślne, gdy baza nie odpowiada, siedzą w `api/settings.js` (obiekt `DEFAULTS`) i w `index.html` (obiekt `SITE`).
 
@@ -256,54 +256,83 @@ Klucze w tabeli `settings`: `stat_products`, `stat_brands`, `stat_delivery`, `st
 
 **Adres:** `/dla-punktow/` · **Plik:** `dla-punktow/index.html`
 
-Osobny landing sprzedażowy skierowany do sklepów i hurtowni. Sedno oferty:
-*postaw Langera na półce, a pozostałe marki kupisz taniej.* Podstrona jest
-podlinkowana w nawigacji i stopce strony głównej.
+Landing sprzedażowy dla sklepów i hurtowni. Zasada oferty w jednym zdaniu:
+*bierzesz Langera — zyskujesz na całym zamówieniu.* Bez sztywnego progu
+kartonów: do zamówionych kartonów Langera pistolet za 1 zł, a pozostałe
+marki nawet kilka procent taniej. Po spełnieniu warunków — współpraca
+marketingowa. Podstrona jest podlinkowana w nawigacji i stopce strony głównej.
 
-Powstała z projektu z Claude Design (wariant „1b" na desktopie, „1c" na
-telefonie), przepisanego na ten sam stack co reszta serwisu — React 18 i JSX
-prosto w pliku HTML (kompilowany przy wdrożeniu) — i na tokeny kolorów z `index.html`.
+### Jak prowadzi klienta
+
+Każda sekcja odpowiada na kolejne pytanie i kończy się przyciskiem do następnego kroku:
+
+| Sekcja | Co mówi | Dokąd prowadzi |
+|---|---|---|
+| Hero + 4 kafle | Bierzesz → dostajesz (pistolet) → oszczędzasz (rabat) → rośniesz (marketing) | Formularz albo „Jak to działa" |
+| Jak to działa | 4 kroki od wyboru Langera do dostawy + schemat zamówienia (Langer + pozostałe marki → co z tego masz). Marki w schemacie biorą się z Ustawień → Marki. | Produkty, katalog na stronie głównej, formularz |
+| Linia Langer | Produkty z parametrami | „Poproś o propozycję" zestawu na start |
+| Pasek pistoletu | Pistolet do zamówionych kartonów | „Dopisz do oferty" |
+| Współpraca marketingowa | Filmy wideo, Google Ads / Meta Ads, wizytówka Google, SEO/GEO, strategia, klienci lokalni i ogólnopolscy — po spełnieniu warunków | „Zapytaj o współpracę marketingową" |
+| Bez ryzyka | Zwroty, opiekun z regionu, elastyczne ilości, czas dostawy (z „Liczb w hero"; puste = kafel znika) | — |
+| Pytania (FAQ) | 7 najczęstszych pytań, teksty liczą się z ustawień | Telefon |
+| Ostatni krok | „Poproś o ofertę z możliwymi rabatami": co się stanie dalej, formularz, telefon i e-mail | — |
+
+Przyciski w sekcjach **zaznaczają właściwą pozycję w formularzu** (np. „Zapytaj
+o współpracę marketingową" zaznacza „Współpraca marketingowa") — klient dochodzi
+do formularza z gotowym wyborem. Link w nagłówku podświetla sekcję, w której
+jest klient. Na telefonie na dole wisi pasek „Poproś o ofertę" + „Zadzwoń";
+znika przy formularzu, żeby go nie zasłaniać.
 
 ### Co zmienisz z panelu
 
-Liczby w ofercie **nie są zaszyte w kodzie**. Wchodzisz na `/admin-langer/` →
-zakładka **Ustawienia** → karta **Oferta dla punktów handlowych** i zmieniasz:
+`/admin-langer/` → **Ustawienia** → karta **Oferta dla punktów handlowych**:
 
 | Pole | Gdzie się pokazuje |
 |---|---|
-| Kartonów Langera | Nagłówek, kafel „Warunek", sekcja „Dlaczego warto" |
-| Rabat na inne marki (%) | Nagłówek, kafel „Twoja korzyść", sekcja „Dlaczego warto" |
-| Pistolet — próg (kartonów) | Kafel „Gratis", niebieski pasek, pasek na telefonie |
-| Pistolet — cena (zł) | Kafel „Gratis", niebieski pasek, pasek na telefonie |
-| Telefon na podstronie | Sekcja kontakt i przycisk „Zadzwoń" |
+| Rabat na pozostałe marki (tekst) | Wszędzie po słowie „nawet": „kilka procent", „3%", „do 5%". Puste = „kilka procent". |
+| Pistolet — cena (zł) | Hero, kafel, pasek, pytania, formularz. `0` = na stronie „gratis". |
+| Telefon | Kontakt, pytania, stopka, przycisk „Zadzwoń" na telefonie. Puste = telefon z „Danych kontaktowych". |
+| E-mail na zapytania | Kontakt, stopka i adres, na który formularz składa wiadomość. Puste = e-mail z „Danych kontaktowych". |
+| Osoba kontaktowa | Sekcja kontakt. Puste = nie pokazujemy. |
+| Godziny kontaktu | Sekcja kontakt. Puste = nie pokazujemy. |
 
-Zapisane wartości trafiają do bazy (tabela `settings`) i podstrona pobiera je
-z `/api/settings` przy każdym wejściu. **Wymaga uruchomienia migracji
-`migrations/004_settings_table.sql`** — do tego czasu (albo gdy API nie
-odpowie) strona pokazuje wartości domyślne: 10 kartonów, 15%, pistolet za 1 zł
-do 5 kartonów.
+Wartości trafiają do bazy (tabela `settings`) i podstrona pobiera je z
+`/api/settings` przy każdym wejściu. Opcjonalna migracja
+`migrations/008_settings_landing_flexible_offer.sql` dokłada nowe klucze —
+bez niej działają wartości domyślne z `api/settings.js`, a pierwszy zapis
+karty i tak utworzy wiersze. Stare klucze (`landing_cartons`,
+`landing_discount_pct`, `landing_pistol_cartons`) nie są już czytane.
 
 Logo i kolor akcentu podstrona bierze z tych samych ustawień co strona główna —
-patrz [Logo i kolory z panelu](#logo-i-kolory-z-panelu). Nowe klucze (logo,
-kolory, dane kontaktowe) dokłada `migrations/005_settings_brand_and_contact.sql`;
-migracja jest opcjonalna — pierwszy zapis z panelu i tak utworzy brakujące
-wiersze, a bez niej wszystko działa na wartościach domyślnych.
+patrz [Logo i kolory z panelu](#logo-i-kolory-z-panelu).
 
 ### Co zmienisz w kodzie
 
-Opisy produktów, parametry techniczne i zastosowania siedzą w stałej
-`PRODUCTS` w `dla-punktow/index.html` — to osobny zestaw od bazy produktów na
-stronie głównej, bo tutaj liczą się parametry techniczne, a nie SKU i jednostka
-sprzedaży. Zdjęcia leżą w `dla-punktow/assets/`: strona używa plików `.webp`
-(840 px, kilkanaście–kilkadziesiąt kB), a `.png` obok to oryginały 1080 px do
-ponownego eksportu. Nowe zdjęcie? Wrzuć je jako WebP i podmień `img:` w `PRODUCTS`.
+Wszystko w `dla-punktow/index.html`:
 
-### Czego jeszcze nie ma
+- **Produkty** — stała `PRODUCTS` (opisy, parametry, zastosowania). To osobny
+  zestaw od bazy produktów na stronie głównej, bo tutaj liczą się parametry
+  techniczne, a nie SKU. Zdjęcia w `dla-punktow/assets/`: strona używa `.webp`
+  (840 px), `.png` obok to oryginały 1080 px. Nowe zdjęcie wrzuć jako WebP i
+  podmień `img:` w `PRODUCTS`.
+- **Usługi marketingowe** — stała `MARKETING` (ikona, etykieta, tytuł, opis;
+  kolejność w tablicy = kolejność kafli).
+- **Pytania** — tablica w komponencie `Faq`.
+- **Pozycje do zaznaczenia w formularzu** — stała `INTERESTS`.
 
-- **Formularz nie wysyła danych** — tak jak na stronie głównej jest to wersja
-  demonstracyjna. Podpięcie wysyłki wymaga osobnego endpointu.
-- **Przycisk „Pobierz ulotkę PDF"** z projektu nie został przeniesiony — ulotka
-  nie leży w repo. Gdy wrzucisz plik, dopnie się w minutę.
+### Formularz
+
+Nie ma jeszcze własnego serwera do wysyłki, więc zamiast udawać wysyłkę
+formularz **składa gotową wiadomość i otwiera ją w poczcie klienta** (link
+`mailto:` na e-mail z panelu): temat „Zapytanie o ofertę dla punktu — nazwa,
+miasto", w treści dane punktu, zaznaczone pozycje i marki, które klient
+zamawia. Klient klika „Wyślij". Gdy poczta się nie otworzy (np. komputer bez
+programu pocztowego), ekran po wysłaniu daje „Kopiuj treść" i numer telefonu.
+Zapisywanie zapytań w bazie albo wysyłka bez programu pocztowego wymaga
+osobnego endpointu — do dopięcia, gdy będzie potrzebne.
+
+**Przycisk „Pobierz ulotkę PDF"** z projektu nie został przeniesiony — ulotka
+nie leży w repo. Gdy wrzucisz plik, dopnie się w minutę.
 
 ---
 
