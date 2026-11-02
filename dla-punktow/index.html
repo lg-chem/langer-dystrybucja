@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Langer na półce — oferta dla punktów handlowych | Langer Dystrybucja</title>
-  <meta name="description" content="Postaw Langera na półce i kupuj pozostałe marki taniej. Piany, pianokleje i kleje montażowe Langer plus rabat na resztę zamówienia, wsparcie marketingowe i zwroty bez ryzyka." />
+  <title>Bierzesz Langera — zyskujesz | Oferta dla punktów handlowych | Langer Dystrybucja</title>
+  <meta name="description" content="Oferta dla sklepów i hurtowni: do zamówionych kartonów Langera pistolet za 1 zł, a pozostałe marki nawet kilka procent taniej. Bez sztywnego progu, ze zwrotami bez ryzyka i możliwą współpracą marketingową." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -50,6 +50,7 @@ body {
 img { max-width: 100%; display: block; }
 a { color: inherit; text-decoration: none; }
 button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--flame); outline-offset: 3px; }
 
 .wrap { width: min(1240px, 100% - 96px); margin-inline: auto; }
 @media (max-width: 760px) { .wrap { width: min(1240px, 100% - 40px); } }
@@ -59,14 +60,14 @@ button, input, textarea { font: inherit; color: inherit; }
   letter-spacing: 0.18em; text-transform: uppercase; color: var(--flame);
 }
 .h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; margin: 0; }
-.h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; margin: 0; font-size: clamp(28px, 3.4vw, 42px); }
+.h2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.08; margin: 0; font-size: clamp(28px, 3.4vw, 42px); text-wrap: balance; }
 .lead { font-size: 18px; line-height: 1.55; color: var(--ash-700); margin: 0; text-wrap: pretty; }
 .lead-dark { color: rgba(255,255,255,.72); }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   font-family: var(--font-text); font-size: 16px; font-weight: 700; cursor: pointer;
-  border: none; padding: 15px 26px; border-radius: var(--r-sm);
+  border: none; padding: 15px 26px; border-radius: var(--r-sm); text-align: center;
   transition: transform .12s, background .15s, box-shadow .15s, color .15s, border-color .15s;
 }
 .btn-flame { background: var(--flame); color: #fff; }
@@ -89,11 +90,15 @@ button, input, textarea { font: inherit; color: inherit; }
 .logo-words { display: flex; flex-direction: column; line-height: 1; }
 .logo-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
 .logo-sub { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.22em; color: var(--ash-700); margin-top: 3px; }
-.hdr-nav { display: flex; gap: var(--s5); margin-left: auto; }
-.hdr-link { font-size: 15px; font-weight: 600; color: var(--ash-700); transition: color .15s; }
-.hdr-link:hover { color: var(--navy); }
+.hdr-nav { display: flex; align-items: center; gap: var(--s5); margin-left: auto; }
+.hdr-link { position: relative; font-size: 15px; font-weight: 600; color: var(--ash-700); transition: color .15s; }
+.hdr-link:hover, .hdr-link.on { color: var(--navy); }
+/* podkreślenie sekcji, w której jesteś — strona „wie", gdzie jest klient */
+.hdr-link.on::after { content: ''; position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; border-radius: 2px; background: var(--flame); }
 .hdr-back { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); }
 .hdr-back:hover { color: var(--flame); }
+.cta-short { display: none; }
+@media (max-width: 1140px) { .hdr-back { display: none; } }
 /* Poniżej 980 px chowamy linki, ale CTA zostaje — bez niego nagłówek
    na telefonie byłby samym logo i nie prowadziłby nigdzie. */
 @media (max-width: 980px) {
@@ -101,37 +106,115 @@ button, input, textarea { font: inherit; color: inherit; }
   .hdr-in { justify-content: space-between; }
   .hdr-cta { margin-left: auto; }
 }
-@media (max-width: 420px) { .logo-sub { display: none; } }
+@media (max-width: 420px) {
+  .logo-sub { display: none; }
+  .cta-long { display: none; } .cta-short { display: inline; }
+}
 
 /* ===== HERO ===== */
-.hero { padding: var(--s9) 0 var(--s8); text-align: center; border-bottom: 1px solid var(--line); }
+.hero {
+  padding: 88px 0 72px; text-align: center; border-bottom: 1px solid var(--line);
+  background: radial-gradient(900px 420px at 50% -140px, var(--flame-tint), transparent 70%), var(--white);
+}
 .hero-in { display: flex; flex-direction: column; align-items: center; gap: var(--s5); }
-.hero h1 { font-size: clamp(38px, 6vw, 74px); max-width: 15ch; text-wrap: balance; }
-.hero .lead { max-width: 62ch; font-size: 19px; }
+.hero h1 { font-size: clamp(38px, 6vw, 76px); max-width: 16ch; text-wrap: balance; }
+.hero h1 em { font-style: normal; color: var(--flame); }
+.hero .lead { max-width: 60ch; font-size: 19px; }
 .hero-cta { display: flex; gap: var(--s3); flex-wrap: wrap; justify-content: center; padding-top: var(--s2); }
-@media (max-width: 560px) { .hero-cta { width: 100%; flex-direction: column; } .hero-cta .btn { width: 100%; } }
+.hero-trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; font-size: 14.5px; color: var(--ash-700); }
+.hero-trust span { display: inline-flex; align-items: center; gap: 7px; }
+.hero-trust svg { color: var(--flame); }
+@media (max-width: 560px) {
+  .hero { padding: 56px 0 48px; }
+  .hero .lead { font-size: 17px; }
+  .hero-cta { width: 100%; flex-direction: column; } .hero-cta .btn { width: 100%; }
+  .hero-trust { flex-direction: column; align-items: center; }
+}
 
-/* trzy kafle: warunek → korzyść → gratis */
-.deal { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 100%; max-width: 980px; margin-top: var(--s5); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--e2); }
-.deal-cell { padding: 28px 32px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+/* cztery kafle: bierzesz → dostajesz → oszczędzasz → rośniesz */
+.deal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: 100%; max-width: 1120px; margin-top: var(--s5); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--e2); }
+.deal-cell { padding: 26px 28px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
 .deal-k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; }
-.deal-v { font-family: var(--font-display); font-size: clamp(24px, 2.6vw, 32px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.deal-v { font-family: var(--font-display); font-size: clamp(22px, 2.1vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
 .deal-d { font-size: 14.5px; line-height: 1.45; }
 .deal-1 { background: var(--light); color: var(--navy); }
 .deal-1 .deal-k { color: var(--ash); } .deal-1 .deal-d { color: var(--ash-700); }
-.deal-2 { background: var(--flame); color: #fff; }
-.deal-2 .deal-k { color: var(--flame-tint); } .deal-2 .deal-d { color: rgba(255,255,255,.85); }
-.deal-3 { background: var(--cobalt); color: #fff; }
-.deal-3 .deal-k { color: var(--cobalt-tint); } .deal-3 .deal-d { color: rgba(255,255,255,.85); }
-@media (max-width: 860px) { .deal { grid-template-columns: 1fr; } .deal-cell { padding: 20px 22px; } }
+.deal-2 { background: var(--cobalt); color: #fff; }
+.deal-2 .deal-k { color: var(--cobalt-tint); } .deal-2 .deal-d { color: rgba(255,255,255,.85); }
+.deal-3 { background: var(--flame); color: #fff; }
+.deal-3 .deal-k { color: var(--flame-tint); } .deal-3 .deal-d { color: rgba(255,255,255,.88); }
+.deal-4 { background: var(--navy); color: #fff; }
+.deal-4 .deal-k { color: rgba(255,255,255,.55); } .deal-4 .deal-d { color: rgba(255,255,255,.75); }
+@media (max-width: 1040px) { .deal { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px)  { .deal { grid-template-columns: 1fr; } .deal-cell { padding: 18px 20px; } }
 
 /* ===== SEKCJE ===== */
 .sec { padding: var(--s9) 0; }
+.sec-tight { padding: var(--s8) 0; }
 .sec-paper { background: var(--paper); }
 .sec-dark { background: var(--navy); color: #fff; }
 .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s6); margin-bottom: var(--s7); }
-.sec-head-l { display: flex; flex-direction: column; gap: var(--s3); }
-@media (max-width: 760px) { .sec { padding: var(--s8) 0; } .sec-head { flex-direction: column; align-items: flex-start; margin-bottom: var(--s6); } }
+.sec-head-l { display: flex; flex-direction: column; gap: var(--s3); max-width: 720px; }
+.sec-head-r { max-width: 380px; font-size: 16px; }
+@media (max-width: 760px) {
+  .sec { padding: var(--s8) 0; } .sec-tight { padding: var(--s7) 0; }
+  .sec-head { flex-direction: column; align-items: flex-start; margin-bottom: var(--s6); gap: var(--s4); }
+}
+
+/* ===== JAK TO DZIAŁA ===== */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s5); }
+.step { position: relative; display: flex; flex-direction: column; gap: 10px; padding-top: 64px; }
+/* linia łącząca kroki — od kółka do następnego kółka */
+.step::before { content: ''; position: absolute; top: 21px; left: 52px; right: calc(8px - var(--s5)); height: 2px; background: var(--line-2); }
+.step:last-child::before { display: none; }
+.step-n {
+  position: absolute; top: 0; left: 0; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy); color: #fff; font-family: var(--font-mono); font-weight: 600; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.step:first-child .step-n { background: var(--flame); }
+.step-t { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; margin: 0; }
+.step-d { font-size: 15.5px; line-height: 1.5; color: var(--ash-700); margin: 0; }
+.step-a { margin-top: auto; padding-top: 4px; font-weight: 700; font-size: 15px; color: var(--flame); display: inline-flex; gap: 6px; align-items: center; }
+.step-a:hover { color: var(--flame-600); }
+@media (max-width: 980px) {
+  .steps { grid-template-columns: 1fr 1fr; row-gap: var(--s7); }
+  .step:nth-child(2)::before { display: none; }
+}
+@media (max-width: 620px) {
+  .steps { grid-template-columns: 1fr; gap: 0; }
+  .step { padding: 0 0 30px 62px; }
+  .step:last-child { padding-bottom: 0; }
+  .step::before, .step:nth-child(2)::before { display: block; top: 50px; bottom: 6px; left: 21px; right: auto; width: 2px; height: auto; }
+  .step:last-child::before { display: none; }
+  .step-n { width: 44px; }
+}
+
+/* Schemat zamówienia: Langer + reszta → co z tego masz */
+.basket {
+  margin-top: var(--s8); background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg);
+  padding: var(--s6); box-shadow: var(--e1);
+  display: grid; grid-template-columns: 2fr 3fr; gap: 12px 6px;
+}
+.basket-k { grid-column: 1 / -1; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--ash); margin-bottom: 4px; }
+.bseg { border-radius: var(--r-md); padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; gap: 4px; min-height: 96px; color: #fff; }
+.bseg-l { grid-column: 1; grid-row: 2; background: var(--flame); }
+.bseg-o { grid-column: 2; grid-row: 2; background: var(--navy); }
+.bseg-k { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+.bseg-d { font-size: 14px; opacity: .82; }
+.bgain { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16.5px; color: var(--navy); padding: 6px 4px 0; }
+.bgain-l { grid-column: 1; grid-row: 3; }
+.bgain-o { grid-column: 2; grid-row: 3; }
+.bgain-ic { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--flame-tint); color: var(--flame); display: inline-flex; align-items: center; justify-content: center; }
+.basket-f { grid-column: 1 / -1; grid-row: 4; margin: 10px 0 0; padding-top: 18px; border-top: 1px dashed var(--line-2); font-size: 15.5px; color: var(--ash-700); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.basket-f strong { color: var(--navy); }
+.basket-scale { flex: none; display: inline-block; width: 120px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--line), var(--flame)); }
+@media (max-width: 700px) {
+  .basket { grid-template-columns: 1fr; padding: 20px; gap: 10px; }
+  .bseg-l, .bseg-o, .bgain-l, .bgain-o, .basket-f { grid-column: auto; grid-row: auto; }
+  .bgain { padding: 0 2px 8px; }
+  .bseg { min-height: 0; }
+}
 
 /* ===== SLIDER PRODUKTÓW (desktop) ===== */
 .slider-nav { display: flex; gap: var(--s2); }
@@ -179,60 +262,174 @@ button, input, textarea { font: inherit; color: inherit; }
 .pcard-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-top: var(--s3); border-top: 1px solid var(--line); }
 .pscroll-hint { font-size: 13.5px; color: var(--ash); }
 
-/* ===== DLACZEGO ===== */
-.why { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s5); }
-.why-card { display: flex; flex-direction: column; gap: 10px; border-top: 3px solid var(--navy); padding-top: 22px; }
-.why-card:first-child { border-top-color: var(--flame); }
-.why-n { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: .1em; color: var(--flame); }
-.why-t { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
-.why-d { font-size: 15.5px; line-height: 1.5; color: var(--ash-700); margin: 0; }
-@media (max-width: 980px) { .why { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 620px) { .why { grid-template-columns: 1fr; gap: var(--s4); } .why-card { border-top-width: 2px; padding-top: 16px; } }
+/* „Nie wiesz, od czego zacząć?" pod produktami */
+.prod-cta { margin-top: var(--s5); display: flex; align-items: center; justify-content: space-between; gap: var(--s5); padding: 22px 28px; background: var(--white); border: 1.5px dashed var(--line-2); border-radius: var(--r-lg); }
+.prod-cta p { margin: 0; font-size: 16.5px; line-height: 1.5; color: var(--ash-700); }
+.prod-cta strong { color: var(--navy); }
+@media (max-width: 760px) { .prod-cta { flex-direction: column; align-items: stretch; padding: 20px; } }
 
 /* ===== PASEK PISTOLETU ===== */
 .pistol { background: var(--cobalt); color: #fff; }
 .pistol-in { display: flex; align-items: center; justify-content: space-between; gap: var(--s6); padding: var(--s6) 0; }
 .pistol-l { display: flex; align-items: center; gap: var(--s5); }
-.pistol-price { font-family: var(--font-display); font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; flex: none; }
-.pistol-d { font-size: 17px; line-height: 1.4; max-width: 60ch; }
+.pistol-price { font-family: var(--font-display); font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; flex: none; }
+.pistol-d { font-size: 17px; line-height: 1.45; max-width: 62ch; margin: 0; }
+.pistol-d strong { font-weight: 700; }
 @media (max-width: 860px) { .pistol-in { flex-direction: column; align-items: flex-start; gap: var(--s4); } }
 
+/* ===== WSPÓŁPRACA MARKETINGOWA ===== */
+.pill-note { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-full); border: 1px solid var(--navy-700); background: var(--navy-800); color: rgba(255,255,255,.8); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.pill-note svg { color: var(--flame-glow); }
+.mkt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s4); }
+.mkt {
+  background: var(--navy-800); border: 1px solid var(--navy-700); border-radius: var(--r-lg);
+  padding: 28px; display: flex; flex-direction: column; gap: 12px; transition: border-color .15s, transform .15s;
+}
+.mkt:hover { border-color: rgba(255,255,255,.22); transform: translateY(-2px); }
+.mkt-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mkt-ic { width: 48px; height: 48px; border-radius: 12px; background: rgba(255,255,255,.06); color: var(--flame-glow); display: inline-flex; align-items: center; justify-content: center; }
+.mkt-tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+.mkt-t { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 4px 0 0; color: #fff; }
+.mkt-d { font-size: 15px; line-height: 1.55; color: rgba(255,255,255,.68); margin: 0; }
+.mkt-cta {
+  margin-top: var(--s6); display: flex; align-items: center; justify-content: space-between; gap: var(--s5);
+  padding: 24px 28px; border-radius: var(--r-lg);
+  background: rgba(240, 78, 35, .12); border: 1px solid rgba(240, 78, 35, .35);
+  background: color-mix(in srgb, var(--flame) 12%, transparent);
+  border-color: color-mix(in srgb, var(--flame) 35%, transparent);
+}
+.mkt-cta p { margin: 0; color: rgba(255,255,255,.82); font-size: 16.5px; line-height: 1.5; }
+.mkt-cta strong { color: #fff; }
+@media (max-width: 980px) { .mkt-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) {
+  .mkt-grid { grid-template-columns: 1fr; gap: var(--s3); }
+  .mkt { padding: 22px; }
+  .mkt-cta { flex-direction: column; align-items: stretch; padding: 20px; }
+  .pill-note { white-space: normal; }
+}
+
+/* ===== BEZ RYZYKA ===== */
+.safe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--s6) var(--s5); }
+.safe-item { display: flex; gap: 14px; align-items: flex-start; }
+.safe-ic { flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--flame-tint); color: var(--flame); display: inline-flex; align-items: center; justify-content: center; }
+.safe-t { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; line-height: 1.25; margin: 2px 0 6px; }
+.safe-d { font-size: 15px; line-height: 1.5; color: var(--ash-700); margin: 0; }
+
+/* ===== FAQ ===== */
+.faq-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: var(--s8); align-items: start; }
+.faq-side { display: flex; flex-direction: column; gap: var(--s3); position: sticky; top: calc(var(--header-h) + 32px); }
+.faq-phone { display: inline-flex; align-items: center; gap: 10px; margin-top: var(--s2); font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--navy); }
+.faq-phone:hover { color: var(--flame); }
+.faq-list { border-top: 1px solid var(--line-2); }
+.faq { border-bottom: 1px solid var(--line-2); }
+.faq summary {
+  list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  padding: 20px 0; font-family: var(--font-display); font-weight: 700; font-size: 18.5px; letter-spacing: -0.01em; line-height: 1.3;
+  transition: color .15s;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:hover { color: var(--flame); }
+.faq-ic { flex: none; width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--line-2); color: var(--navy); display: inline-flex; align-items: center; justify-content: center; transition: transform .2s, background .15s, color .15s, border-color .15s; }
+.faq[open] .faq-ic { transform: rotate(45deg); background: var(--navy); border-color: var(--navy); color: #fff; }
+.faq-a { margin: 0 0 22px; padding-right: 48px; color: var(--ash-700); font-size: 16px; line-height: 1.6; max-width: 64ch; }
+@media (max-width: 900px) {
+  .faq-grid { grid-template-columns: 1fr; gap: var(--s6); }
+  .faq-side { position: static; }
+  .faq summary { font-size: 17px; padding: 18px 0; }
+  .faq-a { padding-right: 0; }
+}
+
 /* ===== KONTAKT ===== */
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s8); align-items: start; }
-@media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; gap: var(--s6); } }
+/* Na komputerze: opis i telefon po lewej, formularz po prawej. Na telefonie
+   formularz idzie zaraz pod opisem — telefon i e-mail dopiero pod nim. */
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s8); align-items: start;
+  grid-template-areas: "intro form" "direct form"; grid-template-rows: auto 1fr;
+}
+.contact-intro { grid-area: intro; }
+.contact-direct { grid-area: direct; }
+.contact-form { grid-area: form; }
+@media (max-width: 900px) {
+  .contact-grid { grid-template-columns: 1fr; grid-template-areas: "intro" "form" "direct"; grid-template-rows: auto; row-gap: var(--s6); }
+  .contact-direct .direct { margin-top: 0; }
+}
+.next { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: n; }
+.next li { display: grid; grid-template-columns: 36px 1fr; column-gap: 14px; counter-increment: n; }
+.next li::before {
+  content: counter(n); grid-row: span 2; width: 36px; height: 36px; border-radius: 50%;
+  border: 1.5px solid var(--navy-700); display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--flame-glow);
+}
+.next b { color: #fff; font-size: 16.5px; line-height: 1.35; }
+.next span { color: rgba(255,255,255,.6); font-size: 14.5px; line-height: 1.45; }
+.direct { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--navy-700); display: flex; flex-direction: column; gap: 8px; }
+.direct-k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
 .contact-phone { font-family: var(--font-display); font-size: 28px; font-weight: 700; letter-spacing: -0.01em; }
 .contact-phone:hover { color: var(--flame-glow); }
+.direct-row { display: inline-flex; align-items: center; gap: 9px; color: rgba(255,255,255,.8); font-size: 16px; word-break: break-word; }
+a.direct-row:hover { color: #fff; }
+.direct-row svg { flex: none; color: var(--ash); }
+.direct-meta { color: rgba(255,255,255,.55); font-size: 14.5px; }
+
 .form { background: var(--navy-800); border: 1px solid var(--navy-700); border-radius: var(--r-lg); padding: var(--s6); display: flex; flex-direction: column; gap: var(--s4); }
+.form-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-bottom: var(--s2); }
+.form-title { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
+.form-time { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash); white-space: nowrap; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
-@media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
-.field { display: flex; flex-direction: column; gap: 8px; }
-.field span { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
+@media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } .form { padding: 22px 18px; } }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.field > span, .picks legend { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); font-weight: 600; }
 .field input, .field textarea {
-  font-family: var(--font-text); font-size: 16px; color: #fff; background: var(--navy);
+  font-family: var(--font-text); font-size: 16px; color: #fff; background: var(--navy); width: 100%;
   border: 1.5px solid var(--navy-700); border-radius: var(--r-sm); padding: 13px 15px;
   transition: border-color .15s, box-shadow .15s; resize: vertical;
 }
 .field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,.35); }
-.field input:focus, .field textarea:focus { outline: none; border-color: var(--flame); box-shadow: 0 0 0 3px rgb(240 78 35 / .18); }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--flame); box-shadow: 0 0 0 3px rgba(240, 78, 35, .18); }
+.picks { border: 0; padding: 0; margin: 0; min-width: 0; }
+.picks legend { padding: 0; margin-bottom: 10px; }
+.picks-in { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick {
+  display: inline-flex; align-items: center; gap: 9px; padding: 9px 14px 9px 10px; cursor: pointer;
+  border-radius: var(--r-full); border: 1.5px solid var(--navy-700); background: var(--navy);
+  color: rgba(255,255,255,.78); font-size: 14.5px; font-weight: 600; line-height: 1.2;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.pick:hover { border-color: rgba(255,255,255,.35); }
+.pick-box { flex: none; width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid rgba(255,255,255,.35); display: inline-flex; align-items: center; justify-content: center; color: transparent; transition: background .15s, border-color .15s, color .15s; }
+.pick.on { border-color: var(--flame); color: #fff; background: rgba(240, 78, 35, .14); background: color-mix(in srgb, var(--flame) 14%, var(--navy)); }
+.pick.on .pick-box { background: var(--flame); border-color: var(--flame); color: #fff; }
 .form-note { font-size: 12.5px; line-height: 1.5; color: var(--ash); margin: 0; }
-.form-done { background: var(--navy-800); border: 1px solid var(--navy-700); border-radius: var(--r-lg); padding: var(--s8) var(--s6); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--s2); }
-.form-done-ic { width: 64px; height: 64px; border-radius: 50%; background: rgb(240 78 35 / .16); color: var(--flame-glow); display: inline-flex; align-items: center; justify-content: center; margin-bottom: var(--s2); }
+.form-note b { color: rgba(255,255,255,.8); font-weight: 600; }
+.form-done { background: var(--navy-800); border: 1px solid var(--navy-700); border-radius: var(--r-lg); padding: var(--s7) var(--s6); text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--s3); }
+.form-done-ic { width: 64px; height: 64px; border-radius: 50%; background: rgba(240, 78, 35, .16); color: var(--flame-glow); display: inline-flex; align-items: center; justify-content: center; }
+.form-done-t { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin: 0; color: #fff; }
+.form-done-acts { display: flex; gap: var(--s2); flex-wrap: wrap; justify-content: center; margin-top: var(--s2); }
+.link-btn { background: none; border: 0; padding: 6px; cursor: pointer; color: var(--ash); font-size: 14.5px; font-weight: 600; }
+.link-btn:hover { color: #fff; }
 
 /* ===== STOPKA ===== */
 .footer { background: var(--navy-900); color: rgba(255,255,255,.55); padding: var(--s7) 0; }
 .footer-in { display: flex; align-items: center; justify-content: space-between; gap: var(--s5); flex-wrap: wrap; font-size: 14px; }
+.footer-c { display: flex; gap: var(--s5); flex-wrap: wrap; }
 .footer a:hover { color: #fff; }
 
 /* ===== PRZYKLEJONY PASEK (mobile) ===== */
 .sticky-cta {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
-  background: var(--cobalt); color: #fff; padding: 10px 16px;
+  background: var(--cobalt); color: #fff; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
   display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
   box-shadow: 0 -8px 28px rgb(14 21 51 / .28);
+  transition: transform .25s ease, visibility 0s;
 }
-.sticky-cta-t { font-size: 13px; line-height: 1.3; }
-.sticky-pad { height: 68px; }
+/* przy formularzu pasek znika — powtarzałby to, co klient ma przed oczami */
+.sticky-cta.off { transform: translateY(110%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s; }
+.sticky-cta-t { font-size: 13px; line-height: 1.3; min-width: 0; }
+.sticky-acts { display: flex; gap: 8px; flex: none; }
+.sticky-call { width: 46px; height: 46px; border-radius: var(--r-sm); border: 1.5px solid rgba(255,255,255,.4); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.sticky-pad { height: 72px; }
 @media (min-width: 861px) { .sticky-cta, .sticky-pad { display: none; } }
+@media (max-width: 359px) { .sticky-cta-t { display: none; } .sticky-acts { flex: 1; } .sticky-acts .btn { flex: 1; } }
 
 /* ===== ANIMACJA WEJŚCIA ===== */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2,0,0,1), transform .7s cubic-bezier(.2,0,0,1); }
@@ -240,7 +437,8 @@ button, input, textarea { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
-  .btn:hover, .snav:hover, .thumb:hover { transform: none; }
+  .btn:hover, .snav:hover, .thumb:hover, .mkt:hover { transform: none; }
+  .sticky-cta { transition: none; }
 }
   </style>
 </head>
@@ -255,18 +453,26 @@ button, input, textarea { font: inherit; color: inherit; }
 const { useState, useEffect, useRef } = React;
 
 /* ============================================================
-   PARAMETRY OFERTY
+   PARAMETRY OFERTY I KONTAKT
    ============================================================
    Wartości domyślne — identyczne z tymi w api/settings.js. Strona pobiera
    aktualne z /api/settings; gdy API nie odpowie (brak bazy, podgląd z dysku),
    zostają poniższe. Zmieniasz je w panelu: /admin-langer/ → Ustawienia →
    „Oferta dla punktów handlowych". */
 const OFFER_DEFAULTS = {
-  landing_cartons:        '10',
-  landing_discount_pct:   '15',
-  landing_pistol_cartons: '5',
-  landing_pistol_price:   '1',
-  landing_phone:          '+48 000 000 000',
+  landing_discount_text: 'kilka procent', // czytane jako „nawet … taniej"
+  landing_pistol_price:  '1',             // '0' = „gratis"
+
+  // Kontakt na tej podstronie. Puste telefon/e-mail = dane z karty
+  // „Dane kontaktowe" (contact_*). Puste osoba/godziny = nie pokazujemy.
+  landing_phone:  '',
+  landing_email:  '',
+  landing_person: '',
+  landing_hours:  '',
+
+  contact_phone:  '+48 000 000 000',
+  contact_email:  'biuro@langerdystrybucja.pl',
+  stat_delivery:  '48 h',
 
   // Identyfikacja wizualna z panelu (Ustawienia → Logo i kolory marki).
   // Puste logo = wbudowany sygnet, tak jak dotąd.
@@ -275,6 +481,28 @@ const OFFER_DEFAULTS = {
   logo_show_text: '1',
   brand_accent:   '#F04E23',
 };
+
+const trim = v => String(v ?? '').trim();
+
+/* Ustawienia z panelu -> gotowe teksty i linki. Jedno miejsce, w którym
+   rozstrzygamy fallbacki, żeby żadna sekcja nie pokazała pustego „za  zł". */
+function terms(o) {
+  const price = trim(o.landing_pistol_price) || '1';
+  const free = Number(price.replace(',', '.')) === 0;
+  const phone = trim(o.landing_phone) || trim(o.contact_phone);
+  const email = trim(o.landing_email) || trim(o.contact_email);
+  return {
+    discount: trim(o.landing_discount_text) || 'kilka procent',
+    pistol: free ? 'gratis' : `za ${price} zł`,      // „pistolet za 1 zł" / „pistolet gratis"
+    pistolBig: free ? 'Gratis' : `${price} zł`,
+    phone,
+    tel: phone ? 'tel:' + phone.replace(/[^+\d]/g, '') : '',
+    email,
+    person: trim(o.landing_person),
+    hours: trim(o.landing_hours),
+    delivery: trim(o.stat_delivery),
+  };
+}
 
 /* Odcień koloru: mix z bielą (t>0) albo czernią (t<0). Jeden wybrany kolor
    akcentu daje komplet odcieni — hover, wciśnięcie, jasne tło ikon. */
@@ -362,6 +590,19 @@ const PRODUCTS = [
   },
 ];
 
+/* Co klient może zaznaczyć w formularzu. Przyciski w sekcjach („Zapytaj
+   o współpracę marketingową", „Dopisz do oferty") zaznaczają właściwą
+   pozycję za niego — dochodzi do formularza z gotowym wyborem. */
+const INTERESTS = [
+  ['langer',    'Langer na półkę'],
+  ['rabat',     'Rabat na inne marki'],
+  ['pistolet',  'Pistolet'],
+  ['marketing', 'Współpraca marketingowa'],
+];
+const INTEREST_DEFAULT = ['langer', 'rabat', 'pistolet'];
+/* Etykieta pistoletu niesie cenę z panelu („Pistolet za 1 zł" / „gratis"). */
+const interestLabel = (k, label, t) => (k === 'pistolet' ? `Pistolet ${t.pistol}` : label);
+
 /* ============================================================
    HOOKI
    ============================================================ */
@@ -381,9 +622,23 @@ function useOffer() {
   return offer;
 }
 
-/* Desktop dostaje duży slider (wariant 1b), telefon — przesuwaną karuzelę
-   kafli (wariant 1c). Renderujemy tylko jeden z nich, żeby nie ładować
-   zdjęć produktów dwa razy. */
+/* Marki z panelu (Ustawienia → Marki) — w schemacie zamówienia pokazujemy
+   konkretne nazwy zamiast „innych marek". Bez API zostaje opis ogólny. */
+function useBrands() {
+  const [list, setList] = useState([]);
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/brands')
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (alive && Array.isArray(d)) setList(d.filter(b => typeof b === 'string' && b.trim())); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  return list;
+}
+
+/* Desktop dostaje duży slider, telefon — przesuwaną karuzelę kafli.
+   Renderujemy tylko jeden z nich, żeby nie ładować zdjęć produktów dwa razy. */
 function useIsMobile(query = '(max-width: 860px)') {
   const [match, setMatch] = useState(() => window.matchMedia(query).matches);
   useEffect(() => {
@@ -394,6 +649,34 @@ function useIsMobile(query = '(max-width: 860px)') {
     return () => mq.removeEventListener('change', on);
   }, [query]);
   return match;
+}
+
+/* Która sekcja jest teraz na środku ekranu — podświetla link w nagłówku. */
+function useActiveSection(ids) {
+  const [active, setActive] = useState('');
+  const key = ids.join();
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    ids.map(id => document.getElementById(id)).filter(Boolean).forEach(el => io.observe(el));
+    return () => io.disconnect();
+  }, [key]);
+  return active;
+}
+
+/* Czy element o danym id jest choć trochę widoczny. */
+function useInView(id) {
+  const [v, setV] = useState(false);
+  useEffect(() => {
+    const el = document.getElementById(id);
+    if (!el || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(([e]) => setV(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [id]);
+  return v;
 }
 
 /* Odsłanianie sekcji przy przewijaniu. Klasę „in" trzyma stan Reacta, a nie
@@ -422,10 +705,29 @@ function Reveal({ as: Tag = 'div', className = '', children, ...rest }) {
 const Svg = ({ s = 18, children }) => (
   <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
 );
-const IArrow = (p) => <Svg {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Svg>;
-const ILeft  = (p) => <Svg {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></Svg>;
-const IPhone = (p) => <Svg {...p}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></Svg>;
-const ICheck = (p) => <Svg {...p}><polyline points="20 6 9 17 4 12"/></Svg>;
+const IArrow   = (p) => <Svg {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Svg>;
+const ILeft    = (p) => <Svg {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></Svg>;
+const IDown    = (p) => <Svg {...p}><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></Svg>;
+const IPhone   = (p) => <Svg {...p}><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></Svg>;
+const IMail    = (p) => <Svg {...p}><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></Svg>;
+const ICheck   = (p) => <Svg {...p}><polyline points="20 6 9 17 4 12"/></Svg>;
+const IPlus    = (p) => <Svg {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></Svg>;
+const IClock   = (p) => <Svg {...p}><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></Svg>;
+const IUser    = (p) => <Svg {...p}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></Svg>;
+const ICopy    = (p) => <Svg {...p}><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 01-1-1V4a1 1 0 011-1h10a1 1 0 011 1v1"/></Svg>;
+const IPercent = (p) => <Svg {...p}><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></Svg>;
+const IGift    = (p) => <Svg {...p}><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M7.5 8a2.5 2.5 0 010-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 010 5"/></Svg>;
+const IStar    = (p) => <Svg {...p}><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></Svg>;
+const IShield  = (p) => <Svg {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></Svg>;
+const ILayers  = (p) => <Svg {...p}><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><line x1="12" y1="13" x2="12" y2="21"/></Svg>;
+const ITruck   = (p) => <Svg {...p}><rect x="1" y="6" width="14" height="11" rx="1"/><path d="M15 9h4l3 3v5h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></Svg>;
+// współpraca marketingowa
+const IVideo   = (p) => <Svg {...p}><rect x="2" y="6" width="14" height="12" rx="2"/><path d="M16 10.5l6-3.5v10l-6-3.5z"/></Svg>;
+const IMega    = (p) => <Svg {...p}><path d="M3 10v4a1 1 0 001 1h3l6 4V5L7 9H4a1 1 0 00-1 1z"/><path d="M16.5 8.5a5 5 0 010 7"/><path d="M19.5 5.5a9 9 0 010 13"/></Svg>;
+const IPin     = (p) => <Svg {...p}><path d="M12 22s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></Svg>;
+const ISearch  = (p) => <Svg {...p}><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/><path d="M19 2.5v4M17 4.5h4"/></Svg>;
+const ICompass = (p) => <Svg {...p}><circle cx="12" cy="12" r="9"/><polygon points="15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5 15.5 8.5"/></Svg>;
+const ITarget  = (p) => <Svg {...p}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></Svg>;
 
 function LangerMark({ size = 38 }) {
   return (
@@ -458,9 +760,9 @@ function showLogoText(cfg = {}) {
 /* ============================================================
    HEADER
    ============================================================ */
-const NAV = [['#rabat', 'Jak działa rabat'], ['#produkty', 'Produkty'], ['#wsparcie', 'Wsparcie punktu']];
+const NAV = [['jak-to-dziala', 'Jak to działa'], ['produkty', 'Produkty'], ['marketing', 'Marketing'], ['faq', 'Pytania']];
 
-function Header({ offer = {} }) {
+function Header({ offer = {}, active }) {
   return (
     <header className="hdr">
       <div className="wrap hdr-in">
@@ -474,12 +776,14 @@ function Header({ offer = {} }) {
           )}
         </a>
         <nav className="hdr-nav">
-          {NAV.map(([href, label]) => <a key={href} href={href} className="hdr-link">{label}</a>)}
+          {NAV.map(([id, label]) => (
+            <a key={id} href={'#' + id} className={'hdr-link' + (active === id ? ' on' : '')} aria-current={active === id ? 'true' : undefined}>{label}</a>
+          ))}
           <a href="/" className="hdr-link hdr-back">← Strona główna</a>
         </nav>
         <div className="hdr-cta">
-          <a href="#kontakt" className="btn btn-dark" style={{ padding: '12px 20px', fontSize: 15 }}>
-            Chcę warunki <IArrow s={17}/>
+          <a href="#kontakt" className="btn btn-flame" style={{ padding: '12px 20px', fontSize: 15 }}>
+            <span className="cta-long">Poproś o ofertę</span><span className="cta-short">Oferta</span> <IArrow s={17}/>
           </a>
         </div>
       </div>
@@ -488,43 +792,116 @@ function Header({ offer = {} }) {
 }
 
 /* ============================================================
-   HERO — mechanizm rabatu na pierwszym planie
+   HERO — zasada w jednym zdaniu, korzyści w czterech kaflach
    ============================================================ */
-function Hero({ offer }) {
-  const cartons = offer.landing_cartons;
-  const pct = offer.landing_discount_pct;
+function Hero({ t }) {
   return (
-    <section className="hero" id="rabat">
+    <section className="hero" id="oferta">
       <Reveal className="wrap hero-in">
         <span className="eyebrow">Oferta dla punktów handlowych</span>
-        <h1 className="h1">Langer na półce obniża cenę całej reszty zamówienia</h1>
+        <h1 className="h1">Bierzesz Langera{'\u00a0'}— <em>zyskujesz</em> na całym zamówieniu</h1>
         <p className="lead">
-          Kup {cartons} kartonów dowolnych produktów Langer w jednym zamówieniu,
-          a pozostałe marki z naszej oferty kupisz {pct}% taniej.
+          Do zamówionych kartonów Langera dokładamy pistolet {t.pistol}, a pozostałe marki
+          z naszej oferty kupisz nawet {t.discount} taniej. Bez sztywnego progu —
+          im więcej Langera w zamówieniu, tym lepsze warunki.
         </p>
         <div className="hero-cta">
-          <a href="#kontakt" className="btn btn-flame">Poproś o ofertę dla punktu <IArrow/></a>
-          <a href="#produkty" className="btn btn-dark">Zobacz produkty</a>
+          <a href="#kontakt" className="btn btn-flame">Poproś o ofertę z rabatami <IArrow/></a>
+          <a href="#jak-to-dziala" className="btn btn-dark">Zobacz, jak to działa <IDown s={17}/></a>
+        </div>
+        <div className="hero-trust">
+          <span><ICheck s={16}/> Odpowiedź w 1 dzień roboczy</span>
+          <span><ICheck s={16}/> Bez zobowiązań</span>
+          <span><ICheck s={16}/> Zwroty bez ryzyka</span>
         </div>
 
         <div className="deal">
           <div className="deal-cell deal-1">
-            <span className="deal-k">Warunek</span>
-            <span className="deal-v">{cartons} kartonów</span>
-            <span className="deal-d">piany, pianokleju lub kleju Langer</span>
+            <span className="deal-k">01 · Bierzesz</span>
+            <span className="deal-v">Langera</span>
+            <span className="deal-d">piany, pianokleje i kleje montażowe — tyle, ile sprzedasz</span>
           </div>
           <div className="deal-cell deal-2">
-            <span className="deal-k">Twoja korzyść</span>
-            <span className="deal-v">−{pct}% na resztę</span>
-            <span className="deal-d">na wszystkie pozostałe marki w koszyku</span>
+            <span className="deal-k">02 · Dostajesz</span>
+            <span className="deal-v">Pistolet {t.pistol}</span>
+            <span className="deal-d">do zamówionych kartonów Langera</span>
           </div>
           <div className="deal-cell deal-3">
-            <span className="deal-k">Gratis</span>
-            <span className="deal-v">Pistolet {offer.landing_pistol_price} zł</span>
-            <span className="deal-d">przy zakupie do {offer.landing_pistol_cartons} kartonów</span>
+            <span className="deal-k">03 · Oszczędzasz</span>
+            <span className="deal-v">Rabat na resztę</span>
+            <span className="deal-d">nawet {t.discount} na pozostałe marki w zamówieniu</span>
+          </div>
+          <div className="deal-cell deal-4">
+            <span className="deal-k">04 · Rośniesz</span>
+            <span className="deal-v">Marketing</span>
+            <span className="deal-d">filmy, reklamy, wizytówka Google — po spełnieniu warunków</span>
           </div>
         </div>
       </Reveal>
+    </section>
+  );
+}
+
+/* ============================================================
+   JAK TO DZIAŁA — cztery kroki + schemat zamówienia
+   ============================================================ */
+function HowItWorks({ t, brands }) {
+  const others = brands.filter(b => b.toLowerCase() !== 'langer').slice(0, 4);
+  const othersLine = others.length ? others.join(' · ') + ' i inne' : 'silikony, akryle, akcesoria i inne marki';
+
+  const steps = [
+    ['Wybierz produkty Langer', 'Piany, pianokleje i kleje montażowe. Bierzesz tyle kartonów, ile realnie sprzedasz — bez sztywnego progu.', '#produkty', 'Zobacz linię Langer'],
+    ['Dobierz resztę asortymentu', 'Silikony, akryle, akcesoria i produkty innych marek z naszej oferty — w tym samym zamówieniu.', '/#baza', 'Przeglądaj katalog'],
+    ['Poproś o ofertę', `Zostaw kontakt albo zadzwoń. Policzymy rabat na Twoim koszyku i dopiszemy pistolet ${t.pistol}.`, '#kontakt', 'Przejdź do formularza'],
+    ['Odbierz towar i sprzedawaj', `${t.delivery ? `Dostawa średnio w ${t.delivery}, prosto` : 'Dostawa prosto'} do Twojego punktu. Przy stałej współpracy pomożemy też sprzedawać — także w internecie.`, '#marketing', 'Współpraca marketingowa'],
+  ];
+
+  return (
+    <section className="sec" id="jak-to-dziala">
+      <div className="wrap">
+        <div className="sec-head">
+          <div className="sec-head-l">
+            <span className="eyebrow">Jak to działa</span>
+            <h2 className="h2">Cztery kroki od zapytania do pełnej półki</h2>
+          </div>
+          <p className="lead sec-head-r">
+            Bez tabel progów i drobnego druku. Zasada jest jedna: bierzesz Langera — zyskujesz na całym zamówieniu.
+          </p>
+        </div>
+
+        <Reveal as="ol" className="steps" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+          {steps.map(([title, desc, href, cta], i) => (
+            <li key={title} className="step">
+              <span className="step-n">{String(i + 1).padStart(2, '0')}</span>
+              <h3 className="step-t">{title}</h3>
+              <p className="step-d">{desc}</p>
+              <a href={href} className="step-a">{cta} {href.startsWith('#') ? <IDown s={15}/> : <IArrow s={15}/>}</a>
+            </li>
+          ))}
+        </Reveal>
+
+        <Reveal className="basket" aria-label="Schemat zamówienia">
+          <span className="basket-k">Tak liczymy Twoje zamówienie</span>
+          <div className="bseg bseg-l">
+            <span className="bseg-k">Langer</span>
+            <span className="bseg-d">piany · pianokleje · kleje</span>
+          </div>
+          <div className="bgain bgain-l">
+            <span className="bgain-ic"><IGift s={17}/></span> Pistolet {t.pistol}
+          </div>
+          <div className="bseg bseg-o">
+            <span className="bseg-k">Pozostałe marki</span>
+            <span className="bseg-d">{othersLine}</span>
+          </div>
+          <div className="bgain bgain-o">
+            <span className="bgain-ic"><IPercent s={17}/></span> Nawet {t.discount} taniej
+          </div>
+          <p className="basket-f">
+            <span className="basket-scale" aria-hidden="true" />
+            <span><strong>Więcej Langera w koszyku = lepsze warunki na resztę.</strong> Konkretne liczby policzymy na Twoim zamówieniu.</span>
+          </p>
+        </Reveal>
+      </div>
     </section>
   );
 }
@@ -553,8 +930,8 @@ function ProductShowcase() {
     <>
       <div className="sec-head">
         <div className="sec-head-l">
-          <span className="eyebrow">Karuzela produktów</span>
-          <h2 className="h2">Co dokładnie stawiasz na półce</h2>
+          <span className="eyebrow">Linia Langer</span>
+          <h2 className="h2">Co stawiasz na półce</h2>
         </div>
         <div className="slider-nav">
           <button className="snav" onClick={prev} aria-label="Poprzedni produkt"><ILeft s={20}/></button>
@@ -608,8 +985,8 @@ function ProductScroller() {
   return (
     <>
       <div className="sec-head-l" style={{ marginBottom: 'var(--s5)' }}>
-        <span className="eyebrow">Produkty</span>
-        <h2 className="h2">Cała linia Langer</h2>
+        <span className="eyebrow">Linia Langer</span>
+        <h2 className="h2">Co stawiasz na półce</h2>
         <span className="pscroll-hint">Przesuń, aby zobaczyć wszystkie {PRODUCTS.length} pozycji →</span>
       </div>
       <div className="pscroll">
@@ -641,45 +1018,128 @@ function ProductScroller() {
   );
 }
 
-function Products() {
+function Products({ want }) {
   const isMobile = useIsMobile();
   return (
     <section className="sec sec-paper" id="produkty">
       <div className="wrap">
         {isMobile ? <ProductScroller /> : <ProductShowcase />}
+        <div className="prod-cta">
+          <p><strong>Nie wiesz, od czego zacząć?</strong> Doradzimy zestaw Langera na start — dobrany do Twojego punktu i Twoich klientów.</p>
+          <a href="#kontakt" className="btn btn-dark" style={{ flex: 'none' }} onClick={() => want('langer')}>
+            Poproś o propozycję <IArrow s={17}/>
+          </a>
+        </div>
       </div>
     </section>
   );
 }
 
 /* ============================================================
-   DLACZEGO WARTO
+   PASEK PISTOLETU
    ============================================================ */
-function Why({ offer }) {
-  const items = [
-    ['01', 'Rabat na inne marki', `${offer.landing_cartons} kartonów Langera obniża o ${offer.landing_discount_pct}% ceny pozostałych marek w tym samym zamówieniu.`],
-    ['02', 'Marketing dla punktu', 'Przy większych zamówieniach wspieramy Twój punkt materiałami i promocją w naszych reklamach.'],
-    ['03', `Pistolet za ${offer.landing_pistol_price} zł`, `Przy zakupie do ${offer.landing_pistol_cartons} kartonów piany lub pianoklejów dokładamy pistolet teflonowy.`],
-    ['04', 'Zwroty bez ryzyka', 'Jeśli towar nie schodzi z półek, przyjmiemy zwrot. Pierwsze zamówienie nic nie ryzykuje.'],
-  ];
+function PistolBand({ t, want }) {
   return (
-    <section className="sec" id="wsparcie">
+    <section className="pistol">
+      <div className="wrap pistol-in">
+        <div className="pistol-l">
+          <span className="pistol-price">{t.pistolBig}</span>
+          <p className="pistol-d">
+            <strong>Pistolet teflonowy {t.pistol} do zamówionych kartonów Langera.</strong>{' '}
+            Zaznacz go w zapytaniu — dopiszemy do oferty.
+          </p>
+        </div>
+        <a href="#kontakt" className="btn btn-light" style={{ flex: 'none' }} onClick={() => want('pistolet')}>Dopisz do oferty</a>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   WSPÓŁPRACA MARKETINGOWA
+   ============================================================
+   Zakres usług dla punktów, które spełnią warunki współpracy. Treść
+   zmieniasz tutaj — kolejność w tablicy = kolejność kafli na stronie. */
+const MARKETING = [
+  [IVideo,   'Wideo',          'Filmy wideo',                      'Tworzenie i edycja filmów: prezentacja punktu, produktów i realizacji. Także krótkie formy na Facebooka, Instagram i YouTube.'],
+  [IMega,    'Reklama płatna', 'Google Ads i Meta Ads',            'Pomoc w ustawieniu i prowadzeniu kampanii w Google oraz na Facebooku i Instagramie — tak, żeby budżet trafiał do kupujących.'],
+  [IPin,     'Lokalnie',       'Wizytówka Google',                 'Profil firmy w Mapach Google: zdjęcia, godziny otwarcia, opinie i wpisy. Klienci z okolicy łatwiej Cię znajdą.'],
+  [ISearch,  'Widoczność',     'SEO i GEO',                        'Widoczność w wyszukiwarce i w odpowiedziach asystentów AI (ChatGPT, Gemini), gdy ktoś szuka chemii budowlanej w Twojej okolicy.'],
+  [ICompass, 'Plan',           'Strategia marketingowa',           'Plan dopasowany do Twojego punktu i budżetu: do kogo mówić, gdzie i z jaką ofertą.'],
+  [ITarget,  'Zasięg',         'Klienci lokalni i ogólnopolscy',   'Docieramy do wykonawców i klientów z Twojej okolicy, a przy sprzedaży wysyłkowej — w całej Polsce.'],
+];
+
+function Marketing({ want }) {
+  return (
+    <section className="sec sec-dark" id="marketing">
       <div className="wrap">
         <div className="sec-head">
           <div className="sec-head-l">
-            <span className="eyebrow">Program partnerski</span>
-            <h2 className="h2">Dlaczego warto nas trzymać na półce</h2>
+            <span className="eyebrow">Współpraca marketingowa</span>
+            <h2 className="h2">Pomożemy Ci sprzedawać więcej{'\u00a0'}— także w{'\u00a0'}internecie</h2>
           </div>
-          <p className="lead" style={{ maxWidth: 340, fontSize: 15.5 }}>
-            Lepsza cena na Langerze plus rabat na resztę zamówienia — korzyść liczy się dwa razy.
-          </p>
+          <div className="sec-head-r" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 14 }}>
+            <span className="pill-note"><IStar s={15}/> Po spełnieniu warunków współpracy</span>
+            <p className="lead lead-dark" style={{ fontSize: 16 }}>
+              Wspieramy punkt marketingowo: od filmów i reklam po widoczność w Google
+              i w asystentach AI. Robimy to, co zwykle zleca się agencji.
+            </p>
+          </div>
         </div>
-        <Reveal className="why">
-          {items.map(([n, t, d]) => (
-            <div key={n} className="why-card">
-              <span className="why-n">{n}</span>
-              <h3 className="why-t">{t}</h3>
-              <p className="why-d">{d}</p>
+
+        <Reveal className="mkt-grid">
+          {MARKETING.map(([Icon, tag, title, desc]) => (
+            <article key={title} className="mkt">
+              <div className="mkt-top">
+                <span className="mkt-ic"><Icon s={24}/></span>
+                <span className="mkt-tag">{tag}</span>
+              </div>
+              <h3 className="mkt-t">{title}</h3>
+              <p className="mkt-d">{desc}</p>
+            </article>
+          ))}
+        </Reveal>
+
+        <div className="mkt-cta">
+          <p><strong>Zakres i warunki ustalamy indywidualnie.</strong> Zapytaj przy okazji oferty — przedstawiciel powie, co jest możliwe dla Twojego punktu.</p>
+          <a href="#kontakt" className="btn btn-flame" style={{ flex: 'none' }} onClick={() => want('marketing')}>
+            Zapytaj o współpracę marketingową <IArrow s={17}/>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   BEZ RYZYKA — ostatnie wątpliwości przed formularzem
+   ============================================================ */
+function Safe({ t }) {
+  const items = [
+    [IShield, 'Zwroty bez ryzyka', 'Jeśli towar nie schodzi z półek, przyjmiemy zwrot. Pierwsze zamówienie nic nie ryzykuje.'],
+    [IUser,   'Opiekun z Twojego regionu', 'Jedna osoba od oferty, zamówień i uzupełnień — zna Twój punkt i asortyment.'],
+    [ILayers, 'Elastyczne ilości', 'Zamawiasz tyle, ile realnie sprzedasz — bez sztywnych minimów.'],
+  ];
+  // „Średni czas realizacji" z panelu (Ustawienia → Liczby w hero). Puste = kafel znika.
+  if (t.delivery) items.push([ITruck, `Dostawa średnio w ${t.delivery}`, 'Prosto do Twojego punktu — od paczki po paletę.']);
+
+  return (
+    <section className="sec sec-tight" id="bez-ryzyka">
+      <div className="wrap">
+        <div className="sec-head" style={{ marginBottom: 'var(--s6)' }}>
+          <div className="sec-head-l">
+            <span className="eyebrow">Bez ryzyka</span>
+            <h2 className="h2">Spróbuj Langera bez obaw</h2>
+          </div>
+        </div>
+        <Reveal className="safe-grid">
+          {items.map(([Icon, title, desc]) => (
+            <div key={title} className="safe-item">
+              <span className="safe-ic"><Icon s={22}/></span>
+              <div>
+                <h3 className="safe-t">{title}</h3>
+                <p className="safe-d">{desc}</p>
+              </div>
             </div>
           ))}
         </Reveal>
@@ -689,73 +1149,191 @@ function Why({ offer }) {
 }
 
 /* ============================================================
-   PASEK PISTOLETU
+   PYTANIA
    ============================================================ */
-function PistolBand({ offer }) {
+function Faq({ t }) {
+  const items = [
+    ['Ile kartonów Langera muszę kupić?',
+      'Nie ma sztywnego progu. Zasada jest prosta: bierzesz Langera — zyskujesz. Im większa część Langera w zamówieniu, tym lepsze warunki na resztę. Konkretne liczby policzymy na Twoim koszyku.'],
+    ['Jak duży jest rabat na pozostałe marki?',
+      `Nawet ${t.discount}. Dokładna wysokość zależy od wielkości zamówienia i udziału Langera — zobaczysz ją czarno na białym w ofercie, zanim cokolwiek zamówisz.`],
+    [`Na czym polega pistolet ${t.pistol}?`,
+      `Do zamówionych kartonów Langera dokładamy pistolet teflonowy ${t.pistol}. Zaznacz go w zapytaniu, a dopiszemy go do oferty.`],
+    ['Czy mogę zamówić same inne marki, bez Langera?',
+      `Tak, cały katalog jest dostępny. Rabat na resztę i pistolet ${t.pistol} działają jednak przy zamówieniu z Langerem — dlatego opłaca się go dorzucić.`],
+    ['Co, jeśli Langer nie zejdzie z półki?',
+      'Przyjmiemy zwrot. Pierwsze zamówienie nic nie ryzykuje.'],
+    ['Kto może liczyć na współpracę marketingową?',
+      'Punkty, które spełnią odpowiednie warunki współpracy. Zakres i warunki ustalamy indywidualnie — zaznacz „Współpraca marketingowa" w formularzu, a przedstawiciel omówi je przy ofercie.'],
+    ['Jak szybko dostanę ofertę?',
+      'Przedstawiciel z Twojego regionu odezwie się w ciągu jednego dnia roboczego.'],
+  ];
   return (
-    <section className="pistol">
-      <div className="wrap pistol-in">
-        <div className="pistol-l">
-          <span className="pistol-price">{offer.landing_pistol_price} zł</span>
-          <p className="pistol-d" style={{ margin: 0 }}>
-            Pistolet teflonowy za złotówkę przy zakupie do {offer.landing_pistol_cartons} kartonów
-            piany lub pianoklejów. Jeden na zamówienie.
+    <section className="sec sec-paper" id="faq">
+      <div className="wrap faq-grid">
+        <div className="faq-side">
+          <span className="eyebrow">Pytania</span>
+          <h2 className="h2">Zanim zapytasz</h2>
+          <p className="lead" style={{ fontSize: 16.5 }}>
+            Najczęstsze pytania właścicieli sklepów i hurtowni. Nie ma tu Twojego? Zadzwoń — odpowiemy od ręki.
           </p>
+          {t.phone && <a href={t.tel} className="faq-phone"><IPhone s={20}/> {t.phone}</a>}
         </div>
-        <a href="#kontakt" className="btn btn-light" style={{ flex: 'none' }}>Dopisz do zamówienia</a>
+        <div className="faq-list">
+          {items.map(([q, a], i) => (
+            <details key={q} className="faq" open={i === 0}>
+              <summary>{q}<span className="faq-ic"><IPlus s={16}/></span></summary>
+              <p className="faq-a">{a}</p>
+            </details>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 /* ============================================================
-   KONTAKT
-   ============================================================ */
-function Contact({ offer }) {
-  const [sent, setSent] = useState(false);
-  const tel = 'tel:' + offer.landing_phone.replace(/[^+\d]/g, '');
+   KONTAKT — „Poproś o ofertę z możliwymi rabatami"
+   ============================================================
+   Formularz nie ma jeszcze własnego serwera do wysyłki. Zamiast udawać
+   wysyłkę, składa gotową wiadomość i otwiera ją w poczcie klienta — adres
+   docelowy to e-mail z panelu (Ustawienia → Oferta dla punktów handlowych,
+   a gdy pusty: Dane kontaktowe). */
+function buildMessage(f, picked, t) {
+  const chosen = INTERESTS.filter(([k]) => picked.includes(k)).map(([k, label]) => '- ' + interestLabel(k, label, t));
+  const subject = `Zapytanie o ofertę dla punktu — ${f.name}${f.city ? ', ' + f.city : ''}`;
+  const body = [
+    'Dzień dobry,',
+    '',
+    'proszę o ofertę dla mojego punktu z możliwymi rabatami.',
+    '',
+    `Punkt: ${f.name}`,
+    `Miejscowość: ${f.city}`,
+    `Telefon: ${f.phone}`,
+    `E-mail: ${f.email || '—'}`,
+    '',
+    'Interesuje mnie:',
+    ...(chosen.length ? chosen : ['- (nie zaznaczono)']),
+    '',
+    'Marki, które zamawiam najczęściej:',
+    f.brands.trim() || '—',
+    '',
+    'Pozdrawiam',
+  ].join('\r\n');
+  return { subject, body };
+}
+
+function Contact({ t, picked, toggle }) {
+  const [f, setF] = useState({ name: '', city: '', phone: '', email: '', brands: '' });
+  const [sent, setSent] = useState(null);       // { href, text } po wysłaniu
+  const [copied, setCopied] = useState(false);
+  const set = k => e => setF(v => ({ ...v, [k]: e.target.value }));
+
+  function submit(e) {
+    e.preventDefault();
+    const { subject, body } = buildMessage(f, picked, t);
+    const href = t.email ? `mailto:${t.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : '';
+    const text = (t.email ? `Do: ${t.email}\r\n` : '') + `Temat: ${subject}\r\n\r\n${body}`;
+    setSent({ href, text });
+    setCopied(false);
+    if (href) window.location.href = href;
+  }
+
+  async function copy() {
+    try { await navigator.clipboard.writeText(sent.text); setCopied(true); }
+    catch (e) { window.prompt('Skopiuj treść zapytania:', sent.text); }
+  }
+
+  const contactInfo = (
+    <div className="direct">
+      <span className="direct-k">Wolisz od razu porozmawiać?</span>
+      {t.phone && <a href={t.tel} className="contact-phone">{t.phone}</a>}
+      {t.email && <a href={'mailto:' + t.email} className="direct-row"><IMail s={17}/> {t.email}</a>}
+      {t.person && <span className="direct-row"><IUser s={17}/> {t.person}</span>}
+      {t.hours && <span className="direct-row direct-meta"><IClock s={17}/> {t.hours}</span>}
+    </div>
+  );
+
   return (
     <section className="sec sec-dark" id="kontakt">
       <div className="wrap contact-grid">
-        <Reveal>
-          <span className="eyebrow">Kontakt</span>
-          <h2 className="h2" style={{ marginTop: 14 }}>Policzmy rabat na Twoim koszyku</h2>
-          <p className="lead lead-dark" style={{ marginTop: 16, maxWidth: '46ch' }}>
-            Zostaw numer — przedstawiciel z Twojego regionu oddzwoni w ciągu jednego dnia
-            roboczego i policzy rabat na Twoim zamówieniu.
+        <Reveal className="contact-intro">
+          <span className="eyebrow">Ostatni krok</span>
+          <h2 className="h2" style={{ marginTop: 14 }}>Poproś o{'\u00a0'}ofertę z{'\u00a0'}możliwymi rabatami</h2>
+          <p className="lead lead-dark" style={{ marginTop: 16, maxWidth: '48ch' }}>
+            Napisz, co sprzedajesz — przygotujemy ofertę z rabatem na pozostałe marki
+            i pistoletem {t.pistol} do kartonów Langera.
           </p>
-          <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <span className="field" style={{ gap: 0 }}>
-              <span>albo od razu</span>
-            </span>
-            <a href={tel} className="contact-phone">{offer.landing_phone}</a>
-          </div>
+          <ol className="next">
+            <li><b>Wysyłasz zapytanie</b><span>Minuta, bez zobowiązań.</span></li>
+            <li><b>Oddzwaniamy</b><span>Przedstawiciel z Twojego regionu — w ciągu jednego dnia roboczego.</span></li>
+            <li><b>Dostajesz ofertę z rabatami</b><span>Czarno na białym. Ty decydujesz, co zamawiasz.</span></li>
+          </ol>
         </Reveal>
 
-        <Reveal>
+        <Reveal className="contact-direct">{contactInfo}</Reveal>
+
+        <Reveal className="contact-form">
           {sent ? (
-            <div className="form-done">
+            <div className="form-done" role="status">
               <span className="form-done-ic"><ICheck s={32}/></span>
-              <h3 className="why-t" style={{ fontSize: 24, color: '#fff' }}>Dziękujemy!</h3>
-              <p className="lead lead-dark" style={{ fontSize: 16 }}>Odezwiemy się w ciągu jednego dnia roboczego.</p>
-              <button className="btn btn-outline" onClick={() => setSent(false)} style={{ marginTop: 12 }}>
-                Wyślij kolejne
-              </button>
+              <h3 className="form-done-t">{sent.href ? 'Wiadomość jest gotowa' : 'Prawie gotowe'}</h3>
+              <p className="lead lead-dark" style={{ fontSize: 16, maxWidth: '42ch' }}>
+                {sent.href
+                  ? <>Otworzyliśmy Twoją pocztę z gotowym zapytaniem do <b style={{ color: '#fff' }}>{t.email}</b> — wystarczy kliknąć „Wyślij". Poczta się nie otworzyła? Skopiuj treść albo zadzwoń.</>
+                  : <>Skopiuj treść zapytania i wyślij ją nam albo po prostu zadzwoń — przygotujemy ofertę.</>}
+              </p>
+              <div className="form-done-acts">
+                {sent.href && <a href={sent.href} className="btn btn-flame"><IMail s={17}/> Otwórz ponownie</a>}
+                <button type="button" className="btn btn-outline" onClick={copy}><ICopy s={17}/> {copied ? 'Skopiowano' : 'Kopiuj treść'}</button>
+              </div>
+              {t.phone && <a href={t.tel} className="contact-phone" style={{ fontSize: 22, marginTop: 8 }}>{t.phone}</a>}
+              <button type="button" className="link-btn" onClick={() => setSent(null)}>← Popraw dane</button>
             </div>
           ) : (
-            <form className="form" onSubmit={e => { e.preventDefault(); setSent(true); }}>
-              <div className="form-row">
-                <label className="field"><span>Nazwa punktu</span><input required placeholder="np. Bud-Mat Kielce"/></label>
-                <label className="field"><span>Telefon</span><input required placeholder="+48 000 000 000" inputMode="tel"/></label>
+            <form className="form" onSubmit={submit}>
+              <div className="form-h">
+                <span className="form-title">Zapytanie o ofertę</span>
+                <span className="form-time">ok. 1 minuty</span>
               </div>
+              <div className="form-row">
+                <label className="field"><span>Nazwa punktu</span>
+                  <input required value={f.name} onChange={set('name')} placeholder="np. Bud-Mat" autoComplete="organization"/>
+                </label>
+                <label className="field"><span>Miejscowość</span>
+                  <input required value={f.city} onChange={set('city')} placeholder="np. Kielce" autoComplete="address-level2"/>
+                </label>
+              </div>
+              <div className="form-row">
+                <label className="field"><span>Telefon</span>
+                  <input required type="tel" value={f.phone} onChange={set('phone')} placeholder="+48 000 000 000" inputMode="tel" autoComplete="tel"/>
+                </label>
+                <label className="field"><span>E-mail (opcjonalnie)</span>
+                  <input type="email" value={f.email} onChange={set('email')} placeholder="sklep@firma.pl" autoComplete="email"/>
+                </label>
+              </div>
+              <fieldset className="picks">
+                <legend>Co Cię interesuje?</legend>
+                <div className="picks-in">
+                  {INTERESTS.map(([k, label]) => {
+                    const on = picked.includes(k);
+                    return (
+                      <button key={k} type="button" className={'pick' + (on ? ' on' : '')} aria-pressed={on} onClick={() => toggle(k)}>
+                        <span className="pick-box"><ICheck s={13}/></span>
+                        {interestLabel(k, label, t)}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
               <label className="field">
-                <span>Co Cię interesuje</span>
-                <textarea rows="3" placeholder="Rabat na pozostałe marki, ekspozycja, pierwsze zamówienie…"></textarea>
+                <span>Jakie marki zamawiasz najczęściej? (opcjonalnie)</span>
+                <textarea rows="3" value={f.brands} onChange={set('brands')} placeholder="np. Soudal, Tytan — pomoże nam policzyć rabat na Twoim koszyku"></textarea>
               </label>
-              <button className="btn btn-flame" type="submit" style={{ width: '100%' }}>Zamów rozmowę <IArrow/></button>
+              <button className="btn btn-flame" type="submit" style={{ width: '100%' }}>Wyślij zapytanie o ofertę <IArrow/></button>
               <p className="form-note">
+                {t.email && <>Otworzy się Twoja poczta z gotową wiadomością do <b>{t.email}</b> — wystarczy kliknąć „Wyślij". </>}
                 Kontakt wyłącznie w sprawie współpracy handlowej.
-                To wersja demonstracyjna — dane nie są nigdzie zapisywane ani wysyłane.
               </p>
             </form>
           )}
@@ -768,7 +1346,7 @@ function Contact({ offer }) {
 /* ============================================================
    STOPKA + PRZYKLEJONY PASEK
    ============================================================ */
-function Footer({ offer = {} }) {
+function Footer({ offer = {}, t }) {
   return (
     <footer className="footer">
       <div className="wrap footer-in">
@@ -781,26 +1359,28 @@ function Footer({ offer = {} }) {
             </span>
           )}
         </a>
-        <span>Montaż bez kompromisów</span>
+        <div className="footer-c">
+          {t.phone && <a href={t.tel}>{t.phone}</a>}
+          {t.email && <a href={'mailto:' + t.email}>{t.email}</a>}
+        </div>
         <a href="/">← Wróć na stronę główną</a>
       </div>
     </footer>
   );
 }
 
-function StickyCta({ offer }) {
-  const tel = 'tel:' + offer.landing_phone.replace(/[^+\d]/g, '');
+function StickyCta({ t, hidden }) {
   return (
     <>
       <div className="sticky-pad" />
-      <div className="sticky-cta">
+      <div className={'sticky-cta' + (hidden ? ' off' : '')}>
         <span className="sticky-cta-t">
-          Pistolet teflonowy<br/>
-          <strong>za {offer.landing_pistol_price} zł</strong> do {offer.landing_pistol_cartons} kartonów
+          <strong>Pistolet {t.pistol}</strong><br/>+ rabat na resztę
         </span>
-        <a href={tel} className="btn btn-light" style={{ padding: '12px 18px', fontSize: 15, flex: 'none' }}>
-          <IPhone s={16}/> Zadzwoń
-        </a>
+        <div className="sticky-acts">
+          {t.tel && <a href={t.tel} className="sticky-call" aria-label={'Zadzwoń: ' + t.phone}><IPhone s={18}/></a>}
+          <a href="#kontakt" className="btn btn-light" style={{ padding: '12px 16px', fontSize: 15 }}>Poproś o ofertę</a>
+        </div>
       </div>
     </>
   );
@@ -811,23 +1391,36 @@ function StickyCta({ offer }) {
    ============================================================ */
 function App() {
   const offer = useOffer();
+  const brands = useBrands();
+  const t = terms(offer);
+  const active = useActiveSection(['oferta', ...NAV.map(([id]) => id), 'bez-ryzyka', 'kontakt']);
+  const atContact = useInView('kontakt');
+
+  // Zaznaczenia w formularzu żyją tutaj, bo zmieniają je też przyciski
+  // w innych sekcjach („Zapytaj o współpracę marketingową" itd.).
+  const [picked, setPicked] = useState(INTEREST_DEFAULT);
+  const want = k => setPicked(p => (p.includes(k) ? p : [...p, k]));
+  const toggle = k => setPicked(p => (p.includes(k) ? p.filter(x => x !== k) : [...p, k]));
 
   // Kolor akcentu z panelu — podmienia --flame i odcienie pochodne na całej
-  // podstronie (przyciski, odznaki, pasek pistoletu).
+  // podstronie (przyciski, odznaki, kafle).
   useEffect(() => { applyAccent(offer.brand_accent); }, [offer.brand_accent]);
 
   return (
     <div id="top">
-      <Header offer={offer} />
+      <Header offer={offer} active={active} />
       <main>
-        <Hero offer={offer} />
-        <Products />
-        <Why offer={offer} />
-        <PistolBand offer={offer} />
-        <Contact offer={offer} />
+        <Hero t={t} />
+        <HowItWorks t={t} brands={brands} />
+        <Products want={want} />
+        <PistolBand t={t} want={want} />
+        <Marketing want={want} />
+        <Safe t={t} />
+        <Faq t={t} />
+        <Contact t={t} picked={picked} toggle={toggle} />
       </main>
-      <Footer offer={offer} />
-      <StickyCta offer={offer} />
+      <Footer offer={offer} t={t} />
+      <StickyCta t={t} hidden={atContact} />
     </div>
   );
 }

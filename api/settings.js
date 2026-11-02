@@ -7,14 +7,21 @@ const sql = neon(process.env.DATABASE_URL);
 // Te same wartości są zaszyte w /dla-punktow/index.html — strona działa
 // poprawnie także wtedy, gdy API jest niedostępne.
 const DEFAULTS = {
-  landing_cartons:        '10',
-  landing_discount_pct:   '15',
-  landing_pistol_cartons: '5',
-  landing_pistol_price:   '1',
-  landing_phone:          '+48 000 000 000',
+  // Oferta na /dla-punktow/ — bez sztywnego progu kartonów: „bierzesz
+  // Langera, zyskujesz". Rabat to tekst czytany jako „nawet … taniej".
+  landing_discount_text:  'kilka procent',
+  landing_pistol_price:   '1',   // '0' = pistolet „gratis"
+
+  // Kontakt na /dla-punktow/. Puste telefon/e-mail = podstrona bierze
+  // contact_phone / contact_email. Puste osoba/godziny = nie pokazujemy.
+  landing_phone:          '',
+  landing_email:          '',    // tu trafiają zapytania z formularza
+  landing_person:         '',
+  landing_hours:          '',
 
   // Dane kontaktowe strony głównej — panel → Ustawienia → „Dane kontaktowe".
-  // Podmieniają się globalnie: sekcja „Kontakt" i stopka.
+  // Podmieniają się globalnie: sekcja „Kontakt" i stopka (oraz /dla-punktow/,
+  // gdy pola landing_phone / landing_email są puste).
   contact_phone:  '+48 000 000 000',
   contact_email:  'biuro@langerdystrybucja.pl',
   contact_street: 'ul. Przykładowa 00',

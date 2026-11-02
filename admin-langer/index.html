@@ -254,20 +254,28 @@ const DEFAULT_CATEGORIES = [
    siedzą w api/settings.js i w samej podstronie — tu są fallbackiem na czas
    ładowania i gdy brak migracji 004. */
 const DEFAULT_OFFER = {
-  landing_cartons:        '10',
-  landing_discount_pct:   '15',
-  landing_pistol_cartons: '5',
-  landing_pistol_price:   '1',
-  landing_phone:          '+48 000 000 000',
+  landing_discount_text: 'kilka procent',
+  landing_pistol_price:  '1',
+  landing_phone:         '',
+  landing_email:         '',
+  landing_person:        '',
+  landing_hours:         '',
 };
 
-/* Pola karty „Oferta dla punktów handlowych" — kolejność jak na formularzu. */
+/* Pola karty „Oferta dla punktów handlowych" — kolejność jak na formularzu.
+   Bez progu kartonów: zasada na stronie to „bierzesz Langera — zyskujesz". */
 const OFFER_FIELDS = [
-  { key: 'landing_cartons',        label: 'Kartonów Langera',      unit: 'kartonów', type: 'number', min: 1,  hint: 'Ile kartonów trzeba kupić, żeby dostać rabat.' },
-  { key: 'landing_discount_pct',   label: 'Rabat na inne marki',   unit: '%',        type: 'number', min: 0,  hint: 'O tyle taniej klient kupi pozostałe marki w tym samym zamówieniu.' },
-  { key: 'landing_pistol_cartons', label: 'Pistolet — próg',       unit: 'kartonów', type: 'number', min: 1,  hint: 'Do ilu kartonów piany/pianokleju dokładacie pistolet.' },
-  { key: 'landing_pistol_price',   label: 'Pistolet — cena',       unit: 'zł',       type: 'number', min: 0,  hint: 'Cena pistoletu teflonowego przy spełnieniu progu.' },
-  { key: 'landing_phone',          label: 'Telefon na podstronie', unit: '',         type: 'text',            hint: 'Wyświetlany w sekcji kontakt i pod przyciskiem „Zadzwoń".' },
+  { key: 'landing_discount_text', label: 'Rabat na pozostałe marki', unit: 'tekst', type: 'text',             placeholder: 'kilka procent', hint: 'Jak ma brzmieć po słowie „nawet": „kilka procent", „3%", „do 5%". Puste = „kilka procent".' },
+  { key: 'landing_pistol_price',  label: 'Pistolet — cena',          unit: 'zł',    type: 'number', min: 0,   placeholder: '1',             hint: 'Pistolet teflonowy do zamówionych kartonów Langera. 0 = na stronie „gratis".' },
+];
+
+/* Kontakt na podstronie. Puste telefon i e-mail = dane z karty „Dane
+   kontaktowe" (podpowiedź widać w polu na szaro). */
+const LANDING_CONTACT_FIELDS = [
+  { key: 'landing_phone',  label: 'Telefon',            type: 'tel',   fallback: 'contact_phone', hint: 'Sekcja kontakt, pytania, stopka i przycisk „Zadzwoń" na telefonie.' },
+  { key: 'landing_email',  label: 'E-mail na zapytania', type: 'email', fallback: 'contact_email', hint: 'Na ten adres formularz „Poproś o ofertę" składa gotową wiadomość.' },
+  { key: 'landing_person', label: 'Osoba kontaktowa',   type: 'text',  placeholder: 'np. Jan Kowalski — przedstawiciel handlowy', hint: 'Opcjonalnie. Puste = nie pokazujemy.' },
+  { key: 'landing_hours',  label: 'Godziny kontaktu',   type: 'text',  placeholder: 'np. pn–pt 8:00–16:00', hint: 'Opcjonalnie. Puste = nie pokazujemy.' },
 ];
 /* Identyfikacja wizualna + dane kontaktowe. Te same wartości domyślne siedzą
    w api/settings.js — tu są fallbackiem na czas ładowania i gdy brak migracji. */
@@ -2070,50 +2078,69 @@ function useCardSave(st, keys) {
   return { busy, err, saved, submit, touch: () => setSaved(false) };
 }
 
-/* Parametry oferty pokazywanej na /dla-punktow/. Zmiana tutaj = zmiana
-   liczb w nagłówku, kaflach, sekcji „Dlaczego warto" i pasku pistoletu —
+/* Parametry oferty i kontakt pokazywane na /dla-punktow/. Zmiana tutaj =
+   zmiana nagłówka, kafli, paska pistoletu, pytań i sekcji kontakt —
    podstrona pobiera je z /api/settings przy każdym wejściu. */
 function OfferSettings({ st }) {
-  const keys = OFFER_FIELDS.map(f => f.key);
+  const keys = [...OFFER_FIELDS, ...LANDING_CONTACT_FIELDS].map(f => f.key);
   const { busy, err, saved, submit, touch } = useCardSave(st, keys);
   const { values, loading } = st;
 
-  const cartons = values.landing_cartons || '—';
-  const pct = values.landing_discount_pct || '—';
+  // Te same zasady co na podstronie (funkcja terms() w dla-punktow/index.html)
+  const discount = (values.landing_discount_text || '').trim() || 'kilka procent';
+  const price = String(values.landing_pistol_price ?? '').trim() || '1';
+  const pistol = Number(price.replace(',', '.')) === 0 ? 'gratis' : `za ${price} zł`;
+  const phone = (values.landing_phone || '').trim() || (values.contact_phone || '').trim();
+  const email = (values.landing_email || '').trim() || (values.contact_email || '').trim();
+
+  const field = f => (
+    <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <span style={{ fontSize: 13, fontWeight: 700 }}>
+        {f.label}{f.unit && <span className="muted" style={{ fontWeight: 400 }}> ({f.unit})</span>}
+      </span>
+      <input
+        type={f.type}
+        min={f.min}
+        value={values[f.key] ?? ''}
+        placeholder={f.fallback ? (values[f.fallback] || '') : (f.placeholder || '')}
+        disabled={loading}
+        onChange={e => { st.set(f.key, e.target.value); touch(); }}
+        style={{ padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }}
+      />
+      <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
+        {f.hint}{f.fallback && ' Puste = to samo co w karcie „Dane kontaktowe".'}
+      </span>
+    </label>
+  );
+  const grid = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 };
+  const sub = { margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--ash-700)' };
 
   return (
     <div className="adm-card">
       <h2 className="adm-card-h">Oferta dla punktów handlowych</h2>
       <p className="adm-card-d">
-        Liczby z podstrony <a href="/dla-punktow/?fresh=1" target="_blank" rel="noopener" className="mono">/dla-punktow/</a>.
+        Warunki i kontakt z podstrony <a href="/dla-punktow/?fresh=1" target="_blank" rel="noopener" className="mono">/dla-punktow/</a>.
         Zapisane wartości podmieniają się na stronie od razu — bez wgrywania kodu.
       </p>
 
       {err && <div className="login-err">{err}</div>}
 
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-          {OFFER_FIELDS.map(f => (
-            <label key={f.key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 700 }}>
-                {f.label}{f.unit && <span className="muted" style={{ fontWeight: 400 }}> ({f.unit})</span>}
-              </span>
-              <input
-                type={f.type}
-                min={f.min}
-                value={values[f.key] ?? ''}
-                disabled={loading}
-                onChange={e => { st.set(f.key, e.target.value); touch(); }}
-                style={{ padding: '10px 12px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15 }}
-              />
-              <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>{f.hint}</span>
-            </label>
-          ))}
-        </div>
+        <h3 style={sub}>Warunki</h3>
+        <div style={grid}>{OFFER_FIELDS.map(field)}</div>
 
         <p className="muted" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>
-          Podgląd zdania z nagłówka: <em>„Kup {cartons} kartonów dowolnych produktów Langer
-          w jednym zamówieniu, a pozostałe marki z naszej oferty kupisz {pct}% taniej."</em>
+          Podgląd zdania z nagłówka: <em>„Do zamówionych kartonów Langera dokładamy pistolet {pistol},
+          a pozostałe marki z naszej oferty kupisz nawet {discount} taniej."</em>
+        </p>
+
+        <h3 style={{ ...sub, marginTop: 8 }}>Kontakt na podstronie</h3>
+        <div style={grid}>{LANDING_CONTACT_FIELDS.map(field)}</div>
+
+        <p className="muted" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>
+          Na stronie: <strong>{phone || '— brak telefonu —'}</strong> · {email || '— brak e-maila —'}
+          {values.landing_person && <> · {values.landing_person}</>}
+          {values.landing_hours && <> · {values.landing_hours}</>}
         </p>
 
         <div className="gap-2" style={{ alignItems: 'center' }}>
@@ -2392,7 +2419,7 @@ function ContactSettings({ st }) {
       <h2 className="adm-card-h">Dane kontaktowe</h2>
       <p className="adm-card-d">
         Telefon, e-mail i adres z sekcji „Kontakt" oraz stopki na <a href="/?fresh=1" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
-        Zapis podmienia je we wszystkich miejscach naraz.
+        Zapis podmienia je we wszystkich miejscach naraz — także na /dla-punktow/, jeśli w karcie oferty pola kontaktu są puste.
       </p>
 
       {err && <div className="login-err">{err}</div>}
