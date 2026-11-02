@@ -301,59 +301,110 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .footer-bottom { display: flex; justify-content: space-between; padding-top: 28px; color: rgba(255,255,255,.45); font-size: 13px; }
 
 /* ===== CATALOG ===== */
-/* Wybór idzie od góry do dołu: kategoria (kafelki) -> podkategoria -> marka.
-   Każdy poziom pokazuje TYLKO to, co realnie jest w bieżącym zawężeniu, i ile
-   tego jest — nie da się kliknąć w pustkę. */
-.pick { margin-bottom: 20px; }
-.pick-h { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
-.pick-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
-.pick-hint { font-size: 13px; color: var(--ash); }
-.pick-hint.warn { color: var(--flame-600); font-weight: 600; }
+/* Kategoria = nawigacja: zakładki, zawsze dokładnie jedna aktywna.
+   Rodzaj i marka = filtry wewnątrz kategorii.
+   Zaznaczenie to wypełnienie, najechanie to tylko ramka — nic nie podskakuje,
+   więc najechanego nie da się pomylić z wybranym. */
+.cbar { margin-bottom: 16px; }
+.cbar-sentinel { height: 1px; margin-bottom: -1px; }
+.ctabs { position: relative; display: flex; flex-wrap: wrap; gap: 8px; }
+.ctab { flex: none; display: inline-flex; align-items: center; gap: 9px; height: 44px; padding: 0 18px;
+  border: 1.5px solid var(--line-2); border-radius: var(--r-full); background: var(--white); color: var(--navy);
+  font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: -.01em; white-space: nowrap;
+  transition: border-color .12s, background .12s, color .12s; }
+.ctab:hover { border-color: var(--navy); }
+.ctab.on { background: var(--navy); border-color: var(--navy); color: #fff; cursor: default; }
+.ctab-n { font-size: 11.5px; color: var(--ash); font-weight: 500; }
+.ctab.on .ctab-n { color: rgb(255 255 255 / 0.62); }
+.ctab.zero:not(.on) { color: var(--ash-700); }
+.ctab:focus-visible, .chip:focus-visible, .tbtn:focus-visible, .fchip:focus-visible, .fclear:focus-visible,
+.sheet-x:focus-visible, .bmenu-ok:focus-visible, .bmenu-clear:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
 
-.ctiles { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-.ctile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-height: 108px; padding: 14px;
-  border: 1.5px solid var(--line); border-radius: var(--r-md); background: var(--white); color: var(--navy); text-align: left;
-  transition: transform .14s, box-shadow .14s, border-color .14s, background .14s, color .14s; }
-.ctile:hover:not(:disabled) { transform: translateY(-3px); box-shadow: var(--e2); border-color: transparent; }
-.ctile:active:not(:disabled) { transform: translateY(-1px); box-shadow: var(--e1); }
-.ctile.on { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: var(--e2); }
-.ctile:disabled { opacity: .38; cursor: not-allowed; }
-/* Wygaszone = „ta marka nie ma tu nic", ale wejść wolno (klik zdejmie markę).
-   Inaczej filtr marki zamyka drogę powrotną do reszty oferty. */
-.ctile.dim, .chip.dim { opacity: .45; }
-.ctile.dim:hover, .chip.dim:hover { opacity: 1; }
-.ctile-ic { color: var(--flame); display: block; }
-.ctile.on .ctile-ic { color: var(--flame-glow); }
-.ctile-t { font-family: var(--font-display); font-weight: 700; font-size: 14.5px; line-height: 1.15; letter-spacing: -.02em; }
-.ctile-n { font-family: var(--font-mono); font-size: 11.5px; color: var(--ash); margin-top: auto; }
-.ctile.on .ctile-n { color: rgb(255 255 255 / 0.6); }
-.ctile-all { background: var(--light); border-style: dashed; }
-.ctile-all.on { background: var(--navy); border-style: solid; }
+/* Rodzaj (komputer) — rząd pigułek pod zakładkami, tylko w wybranej kategorii */
+.subrow { display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px; }
+.subrow .chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.subrow-k { flex: none; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ash-700); font-weight: 600; }
 
-/* Numer kroku przy etykiecie — „1 Wybierz kategorię", „2 Podkategoria"… */
-.pick-no { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-right: 7px;
-  border-radius: 50%; background: var(--navy); color: #fff; font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; }
+/* Pasek narzędzi: marka, wybrane marki, licznik, sortowanie */
+.tools { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; padding-top: 16px;
+  border-top: 1px solid var(--line-2); }
+.tools-r { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+.res-count { font-size: 15px; color: var(--ash-700); font-weight: 600; white-space: nowrap; }
+.res-count .num { color: var(--navy); font-size: 18px; }
+.tbtn { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 14px; flex: none;
+  border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--white); color: var(--navy);
+  font-size: 14.5px; font-weight: 700; transition: border-color .12s; }
+.tbtn:hover, .tbtn.on, .tbtn[aria-expanded="true"] { border-color: var(--navy); }
+.tbtn-n { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: var(--r-full); background: var(--flame); color: #fff; font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
 
-/* Pasek kroku (telefon): gdzie jestem + jedno tapnięcie wstecz */
-.step-bar { position: sticky; top: var(--header-h); z-index: 20; display: flex; align-items: center; gap: 12px;
-  margin: 0 -20px 16px; padding: 10px 20px; background: var(--white); border-bottom: 1px solid var(--line);
-  box-shadow: 0 6px 16px -12px rgb(14 21 51 / 0.4); }
-.step-back { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 8px 12px 8px 8px;
-  border-radius: var(--r-full); background: var(--light); color: var(--navy); font-size: 13.5px; font-weight: 700; }
-.step-back:active { background: var(--line); }
-.step-now { min-width: 0; margin-left: auto; display: flex; align-items: baseline; gap: 8px; }
-.step-now strong { font-family: var(--font-display); font-size: 14.5px; letter-spacing: -.02em;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.step-now .num { flex: none; font-size: 12px; color: var(--ash); }
+.bmenu { position: relative; }
+.bmenu-pop { position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; width: 290px; padding: 6px;
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--r-md); box-shadow: var(--e2); }
+.bmenu-pop .olist { max-height: 340px; overflow-y: auto; }
+.bmenu-f { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 4px 2px; margin-top: 4px;
+  border-top: 1px solid var(--line); }
+.bmenu-clear { font-size: 13.5px; font-weight: 600; color: var(--ash-700); padding: 7px 8px; border-radius: var(--r-sm); }
+.bmenu-clear:hover:not(:disabled) { color: var(--navy); }
+.bmenu-clear:disabled { opacity: .4; cursor: default; }
+.bmenu-ok { font-size: 13.5px; font-weight: 700; color: #fff; background: var(--navy); border-radius: var(--r-sm); padding: 8px 16px; }
+.bmenu-ok:hover { background: var(--navy-800); }
 
-.crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; font-size: 14px; }
-.crumb { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: var(--r-full);
-  background: var(--navy); color: #fff; font-weight: 600; }
-.crumb-x { display: inline-flex; opacity: .7; }
-.crumb-x:hover { opacity: 1; }
-.crumb-sep { color: var(--ash); }
-.crumb-home { color: var(--ash-700); font-weight: 600; }
-.crumb-home:hover { color: var(--navy); }
+/* Wiersze opcji (pole wyboru / jednokrotny wybór) — wspólne dla menu i panelu */
+.olist { display: flex; flex-direction: column; }
+.orow { position: relative; display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 8px 10px;
+  border-radius: var(--r-sm); cursor: pointer; font-size: 15px; font-weight: 600; color: var(--navy); line-height: 1.25; }
+.orow:hover { background: var(--light); }
+.orow input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.orow-mark { flex: none; width: 21px; height: 21px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1.5px solid var(--line-2); border-radius: 50%; background: var(--white); color: #fff; transition: background .12s, border-color .12s; }
+.orow.multi .orow-mark { border-radius: 5px; }
+.orow-mark svg { opacity: 0; stroke-width: 3px; }
+.orow.on .orow-mark { border-color: var(--navy); }
+.orow.multi.on .orow-mark { background: var(--navy); }
+.orow.multi.on .orow-mark svg { opacity: 1; }
+.orow:not(.multi).on .orow-mark::after { content: ''; width: 11px; height: 11px; border-radius: 50%; background: var(--navy); }
+.orow input:focus-visible + .orow-mark { outline: 2px solid var(--flame); outline-offset: 2px; }
+.orow-t { flex: 1; min-width: 0; }
+.orow-n { flex: none; font-size: 12px; color: var(--ash); }
+.orow.off { opacity: .4; cursor: default; }
+.orow.off:hover { background: none; }
+
+/* Wybrane filtry jako chipy z ✕ */
+.applied { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.fchip { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 10px 0 14px; flex: none;
+  border-radius: var(--r-full); background: var(--cobalt-tint); color: var(--navy); font-size: 14px; font-weight: 600; }
+.fchip svg { opacity: .55; }
+.fchip:hover { background: #D7DDF4; }
+.fchip:hover svg { opacity: 1; }
+.fclear { font-size: 14px; font-weight: 600; color: var(--flame-600); padding: 6px 6px; }
+.fclear:hover { text-decoration: underline; }
+
+/* Panel filtrów (telefon) — od dołu, na całą szerokość */
+.sheet-wrap { position: fixed; inset: 0; z-index: 300; display: flex; flex-direction: column; justify-content: flex-end; }
+.sheet-bg { position: absolute; inset: 0; background: rgb(8 12 34 / 0.5); animation: sheet-fade .2s ease-out; }
+.sheet { position: relative; display: flex; flex-direction: column; max-height: 86vh; max-height: 86dvh;
+  background: var(--white); border-radius: 18px 18px 0 0; box-shadow: 0 -12px 40px -12px rgb(8 12 34 / 0.4);
+  animation: sheet-up .26s cubic-bezier(.2,.8,.2,1); }
+.sheet-h { display: flex; align-items: center; justify-content: space-between; padding: 12px 10px 10px 20px; border-bottom: 1px solid var(--line); }
+.sheet-h strong { font-family: var(--font-display); font-size: 19px; letter-spacing: -.02em; }
+.sheet-x { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--navy); }
+.sheet-x:active { background: var(--light); }
+.sheet-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 6px 10px 14px; }
+.sheet-sec + .sheet-sec { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.sheet-k { padding: 12px 10px 4px; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ash-700); font-weight: 600; }
+.sheet-empty { padding: 18px 10px; margin: 0; color: var(--ash-700); font-size: 15px; }
+.sheet-f { display: flex; gap: 10px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); }
+.sheet-f .btn { padding: 14px 16px; font-size: 15px; }
+.sheet-f .btn-dark { flex: 1; }
+.sheet-f .btn:disabled { opacity: .4; cursor: default; }
+@keyframes sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes sheet-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sheet, .sheet-bg { animation: none; } }
+
+.empty-act { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 8px; }
 
 .load-more { display: flex; justify-content: center; margin-top: 30px; }
 
@@ -363,7 +414,6 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   align-items: end; margin-bottom: 22px; }
 .h-base { font-size: clamp(26px, 3vw, 38px); letter-spacing: -.03em; margin-top: 12px; }
 
-.base-toolbar { display: flex; gap: 16px; align-items: center; margin-bottom: 20px; }
 .search { flex: 1; display: flex; align-items: center; gap: 12px; background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 0 16px; transition: border-color .15s, box-shadow .15s; }
 .search:focus-within { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
 .search svg { color: var(--ash); flex: none; }
@@ -375,19 +425,6 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .sortbox label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; }
 .sortbox select { font-family: var(--font-text); font-size: 15px; font-weight: 600; color: var(--navy); background: var(--white); border: 1.5px solid var(--line-2); border-radius: var(--r-sm); padding: 13px 14px; cursor: pointer; }
 .sortbox select:focus { outline: none; border-color: var(--navy); }
-/* min-width:0 w całym łańcuchu — bez tego przewijany poziomo pasek chipów
-   rozpycha stronę na szerokość swojej zawartości i cały layout jedzie w bok. */
-.filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; min-width: 0; }
-.filter-line { display: flex; align-items: baseline; gap: 16px; min-width: 0; }
-.filter-line .chips { min-width: 0; }
-.filter-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ash-700); font-weight: 600; flex: none; width: 132px; padding-top: 7px; display: flex; align-items: center; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.base-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; font-size: 15px; color: var(--ash-700); font-weight: 600; }
-.base-meta .sortbox { margin-left: auto; }
-.base-meta .sortbox select { padding: 9px 12px; font-size: 14px; }
-.base-meta .num { color: var(--navy); font-size: 18px; }
-.base-clear { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--flame); border: 1px solid var(--flame-tint); background: var(--flame-tint); padding: 6px 12px; border-radius: var(--r-full); }
-.base-clear:hover { background: var(--flame); color: #fff; }
 .pgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .pcard { background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s, border-color .2s; }
 .pcard:hover { transform: translateY(-4px); box-shadow: var(--e2); border-color: transparent; }
@@ -415,7 +452,6 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1080px){
-  .ctiles { grid-template-columns: repeat(4, 1fr); }
   .why-grid { grid-template-columns: repeat(2, 1fr); }
   .proc-grid { grid-template-columns: repeat(2, 1fr); gap: 36px 24px; }
   .pgrid { grid-template-columns: repeat(3, 1fr); }
@@ -428,7 +464,6 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .hdr-burger { display: inline-flex; }
   .hero-navy-in { grid-template-columns: 1fr; gap: 28px; }
   .hero-facts { padding: 18px 20px; gap: 16px; }
-  .ctiles { grid-template-columns: repeat(3, 1fr); }
   .contact-grid, .footer-in { grid-template-columns: 1fr; gap: 40px; }
 }
 @media (max-width: 680px){
@@ -440,36 +475,38 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   .pcard-name { font-size: 15px; }
   .pcard-variant, .pcard-pack { font-size: 12.5px; }
   .pcard-foot { flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 10px; }
-  .ctiles { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  /* Kafelek kładzie się na bok: 11 kategorii w dwóch kolumnach zajmuje wtedy
-     ekran, a nie trzy — do produktów jest bliżej. */
-  .ctile { flex-direction: row; align-items: center; gap: 10px; min-height: 58px; padding: 10px 12px; }
-  .ctile-ic svg { width: 20px; height: 20px; }
-  .ctile-t { font-size: 13.5px; }
-  .ctile-n { margin: 0 0 0 auto; font-size: 11px; }
   .base-head { grid-template-columns: 1fr; gap: 14px; align-items: stretch; }
-  /* Krok 2 na telefonie to kafelki, nie pigułki — kafelek „Wszystkie w kategorii"
-     bywa dłuższy, więc łamiemy tekst zamiast go ucinać. */
-  .ctile-t { overflow-wrap: break-word; hyphens: auto; }
   .h-base { margin-top: 10px; }
-  .pick-hint { display: none; }
-  .pick-hint.warn { display: block; width: 100%; font-size: 12.5px; line-height: 1.4; }
-  .base-meta { flex-wrap: wrap; gap: 10px; }
-  /* Pigułki zawijają się do kolejnych linii — na telefonie nic nie może chować
-     się poza krawędzią, bo nikt tego nie znajdzie. */
-  .filter-line .chips { flex-wrap: wrap; width: 100%; }
-  .chip { padding: 9px 14px; }
+  /* Katalog na telefonie: pasek kategorii + „Filtry" przykleja się pod
+     nagłówkiem. Zakładki przewijają się w poziomie od krawędzi do krawędzi
+     ekranu; brzeg, za którym coś jest, wygasa — widać, że pasek idzie dalej. */
+  .cbar { position: sticky; top: var(--header-h); z-index: 20; margin: 0 -20px 14px; padding: 10px 0;
+    background: var(--light); border-bottom: 1px solid transparent; transition: background .2s, box-shadow .2s, border-color .2s; }
+  .cbar.stuck { background: var(--white); border-bottom-color: var(--line); box-shadow: 0 10px 20px -16px rgb(14 21 51 / 0.5); }
+  .ctabs { flex-wrap: nowrap; gap: 7px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; padding-left: 20px; }
+  .ctabs::-webkit-scrollbar { display: none; }
+  .ctabs::after { content: ''; flex: 0 0 13px; }
+  .ctabs.fr { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+              mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent); }
+  .ctabs.fl { -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent);
+              mask-image: linear-gradient(to left, #000 calc(100% - 48px), transparent); }
+  .ctabs.fl.fr { -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+                 mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent); }
+  .ctab { height: 40px; padding: 0 15px; gap: 7px; font-size: 14.5px; }
+  .cbar-tools { display: flex; align-items: center; gap: 8px; padding: 10px 20px 0; }
+  .cbar-tools .tbtn { height: 40px; padding: 0 12px; font-size: 14px; }
+  .cbar-tools .sortbox label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .cbar-tools .sortbox select { height: 40px; padding: 0 8px; font-size: 14px; }
+  .cbar-tools .res-count { margin-left: auto; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+  .cbar-tools .res-count .num { font-size: 14px; }
+  .fchip { height: 34px; font-size: 13.5px; }
   .hero-navy { padding: calc(var(--header-h) + 28px) 0 32px; }
   .hero-cats { margin-top: 22px; gap: 7px; }
   .hcat { padding: 8px 13px; font-size: 13px; }
   .pcard-sub { display: none; }
-  .base-meta .sortbox { margin-left: 0; }
   .lcar-track { grid-auto-columns: 78%; }
   .lcar-nav { display: none; }
   .form-row { grid-template-columns: 1fr; }
-  .base-toolbar { flex-direction: column; align-items: stretch; }
-  .filter-line { flex-direction: column; gap: 8px; }
-  .filter-k { width: auto; padding-top: 0; }
   .footer-cols { grid-template-columns: 1fr; }
   .footer-bottom { flex-direction: column; gap: 8px; }
   .marquee-item { font-size: 20px; }
@@ -766,6 +803,8 @@ const IPin   = (p) => <Svg {...p}><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 1
 const ICheck = (p) => <Svg {...p}><path d="M20 6L9 17l-5-5"/></Svg>;
 const IMenu  = (p) => <Svg {...p}><path d="M3 6h18M3 12h18M3 18h18"/></Svg>;
 const IX     = (p) => <Svg {...p}><path d="M6 6l12 12M18 6L6 18"/></Svg>;
+const IChevron = (p) => <Svg {...p}><path d="M6 9l6 6 6-6"/></Svg>;
+const IFilter  = (p) => <Svg {...p}><path d="M4 6h16M7 12h10M10 18h4"/></Svg>;
 
 /* Category icon SVGs (inline, stroke-based, currentColor) */
 function CatIcon({ name, size = 48 }) {
@@ -1340,8 +1379,8 @@ function ProductTile({ p }) {
   );
 }
 
-/* Czy jesteśmy na wąskim ekranie. Telefon dostaje inny sposób wybierania —
-   nie „wszystko naraz, część za krawędzią", tylko jeden krok na ekranie. */
+/* Czy jesteśmy na wąskim ekranie (telefon). Tam filtry siedzą w panelu
+   wysuwanym od dołu, a zakładki kategorii przewijają się w poziomie. */
 function useNarrow(query = '(max-width: 680px)') {
   const [narrow, setNarrow] = useState(() => window.matchMedia(query).matches);
   useEffect(() => {
@@ -1365,27 +1404,244 @@ function plProducts(n) {
   return (t >= 2 && t <= 4 && !(h >= 12 && h <= 14)) ? 'produkty' : 'produktów';
 }
 
+/* „Soudal", „Soudal i Tytan", „Soudal, Tytan i Penosil" */
+const joinPl = (arr) => arr.length < 2 ? arr.join('') : arr.slice(0, -1).join(', ') + ' i ' + arr[arr.length - 1];
+
 const subKey = (p) => String(p.subcategory || '').trim().toLowerCase();
+const brandKey = (p) => String(p.brand || '').trim().toLowerCase();
+const sameList = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+/* STAN KATALOGU W ADRESIE STRONY
+   ?kat=kleje&pod=kleje montażowe&marka=soudal&marka=den braven
+   Odświeżenie niczego nie gubi, a handlowiec może wysłać klientowi link do
+   „silikonów Soudal". Inne parametry (np. ?fresh z panelu) zostają nietknięte. */
+function readFilterUrl() {
+  const p = new URLSearchParams(location.search);
+  const cat = (p.get('kat') || '').trim();
+  const sub = (p.get('pod') || '').trim().toLowerCase();
+  return {
+    cat: cat || 'all',
+    sub: cat && sub ? sub : 'all',
+    brands: [...new Set(p.getAll('marka').map(s => s.trim().toLowerCase()).filter(Boolean))],
+  };
+}
+function filterUrl({ cat, sub, brands }) {
+  const p = new URLSearchParams(location.search);
+  ['kat', 'pod', 'marka'].forEach(k => p.delete(k));
+  if (cat !== 'all') p.set('kat', cat);
+  if (cat !== 'all' && sub !== 'all') p.set('pod', sub);
+  brands.forEach(b => p.append('marka', b));
+  const qs = p.toString();
+  return location.pathname + (qs ? '?' + qs : '') + location.hash;
+}
+function writeHistory(mode, state) {
+  try { history[mode]({ langer: state }, '', filterUrl(state)); } catch (e) { /* np. strona z dysku */ }
+}
+
+/* ZAKŁADKI KATEGORII — zawsze dokładnie jedna aktywna („Wszystkie" też jest
+   zakładką), klik w aktywną nic nie robi. Na dużym ekranie zawijają się do
+   kolejnej linii; na telefonie przewijają w poziomie, a brzeg, za którym coś
+   jeszcze jest, wygasa — widać, że pasek idzie dalej. Aktywna zakładka sama
+   wjeżdża w pole widzenia (np. po wejściu z linku albo z hero). */
+function CatTabs({ tabs, active, onPick }) {
+  const ref = useRef(null);
+  const [edge, setEdge] = useState('');
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => {
+      const l = el.scrollLeft > 2;
+      const r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2;
+      setEdge((l ? ' fl' : '') + (r ? ' fr' : ''));
+    };
+    measure();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+    el.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    return () => { el.removeEventListener('scroll', measure); window.removeEventListener('resize', measure); };
+  }, [tabs]);
+
+  useEffect(() => {
+    const el = ref.current;
+    const btn = el && el.querySelector('.ctab.on');
+    if (!btn || el.scrollWidth <= el.clientWidth) return;
+    const pad = 40;
+    const l = btn.offsetLeft, r = l + btn.offsetWidth;
+    if (l - pad < el.scrollLeft) el.scrollTo({ left: Math.max(0, l - pad), behavior: 'smooth' });
+    else if (r + pad > el.scrollLeft + el.clientWidth) el.scrollTo({ left: r + pad - el.clientWidth, behavior: 'smooth' });
+  }, [active, tabs.length]);
+
+  return (
+    <nav className={'ctabs' + edge} ref={ref} aria-label="Kategorie produktów">
+      {tabs.map(t => {
+        const on = active === t.id;
+        return (
+          <button key={t.id} type="button"
+                  className={'ctab' + (on ? ' on' : '') + (t.count ? '' : ' zero')}
+                  aria-current={on ? 'true' : undefined}
+                  onClick={() => { if (!on) onPick(t.id); }}>
+            <span className="ctab-t">{t.label}</span>
+            <span className="ctab-n num">{t.count}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+/* Lista opcji z licznikami — pola wyboru (marka, można kilka) albo jednokrotny
+   wybór (rodzaj). Ta sama lista siedzi w rozwijanym menu na komputerze i w
+   panelu filtrów na telefonie. Marka bez produktów w bieżącym widoku jest
+   nieaktywna (chyba że już zaznaczona — wtedy da się ją odznaczyć). */
+function OptionRows({ name, options, isOn, onPick, multi }) {
+  return (
+    <div className="olist" role={multi ? 'group' : 'radiogroup'}>
+      {options.map(o => {
+        const on = isOn(o.key);
+        const off = multi && !on && !o.count;
+        return (
+          <label key={o.key} className={'orow' + (multi ? ' multi' : '') + (on ? ' on' : '') + (off ? ' off' : '')}>
+            <input type={multi ? 'checkbox' : 'radio'} name={name} checked={on} disabled={off}
+                   onChange={() => onPick(o.key)} />
+            <span className="orow-mark" aria-hidden="true">{multi && <ICheck s={14}/>}</span>
+            <span className="orow-t">{o.label}</span>
+            <span className="orow-n num">{o.count}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+/* MARKA na komputerze — przycisk z rozwijaną listą pól wyboru. Zmiany działają
+   od razu (wyniki pod spodem odświeżają się na żywo), „Gotowe" tylko zamyka. */
+function BrandMenu({ options, selected, onToggle, onClear }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      const b = ref.current && ref.current.querySelector('.tbtn');
+      if (b) b.focus();
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+  const n = selected.length;
+  return (
+    <div className="bmenu" ref={ref}>
+      <button type="button" className={'tbtn' + (n ? ' on' : '')} aria-expanded={open} onClick={() => setOpen(o => !o)}>
+        Marka {n > 0 && <span className="tbtn-n">{n}</span>}
+        <IChevron s={16} style={{ transform: open ? 'rotate(180deg)' : undefined, transition: 'transform .15s' }}/>
+      </button>
+      {open && (
+        <div className="bmenu-pop">
+          <OptionRows name="marka-d" multi options={options} isOn={k => selected.includes(k)} onPick={onToggle} />
+          <div className="bmenu-f">
+            <button type="button" className="bmenu-clear" onClick={onClear} disabled={!n}>Wyczyść</button>
+            <button type="button" className="bmenu-ok" onClick={() => setOpen(false)}>Gotowe</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* FILTRY na telefonie — panel od dołu. Zmiany działają od razu, a przycisk na
+   dole na żywo mówi, ile produktów zostanie. Systemowe „wstecz" go zamyka
+   (patrz historia w ProductDatabase), tak jak przycisk ✕ i tapnięcie w tło. */
+function FilterSheet({ onClose, count, catLabel, subOpts, subAll, sub, onSub, brandOpts, brands, onBrand, onClear }) {
+  const closeRef = useRef(null);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    if (closeRef.current) closeRef.current.focus();
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', onKey); };
+  }, []);
+  const active = sub !== 'all' || brands.length > 0;
+  return (
+    <div className="sheet-wrap">
+      <div className="sheet-bg" onClick={onClose} />
+      <div className="sheet" role="dialog" aria-modal="true" aria-label="Filtry">
+        <div className="sheet-h">
+          <strong>Filtry</strong>
+          <button type="button" ref={closeRef} className="sheet-x" onClick={onClose} aria-label="Zamknij filtry"><IX s={22}/></button>
+        </div>
+        <div className="sheet-body">
+          {subOpts.length > 0 && (
+            <div className="sheet-sec">
+              <div className="sheet-k">Rodzaj · {catLabel}</div>
+              <OptionRows name="pod-m"
+                          options={[{ key: 'all', label: 'Wszystkie', count: subAll }, ...subOpts]}
+                          isOn={k => k === sub} onPick={onSub} />
+            </div>
+          )}
+          {brandOpts.length > 0 && (
+            <div className="sheet-sec">
+              <div className="sheet-k">Marka</div>
+              <OptionRows name="marka-m" multi options={brandOpts} isOn={k => brands.includes(k)} onPick={onBrand} />
+            </div>
+          )}
+          {!subOpts.length && !brandOpts.length && (
+            <p className="sheet-empty">W tym widoku nie ma czego zawężać.</p>
+          )}
+        </div>
+        <div className="sheet-f">
+          <button type="button" className="btn btn-ghost" onClick={onClear} disabled={!active}>Wyczyść</button>
+          <button type="button" className="btn btn-dark" onClick={onClose}>
+            Pokaż {count} {plProducts(count)}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ===== BAZA PRODUKTÓW =====
-   Zawężanie schodkowe: kategoria -> podkategoria -> marka. Liczniki na każdym
-   poziomie liczymy z produktów, które przeszły POZOSTAŁE filtry — dlatego pod
-   „Akryle" widać tylko te marki, które w akrylach faktycznie są, i od razu
-   wiadomo ile. Wybór, po którym nic by nie zostało, jest nieklikalny. */
+   Dwa rodzaje wyboru, każdy z jednym, przewidywalnym zachowaniem:
+   • KATEGORIA to nawigacja („gdzie jestem") — zakładki, zawsze jedna aktywna.
+   • RODZAJ (podkategoria) i MARKA to filtry wewnątrz kategorii. Marki można
+     łączyć (Soudal + Den Braven).
+   Żaden wybór nie zmienia po cichu innego. Gdy filtry się wykluczają, pusty
+   stan mówi to wprost i daje jeden przycisk naprawy.
+   Liczniki zawsze mówią, ile zostanie po kliknięciu — uwzględniają
+   wyszukiwanie i pozostałe filtry.
+   Listy marek nie trzymamy w kodzie ani w panelu: bierzemy ją z produktów,
+   więc każda marka, która jest w bazie, da się odfiltrować. */
 function ProductDatabase({ products, initialCatRef }) {
+  const initial = useRef(null);
+  if (!initial.current) initial.current = readFilterUrl();
   const [q, setQ] = useState('');
-  const [cat, setCat] = useState('all');
-  const [sub, setSub] = useState('all');
-  const [brand, setBrand] = useState('all');
+  const [cat, setCat] = useState(initial.current.cat);
+  const [sub, setSub] = useState(initial.current.sub);
+  const [brands, setBrands] = useState(initial.current.brands);
   const [sort, setSort] = useState('name');
   const [shown, setShown] = useState(PAGE);
-  const resultsRef = useRef(null);
-  const pickRef = useRef(null);
+  const [sheet, setSheet] = useState(false);
+  const [stuck, setStuck] = useState(false);
   const narrow = useNarrow();
+  const resultsRef = useRef(null);
+  const barRef = useRef(null);
+  const sentinelRef = useRef(null);
+  const sheetRef = useRef(false);
+  const stateRef = useRef(null);
+  stateRef.current = { cat, sub, brands };
 
-  React.useEffect(() => {
-    if (initialCatRef) initialCatRef.current = (c) => { setCat(c === 'all' ? 'all' : c); setSub('all'); };
+  useEffect(() => {
+    if (initialCatRef) initialCatRef.current = (c) => { setCat(c || 'all'); setSub('all'); };
   }, [initialCatRef]);
+
+  const goCat = (id) => { setCat(id); setSub('all'); };
+  const toggleBrand = (k) => setBrands(bs => bs.includes(k) ? bs.filter(x => x !== k) : [...bs, k]);
+  const clearFilters = () => { setSub('all'); setBrands([]); };
+  const clearAll = () => { setQ(''); setCat('all'); setSub('all'); setBrands([]); };
 
   const term = q.trim().toLowerCase();
   const searched = useMemo(() => {
@@ -1397,164 +1653,243 @@ function ProductDatabase({ products, initialCatRef }) {
     });
   }, [products, term]);
 
-  /* KATEGORIE — dwa liczniki na kategorię:
-       total – ile jest po samym wyszukiwaniu (bez marki),
-       count – ile z tego zostaje przy wybranej marce.
-     Wybór wyżej w drzewie nie może być zablokowany wyborem niższym: kategorii
-     bez produktów danej marki nie wyłączamy, tylko wygaszamy — kliknięcie w nią
-     zdejmuje filtr marki i wchodzi w całą kategorię. Wyłączona jest dopiero
-     kategoria, w której nie ma nic nawet bez marki (np. po wyszukiwaniu). */
-  const catOptions = useMemo(() => {
-    const total = new Map(), withBrand = new Map();
-    for (const p of searched) {
-      if (!p.category) continue;
-      total.set(p.category, (total.get(p.category) || 0) + 1);
-      if (brand === 'all' || p.brand === brand) withBrand.set(p.category, (withBrand.get(p.category) || 0) + 1);
+  // Nazwa marki do wyświetlenia: pisownia z panelu, jeśli tam jest, inaczej
+  // pierwsza napotkana w produktach („SOUDAL" i „Soudal" to ta sama marka).
+  const brandLabels = useMemo(() => {
+    const m = new Map();
+    for (const b of BRANDS) m.set(String(b).trim().toLowerCase(), String(b).trim());
+    const out = new Map();
+    for (const p of products) {
+      const k = brandKey(p);
+      if (k && !out.has(k)) out.set(k, m.get(k) || String(p.brand).trim());
     }
-    return CATEGORIES.map(c => ({ ...c, total: total.get(c.id) || 0, count: withBrand.get(c.id) || 0 }));
-  }, [searched, brand]);
+    return out;
+  }, [products]);
 
-  const totalInScope = useMemo(
-    () => searched.filter(p => brand === 'all' || p.brand === brand).length,
-    [searched, brand]);
+  const inCat = (p) => cat === 'all' || p.category === cat;
+  const inSub = (p) => sub === 'all' || subKey(p) === sub;
+  const inBrand = (p) => !brands.length || brands.includes(brandKey(p));
 
-  // PODKATEGORIE — ta sama zasada co przy kategoriach: lista z całej kategorii,
-  // licznik uwzględnia markę, a wejście w pustą przy tej marce zdejmuje markę.
-  const subOptions = useMemo(() => {
+  /* Zakładki: kategorie, w których cokolwiek jest w bazie (puste się nie
+     pokazują). Lista nie zależy od wyszukiwania ani marki — zakładki nie
+     skaczą; zmienia się tylko licznik. */
+  const catTabs = useMemo(() => {
+    const inBase = new Set(products.map(p => p.category).filter(Boolean));
+    const counts = new Map();
+    let all = 0;
+    for (const p of searched) {
+      if (brands.length && !brands.includes(brandKey(p))) continue;
+      all++;
+      if (p.category) counts.set(p.category, (counts.get(p.category) || 0) + 1);
+    }
+    const list = CATEGORIES
+      .filter(c => !products.length || inBase.has(c.id) || c.id === cat)
+      .map(c => ({ id: c.id, label: c.label, count: counts.get(c.id) || 0 }));
+    return [{ id: 'all', label: 'Wszystkie', count: all }, ...list];
+  }, [products, searched, brands, cat]);
+
+  // Rodzaje w kategorii — lista z całej kategorii, licznik z bieżącymi filtrami.
+  const subOpts = useMemo(() => {
     if (cat === 'all') return [];
     const acc = new Map();
-    for (const p of searched) {
+    for (const p of products) {
       if (p.category !== cat) continue;
-      const key = subKey(p);
-      if (!key) continue;
-      const cur = acc.get(key) || { key, label: String(p.subcategory).trim(), total: 0, count: 0 };
-      cur.total++;
-      if (brand === 'all' || p.brand === brand) cur.count++;
-      acc.set(key, cur);
+      const k = subKey(p);
+      if (k && !acc.has(k)) acc.set(k, { key: k, label: String(p.subcategory).trim(), count: 0 });
+    }
+    for (const p of searched) {
+      if (p.category !== cat || (brands.length && !brands.includes(brandKey(p)))) continue;
+      const o = acc.get(subKey(p));
+      if (o) o.count++;
     }
     return [...acc.values()].sort((a, b) => a.label.localeCompare(b.label, 'pl'));
-  }, [searched, cat, brand]);
+  }, [products, searched, cat, brands]);
 
-  // MARKI — tylko te obecne w bieżącym zawężeniu (kategoria + podkategoria)
-  const brandOptions = useMemo(() => {
-    const base = searched.filter(p =>
-      (cat === 'all' || p.category === cat) && (sub === 'all' || subKey(p) === sub));
-    const counts = new Map();
-    for (const p of base) if (p.brand) counts.set(p.brand, (counts.get(p.brand) || 0) + 1);
-    return BRANDS.map(b => ({ name: b, count: counts.get(b) || 0 })).filter(b => b.count > 0);
-  }, [searched, cat, sub]);
+  const subAll = useMemo(() => searched.filter(p => inCat(p) && inBrand(p)).length, [searched, cat, brands]);
 
-  // Zawężenie mogło wyciąć wybraną wcześniej podkategorię albo markę — wracamy
-  // do „wszystkich" zamiast pokazywać pustą listę z aktywnym filtrem.
-  useEffect(() => {
-    if (sub !== 'all' && !subOptions.some(o => o.key === sub)) setSub('all');
-  }, [subOptions, sub]);
-  useEffect(() => {
-    if (brand !== 'all' && !brandOptions.some(o => o.name === brand)) setBrand('all');
-  }, [brandOptions, brand]);
-  useEffect(() => { setShown(PAGE); }, [q, cat, sub, brand, sort]);
-
-  /* HISTORIA PRZEGLĄDARKI
-     Na telefonie ludzie cofają się gestem od krawędzi albo systemowym „wstecz",
-     nie przyciskiem w interfejsie. Bez tego wychodzili z całej strony w środku
-     przeglądania. Każde zejście poziom niżej (kategoria, podkategoria) to wpis
-     w historii; marka tylko odświeża bieżący wpis, bo jest doprecyzowaniem
-     wewnątrz poziomu — dzięki temu jedno cofnięcie = jeden poziom wyżej,
-     dokładnie jak przycisk w pasku kroku.
-     `restoring` pilnuje, żeby przywracanie stanu z historii nie dopisało
-     kolejnego wpisu (i nie zapętliło cofania). */
-  const restoring = useRef(false);
-  const histReady = useRef(false);
-
-  useEffect(() => {
-    const onPop = (e) => {
-      const st = e.state && e.state.langer;
-      restoring.current = true;
-      setCat(st ? st.cat : 'all');
-      setSub(st ? st.sub : 'all');
-      setBrand(st ? st.brand : 'all');
-      if (narrow) scrollTo(pickRef);
-    };
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
-  }, [narrow]);
-
-  useEffect(() => {
-    const snapshot = { langer: { cat, sub, brand } };
-    if (!histReady.current) {
-      // pierwszy render: podpinamy stan pod wpis, na którym już jesteśmy
-      history.replaceState(snapshot, '');
-      histReady.current = true;
-      return;
+  // Marki obecne w bieżącej kategorii i rodzaju (+ już zaznaczone, żeby dało
+  // się je odznaczyć), licznik z wyszukiwaniem.
+  const brandOpts = useMemo(() => {
+    const acc = new Map();
+    for (const p of products) {
+      if (!inCat(p) || !inSub(p)) continue;
+      const k = brandKey(p);
+      if (k && !acc.has(k)) acc.set(k, { key: k, label: brandLabels.get(k), count: 0 });
     }
-    if (restoring.current) { restoring.current = false; history.replaceState(snapshot, ''); return; }
-    history.pushState(snapshot, '');
-  }, [cat, sub]);
-
-  // Marka: bez nowego wpisu, ale zapisana w bieżącym — po powrocie do tego
-  // ekranu (np. z karty produktu) filtry są takie, jak je zostawiono.
-  useEffect(() => {
-    if (!histReady.current || restoring.current) return;
-    history.replaceState({ langer: { cat, sub, brand } }, '');
-  }, [brand]);
+    for (const k of brands) if (!acc.has(k)) acc.set(k, { key: k, label: brandLabels.get(k) || k, count: 0 });
+    for (const p of searched) {
+      if (!inCat(p) || !inSub(p)) continue;
+      const o = acc.get(brandKey(p));
+      if (o) o.count++;
+    }
+    return [...acc.values()].sort((a, b) => a.label.localeCompare(b.label, 'pl'));
+  }, [products, searched, cat, sub, brands, brandLabels]);
 
   const results = useMemo(() => {
-    let r = searched.filter(p => {
-      if (cat !== 'all' && p.category !== cat) return false;
-      if (sub !== 'all' && subKey(p) !== sub) return false;
-      if (brand !== 'all' && p.brand !== brand) return false;
-      return true;
-    });
+    let r = searched.filter(p => inCat(p) && inSub(p) && inBrand(p));
     if (sort === 'name') r = [...r].sort((a,b) => (a.name || '').localeCompare(b.name || '','pl'));
     if (sort === 'brand') r = [...r].sort((a,b) => (a.brand || '').localeCompare(b.brand || '','pl') || (a.name || '').localeCompare(b.name || '','pl'));
     return r;
-  }, [searched, cat, sub, brand, sort]);
+  }, [searched, cat, sub, brands, sort]);
 
-  const subTotal = useMemo(() => searched.filter(p =>
-    (cat === 'all' || p.category === cat) && (brand === 'all' || p.brand === brand)).length, [searched, cat, brand]);
+  useEffect(() => { setShown(PAGE); }, [q, cat, sub, brands, sort]);
+
+  /* Adres z linku mógł wskazywać kategorię, rodzaj albo markę, których (już)
+     nie ma. Po załadowaniu produktów zdejmujemy to, co nie istnieje — bez
+     nowego wpisu w historii. */
+  const hist = useRef({ ready: false, quiet: false, prev: null });
+  useEffect(() => {
+    if (!products.length) return;
+    const cur = stateRef.current;
+    const catOk = cur.cat === 'all' || (CATEGORIES.some(c => c.id === cur.cat) && products.some(p => p.category === cur.cat));
+    const nextCat = catOk ? cur.cat : 'all';
+    const nextSub = nextCat !== 'all' && cur.sub !== 'all' &&
+      products.some(p => p.category === nextCat && subKey(p) === cur.sub) ? cur.sub : 'all';
+    const nextBrands = cur.brands.filter(k => products.some(p => brandKey(p) === k));
+    if (nextCat !== cur.cat || nextSub !== cur.sub || !sameList(nextBrands, cur.brands)) {
+      hist.current.quiet = true;
+      setCat(nextCat); setSub(nextSub); setBrands(nextBrands);
+    }
+  }, [products]);
+
+  /* Wejście z linku z filtrami (?kat=…) — od razu pokazujemy katalog, a nie
+     hero. Przy odświeżeniu i „wstecz" przeglądarka sama odtwarza przewinięcie. */
+  const fromLink = useRef(/[?&](kat|pod|marka)=/.test(location.search));
+  useEffect(() => {
+    if (!products.length || !fromLink.current) return;
+    fromLink.current = false;
+    const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (nav && nav.type !== 'navigate') return;
+    requestAnimationFrame(() => {
+      const el = document.getElementById('baza');
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 60 });
+    });
+  }, [products]);
+
+  /* HISTORIA PRZEGLĄDARKI
+     Na telefonie ludzie cofają się gestem albo systemowym „wstecz". Zmiana
+     kategorii i rodzaju to nowy wpis (jedno cofnięcie = poprzedni widok),
+     marka tylko podmienia bieżący. Otwarty panel filtrów to osobny wpis, więc
+     „wstecz" go zamyka, zamiast wyrzucać ze strony.
+     `quiet` — stan przywracany z historii (albo poprawiany po załadowaniu) nie
+     dopisuje nowego wpisu, tylko podmienia bieżący. */
+  useEffect(() => {
+    const h = hist.current;
+    const st = { cat, sub, brands };
+    const nav = h.prev && (h.prev.cat !== cat || h.prev.sub !== sub);
+    const push = h.ready && nav && !h.quiet && !sheetRef.current;
+    h.ready = true; h.quiet = false; h.prev = st;
+    writeHistory(push ? 'pushState' : 'replaceState', { ...st, sheet: sheetRef.current });
+  }, [cat, sub, brands]);
+
+  useEffect(() => {
+    const onPop = (e) => {
+      if (sheetRef.current) {
+        // „Wstecz" przy otwartym panelu tylko go zamyka. Filtry wybrane w panelu
+        // zostają — zapisujemy je we wpisie, na który wróciliśmy.
+        sheetRef.current = false;
+        setSheet(false);
+        writeHistory('replaceState', { ...stateRef.current, sheet: false });
+        return;
+      }
+      const st = (e.state && e.state.langer) || readFilterUrl();
+      const cur = stateRef.current;
+      const nextBrands = st.brands || [];
+      if (st.cat === cur.cat && st.sub === cur.sub && sameList(nextBrands, cur.brands)) return;
+      hist.current.quiet = true;
+      setCat(st.cat || 'all'); setSub(st.sub || 'all'); setBrands(nextBrands);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  const openSheet = () => {
+    sheetRef.current = true;
+    setSheet(true);
+    try { history.pushState({ langer: { ...stateRef.current, sheet: true } }, '', filterUrl(stateRef.current)); } catch (e) {}
+  };
+  const closeSheet = () => {
+    if (!sheetRef.current) return;
+    const st = history.state && history.state.langer;
+    if (st && st.sheet) { history.back(); return; }   // popstate zamknie panel
+    sheetRef.current = false;
+    setSheet(false);
+  };
+  // Obrót telefonu / poszerzenie okna do układu komputerowego — panel znika.
+  useEffect(() => { if (!narrow && sheetRef.current) closeSheet(); }, [narrow]);
+
+  /* Pasek kategorii przykleja się na telefonie pod nagłówkiem. Kiedy jest
+     przyklejony, dostaje białe tło i cień — odcina się od przewijanej listy. */
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el || !narrow || !window.IntersectionObserver) { setStuck(false); return; }
+    const hdr = document.querySelector('.hdr');
+    const top = hdr ? hdr.offsetHeight : 76;
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < top + 1),
+      { rootMargin: `-${top + 1}px 0px 0px 0px`, threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [narrow]);
+
+  /* Po zmianie wyboru, gdy jesteśmy przewinięci głęboko w listę, wracamy na jej
+     początek (tuż pod przyklejony pasek) — inaczej nowa lista zaczynałaby się
+     gdzieś w połowie. Jeśli początek wyników jest widoczny, nic nie ruszamy. */
+  const navKey = cat + '|' + sub + '|' + brands.join(',');
+  const lastNav = useRef(navKey);
+  useEffect(() => {
+    if (lastNav.current === navKey) return;
+    lastNav.current = navKey;
+    requestAnimationFrame(() => {
+      const el = resultsRef.current;
+      if (!el) return;
+      const hdr = document.querySelector('.hdr');
+      const bar = narrow ? barRef.current : null;
+      const offset = (hdr ? hdr.offsetHeight : 76) + (bar ? bar.offsetHeight : 0) + 12;
+      const top = el.getBoundingClientRect().top;
+      if (top < offset) window.scrollTo({ top: top + window.scrollY - offset, behavior: 'smooth' });
+    });
+  }, [navKey]);
 
   const catObj = CATEGORIES.find(c => c.id === cat);
-  const subObj = subOptions.find(o => o.key === sub);
-  const active = q || cat !== 'all' || sub !== 'all' || brand !== 'all';
-  const clear = () => { setQ(''); setCat('all'); setSub('all'); setBrand('all'); };
+  const subObj = subOpts.find(o => o.key === sub);
+  const brandName = (k) => brandLabels.get(k) || k;
+  const nFilters = (sub !== 'all' ? 1 : 0) + brands.length;
+  const showBrandMenu = brandOpts.length > 1 || brands.length > 0;
 
-  /* Po wyborze kategorii na telefonie zjeżdżamy do filtrów i wyników — inaczej
-     trzeba by przewinąć przez całą siatkę kafelków. Na dużym ekranie wszystko
-     jest widoczne naraz, więc nie ruszamy stroną pod palcem użytkownika. */
-  /* Przewijamy tak, żeby cel wypadł POD nagłówkiem i paskiem kroku — inaczej
-     „Wybierz podkategorię" ląduje dokładnie za przyklejonym paskiem. */
-  const scrollTo = (ref) => requestAnimationFrame(() => {
-    const el = ref.current;
-    if (!el) return;
-    const bar = document.querySelector('.step-bar');
-    const offset = 84 + (bar ? bar.getBoundingClientRect().height : 0);
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
-  });
+  // Pusty wynik: mówimy dlaczego i dajemy jeden przycisk naprawy.
+  let emptyMsg = 'Nie znaleźliśmy produktów dla tych filtrów.';
+  let emptyFix = null;
+  if (!results.length) {
+    const where = catObj ? ` w kategorii ${catObj.label}${subObj ? ' — ' + subObj.label : ''}`
+      : term ? ` pasujących do „${q.trim()}”` : '';
+    const withoutBrand = brands.length ? searched.filter(p => inCat(p) && inSub(p)).length : 0;
+    if (brands.length && withoutBrand > 0) {
+      const one = brands.length === 1;
+      emptyMsg = `${one ? 'Marka' : 'Marki'} ${joinPl(brands.map(brandName))} nie ${one ? 'ma' : 'mają'} produktów${where}.`;
+      emptyFix = { label: 'Pokaż wszystkie marki', run: () => setBrands([]) };
+    } else if (term) {
+      emptyMsg = `Nic nie pasuje do „${q.trim()}”${catObj ? ' w kategorii ' + catObj.label : ''}.`;
+      emptyFix = { label: 'Wyczyść wyszukiwanie', run: () => setQ('') };
+    }
+  }
 
-  const pickCategory = (id, dropBrand) => {
-    const next = cat === id ? 'all' : id;
-    setCat(next);
-    setSub('all');
-    if (dropBrand) setBrand('all');
-    // Telefon: po wyborze kategorii pokazujemy krok 2 (albo od razu wyniki,
-    // gdy kategoria nie ma podkategorii). Desktop nie skacze — tam widać wszystko.
-    if (narrow) scrollTo(next === 'all' ? pickRef : resultsRef);
-  };
-
-  /* Cofanie o jeden poziom = zaczynasz ten poziom od nowa, więc zdejmujemy też
-     wybory z poziomów niższych. Inaczej marka zostaje przyklejona i po powrocie
-     do kategorii połowa z nich jest wygaszona — a użytkownik chciał właśnie
-     wybrać coś innego. */
-  const stepBack = () => {
-    setBrand('all');
-    if (sub !== 'all') { setSub('all'); scrollTo(pickRef); return; }
-    setCat('all'); setSub('all'); scrollTo(pickRef);
-  };
-
-  const pickSub = (key, dropBrand) => {
-    setSub(key);
-    if (dropBrand) setBrand('all');
-  };
+  const sortBox = (
+    <div className="sortbox">
+      <label htmlFor="pdb-sort">Sortuj</label>
+      <select id="pdb-sort" value={sort} onChange={e => setSort(e.target.value)}>
+        <option value="name">Nazwa A–Z</option>
+        <option value="brand">Marka</option>
+      </select>
+    </div>
+  );
+  const count = (
+    <span className="res-count"><span className="num">{results.length}</span> {plProducts(results.length)}</span>
+  );
+  const brandChips = brands.map(k => (
+    <button key={'b:' + k} type="button" className="fchip" onClick={() => toggleBrand(k)} aria-label={`Usuń filtr: ${brandName(k)}`}>
+      {brandName(k)} <IX s={14}/>
+    </button>
+  ));
 
   return (
     <section id="baza" className="sec sec-base">
@@ -1562,163 +1897,72 @@ function ProductDatabase({ products, initialCatRef }) {
         <div className="base-head">
           <div>
             <span className="eyebrow">Baza produktów</span>
-            <h2 className="h-base">Wybierz kategorię.</h2>
+            <h2 className="h-base">Przeglądaj ofertę.</h2>
           </div>
           <div className="search">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.2-3.2"/></svg>
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder={'Szukaj: nazwa, marka, SKU…'} />
-            {q && <button className="search-x" onClick={() => setQ('')} aria-label="Wyczyść"><IX s={18}/></button>}
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder={'Szukaj: nazwa, marka, SKU…'} aria-label="Szukaj produktów" />
+            {q && <button className="search-x" onClick={() => setQ('')} aria-label="Wyczyść wyszukiwanie"><IX s={18}/></button>}
           </div>
         </div>
 
-        {/* Ścieżka wyboru — widać, gdzie się jest, i wychodzi się jednym kliknięciem */}
-        {(cat !== 'all' || sub !== 'all' || brand !== 'all') && (
-          <div className="crumbs">
-            <button className="crumb-home" onClick={clear}>Wszystkie produkty</button>
-            {catObj && <><span className="crumb-sep">/</span>
-              <button className="crumb" onClick={() => { setCat('all'); setSub('all'); }}>
-                {catObj.label} <span className="crumb-x"><IX s={13}/></span>
-              </button></>}
-            {subObj && <><span className="crumb-sep">/</span>
-              <button className="crumb" onClick={() => setSub('all')}>
-                {subObj.label} <span className="crumb-x"><IX s={13}/></span>
-              </button></>}
-            {brand !== 'all' && <><span className="crumb-sep">/</span>
-              <button className="crumb" onClick={() => setBrand('all')}>
-                {brand} <span className="crumb-x"><IX s={13}/></span>
-              </button></>}
-          </div>
-        )}
-
-        {/* Pasek kroku — na telefonie przykleja się pod nagłówkiem, więc przez cały
-            czas widać, gdzie się jest i czym wrócić poziom wyżej. */}
-        <div ref={pickRef} />
-        {narrow && cat !== 'all' && (
-          <div className="step-bar">
-            <button className="step-back" onClick={stepBack}>
-              <IArrow s={16} style={{ transform: 'rotate(180deg)' }}/>
-              {sub !== 'all' ? (catObj ? catObj.label : 'Kategoria') : 'Kategorie'}
-            </button>
-            <div className="step-now">
-              <strong>{subObj ? subObj.label : (catObj ? catObj.label : '')}</strong>
-              <span className="num">{results.length}</span>
-            </div>
-          </div>
-        )}
-
-        {/* KROK 1 — kategoria. Na telefonie znika, gdy kategoria jest już wybrana:
-            jej miejsce zajmuje krok 2, żeby nie przewijać przez całą siatkę. */}
-        {(!narrow || cat === 'all') && (
-          <div className="pick">
-            <div className="pick-h">
-              <span className="pick-k"><span className="pick-no">1</span> Wybierz kategorię</span>
-              {/* Ostrzeżenie o wygaszonych kafelkach pokazujemy też na telefonie —
-                  tam nie ma najechania kursorem, więc inaczej nikt by się nie
-                  dowiedział, że w wygaszone wolno kliknąć. */}
-              {brand !== 'all' && catOptions.some(c => c.total && !c.count)
-                ? <span className="pick-hint warn">Wygaszone kategorie nie mają produktów marki {brand} — kliknięcie zdejmie filtr marki.</span>
-                : <span className="pick-hint">Kliknij kafelek, żeby zawęzić. Drugi klik cofa wybór.</span>}
-            </div>
-            <div className="ctiles">
-              <button className={'ctile ctile-all' + (cat === 'all' ? ' on' : '')} onClick={() => pickCategory('all')}>
-                <span className="ctile-ic"><IGrid s={26}/></span>
-                <span className="ctile-t">Wszystkie</span>
-                <span className="ctile-n">{totalInScope}</span>
+        <div ref={sentinelRef} className="cbar-sentinel" />
+        <div ref={barRef} className={'cbar' + (stuck ? ' stuck' : '')}>
+          <CatTabs tabs={catTabs} active={cat} onPick={goCat} />
+          {narrow && (
+            <div className="cbar-tools">
+              <button type="button" className={'tbtn' + (nFilters ? ' on' : '')} onClick={openSheet}>
+                <IFilter s={17}/> Filtry {nFilters > 0 && <span className="tbtn-n">{nFilters}</span>}
               </button>
-              {catOptions.map(c => (
-                <button key={c.id}
-                        className={'ctile' + (cat === c.id ? ' on' : '') + (c.total && !c.count ? ' dim' : '')}
-                        disabled={!c.total && cat !== c.id}
-                        title={c.total && !c.count ? `Marka ${brand} nie ma tu produktów — kliknięcie pokaże całą kategorię` : undefined}
-                        onClick={() => pickCategory(c.id, !c.count)}>
-                  <span className="ctile-ic"><CatIcon name={c.icon} size={26}/></span>
-                  <span className="ctile-t">{c.label}</span>
-                  <span className="ctile-n">{c.count}</span>
+              {sortBox}
+              {count}
+            </div>
+          )}
+        </div>
+
+        {/* Komputer: rodzaj jako rząd pigułek pod zakładkami, marka w menu. */}
+        {!narrow && subOpts.length > 0 && (
+          <div className="subrow">
+            <span className="subrow-k">Rodzaj</span>
+            <div className="chips">
+              <button type="button" className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>
+                Wszystkie <span className="chip-n">{subAll}</span>
+              </button>
+              {subOpts.map(o => (
+                <button key={o.key} type="button" className={'chip' + (sub === o.key ? ' active' : '')}
+                        onClick={() => setSub(o.key)}>
+                  {o.label} <span className="chip-n">{o.count}</span>
                 </button>
               ))}
             </div>
           </div>
         )}
+        {!narrow && (
+          <div className="tools">
+            {showBrandMenu && (
+              <BrandMenu options={brandOpts} selected={brands} onToggle={toggleBrand} onClear={() => setBrands([])} />
+            )}
+            {brandChips}
+            {brands.length > 1 && <button type="button" className="fclear" onClick={() => setBrands([])}>Wyczyść marki</button>}
+            <div className="tools-r">{count}{sortBox}</div>
+          </div>
+        )}
+
+        {/* Telefon: rodzaj i marka siedzą w panelu, więc to, co wybrane, widać
+            tutaj jako chipy z ✕ — jedno tapnięcie zdejmuje filtr. */}
+        {narrow && nFilters > 0 && (
+          <div className="applied">
+            {subObj && (
+              <button type="button" className="fchip" onClick={() => setSub('all')} aria-label={`Usuń filtr: ${subObj.label}`}>
+                {subObj.label} <IX s={14}/>
+              </button>
+            )}
+            {brandChips}
+            {nFilters > 1 && <button type="button" className="fclear" onClick={clearFilters}>Wyczyść filtry</button>}
+          </div>
+        )}
 
         <div ref={resultsRef} />
-
-        {/* KROK 2 — podkategoria. Na telefonie kafelki (wszystko widoczne naraz),
-            na dużym ekranie pigułki obok kroku 1. */}
-        {subOptions.length > 0 && (
-          narrow ? (
-            <div className="pick">
-              <div className="pick-h">
-                <span className="pick-k"><span className="pick-no">2</span> Wybierz podkategorię</span>
-              </div>
-              <div className="ctiles">
-                <button className={'ctile ctile-all' + (sub === 'all' ? ' on' : '')} onClick={() => pickSub('all', false)}>
-                  <span className="ctile-ic"><IGrid s={26}/></span>
-                  <span className="ctile-t">Wszystkie w kategorii</span>
-                  <span className="ctile-n">{subTotal}</span>
-                </button>
-                {subOptions.map(o => (
-                  <button key={o.key}
-                          className={'ctile' + (sub === o.key ? ' on' : '') + (o.total && !o.count ? ' dim' : '')}
-                          onClick={() => pickSub(o.key, !o.count)}>
-                    <span className="ctile-ic"><CatIcon name={catObj ? catObj.icon : ''} size={26}/></span>
-                    <span className="ctile-t">{o.label}</span>
-                    <span className="ctile-n">{o.count}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="filters">
-              <div className="filter-line">
-                <span className="filter-k"><span className="pick-no">2</span> Podkategoria</span>
-                <div className="chips">
-                  <button className={'chip' + (sub === 'all' ? ' active' : '')} onClick={() => setSub('all')}>Wszystkie</button>
-                  {subOptions.map(o => (
-                    <button key={o.key}
-                            className={'chip' + (sub === o.key ? ' active' : '') + (o.total && !o.count ? ' dim' : '')}
-                            title={o.total && !o.count ? `Marka ${brand} nie ma tu produktów — kliknięcie zdejmie filtr marki` : undefined}
-                            onClick={() => pickSub(o.key, !o.count)}>
-                      {o.label} <span className="chip-n">{o.count}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )
-        )}
-
-        {/* KROK 3 — marka. Pigułki zawijają się do kolejnych linii, nic nie chowa
-            się poza krawędzią ekranu. */}
-        {brandOptions.length > 1 && (
-          <div className="filters">
-            <div className="filter-line">
-              <span className="filter-k">
-                <span className="pick-no">{subOptions.length > 0 ? 3 : 2}</span>
-                {narrow ? 'Wybierz markę' : 'Marka'}
-              </span>
-              <div className="chips">
-                <button className={'chip' + (brand === 'all' ? ' active' : '')} onClick={() => setBrand('all')}>Wszystkie</button>
-                {brandOptions.map(b => (
-                  <button key={b.name} className={'chip' + (brand === b.name ? ' active' : '')} onClick={() => setBrand(b.name)}>
-                    {b.name} <span className="chip-n">{b.count}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="base-meta">
-          <span><span className="num">{results.length}</span> {plProducts(results.length)}</span>
-          {active && <button className="base-clear" onClick={clear}>Wyczyść filtry <IX s={15}/></button>}
-          <div className="sortbox">
-            <label>Sortuj</label>
-            <select value={sort} onChange={e => setSort(e.target.value)}>
-              <option value="name">Nazwa A–Z</option>
-              <option value="brand">Marka</option>
-            </select>
-          </div>
-        </div>
 
         {results.length ? (
           <>
@@ -1733,15 +1977,29 @@ function ProductDatabase({ products, initialCatRef }) {
               </div>
             )}
           </>
-        ) : (
+        ) : products.length ? (
           <div className="empty">
             <span className="empty-ic"><IGrid s={30}/></span>
             <h3 className="why-t">Brak wyników</h3>
-            <p className="why-d">Nie znaleźliśmy produktów dla tych filtrów. Zmień zapytanie lub wyczyść filtry.</p>
-            <button className="btn btn-ghost" onClick={clear}>Wyczyść filtry</button>
+            <p className="why-d">{emptyMsg}</p>
+            <div className="empty-act">
+              {emptyFix && <button className="btn btn-dark" onClick={emptyFix.run}>{emptyFix.label}</button>}
+              <button className="btn btn-ghost" onClick={clearAll}>Pokaż wszystkie produkty</button>
+            </div>
           </div>
-        )}
+        ) : null}
       </div>
+
+      {/* Portal do <body> — panel ma przykryć cały ekran, łącznie z nagłówkiem,
+          niezależnie od tego, w czym siedzi sekcja. */}
+      {sheet && ReactDOM.createPortal(
+        <FilterSheet onClose={closeSheet} count={results.length}
+                     catLabel={catObj ? catObj.label : ''} subOpts={subOpts} subAll={subAll}
+                     sub={sub} onSub={setSub}
+                     brandOpts={brandOpts} brands={brands} onBrand={toggleBrand}
+                     onClear={clearFilters} />,
+        document.body
+      )}
     </section>
   );
 }

@@ -193,39 +193,40 @@ Pasek marek pod hero też jedzie z bazy (Ustawienia → Marki) — nie da się j
 
 Kolejność sekcji: **hero → baza produktów → linia Langer → dlaczego my → proces → kontakt**. Kto wchodzi po produkt, ma go od razu; argumenty sprzedażowe są niżej, dla tych, którzy przewijają.
 
-### Baza produktów — zawężanie schodkowe
+### Baza produktów — kategoria to nawigacja, reszta to filtry
 
-Trzy poziomy, każdy z licznikami, każdy liczony z tego, co zostało po pozostałych filtrach:
+Dwa rodzaje wyboru, każdy z jednym, standardowym zachowaniem — takim samym na komputerze i telefonie (zmienia się tylko układ):
 
-| Poziom | Jak wygląda | Co pokazuje |
+| Element | Jak wygląda | Jak działa |
 |---|---|---|
-| **Kategoria** | Kafelki z ikoną i liczbą | Wszystkie kategorie. Bez produktów (np. po wyszukiwaniu) — wygaszone i nieklikalne. Drugi klik w wybraną cofa wybór. |
-| **Podkategoria** | Pasek pigułek | Tylko podkategorie z wybranej kategorii, tylko niepuste. |
-| **Marka** | Pasek pigułek | **Tylko marki, które faktycznie są w tym zawężeniu** — wybierasz Akryle, widzisz marki mające akryle, z liczbą sztuk. |
+| **Kategoria** | Zakładki-pigułki z liczbą | Nawigacja („gdzie jestem"). Zawsze **dokładnie jedna aktywna**, „Wszystkie" jest pierwszą zakładką. Klik w aktywną nic nie robi. Puste kategorie (bez żadnego produktu w bazie) się nie pokazują. |
+| **Rodzaj** (podkategoria) | Komputer: rząd pigułek pod zakładkami. Telefon: w panelu „Filtry" | Pojawia się dopiero w wybranej kategorii. Jeden wybór plus „Wszystkie". |
+| **Marka** | Komputer: przycisk „Marka ▾" z listą pól wyboru. Telefon: w panelu „Filtry" | **Można zaznaczyć kilka** (Soudal + Den Braven). Przy każdej liczba produktów; marka bez produktów w bieżącym widoku jest nieaktywna. |
+| **Wybrane filtry** | Chipy z ✕ | Jedno kliknięcie zdejmuje filtr. Na komputerze chipy pokazują wybrane marki (rodzaj widać w rzędzie pigułek), na telefonie — rodzaj i marki (bo oba siedzą w panelu). |
 
-**Wybór niżej nigdy nie blokuje wyboru wyżej.** Kategoria, w której wybrana marka nie ma nic, jest wygaszona, ale **klikalna** — wejście w nią zdejmuje filtr marki i pokazuje całą kategorię (nad kafelkami wyjaśnia to jedna linijka tekstu). To samo dotyczy podkategorii. Wyłączona na amen jest tylko kategoria, w której nie ma nic nawet bez marki — na przykład po wyszukiwaniu.
+**Liczniki zawsze mówią, ile zostanie po kliknięciu** — uwzględniają wyszukiwanie i pozostałe filtry. Wybierzesz markę Soudal → na zakładkach widać, ile produktów Soudal jest w każdej kategorii.
 
-Zmiana poziomu wyżej czyści poziomy niższe: inna kategoria kasuje podkategorię, a cofnięcie się o krok (przycisk na telefonie) kasuje też markę — po powrocie wybierasz od nowa, zamiast zderzać się z filtrem, o którym już się nie pamięta.
+**Żaden wybór nie zmienia po cichu innego.** Zmiana kategorii kasuje tylko rodzaj (bo rodzaje należą do kategorii); wybrane marki zostają. Jeśli filtry się wykluczają (np. Bostik + Akryle), pusty stan mówi to wprost — „Marka Bostik nie ma produktów w kategorii Akryle" — i daje jeden przycisk naprawy („Pokaż wszystkie marki").
 
-Poziomy są ponumerowane (**1 Wybierz kategorię**, **2 Podkategoria**, **3 Marka**), a nad nimi jest ścieżka wyboru (`Wszystkie produkty / Akryle / Kity do parkietu / Langer`) — każdy element zdejmuje się jednym kliknięciem. Jeśli zawężenie wytnie wybraną wcześniej podkategorię albo markę, filtr sam wraca do „wszystkich" — nigdy nie zostaje pusta lista z aktywnym, niemożliwym filtrem.
+**Lista marek do filtrowania bierze się z produktów**, nie z listy w Ustawieniach — każda marka, która jest w bazie, da się odfiltrować. „SOUDAL" i „Soudal" to ta sama marka; nazwę pokazujemy w pisowni z Ustawień → Marki, jeśli tam jest.
 
-Wyszukiwarka działa równolegle do filtrów: przeszukuje nazwę, markę, SKU, wariant, podkategorię i tagi, a liczniki na kafelkach od razu pokazują, gdzie są trafienia.
+Zaznaczenie = wypełnienie (granat), najechanie = tylko ramka. Nic nie podskakuje pod kursorem, więc najechanego nie da się pomylić z wybranym.
+
+Wyszukiwarka działa równolegle do filtrów: przeszukuje nazwę, markę, SKU, wariant, podkategorię i tagi, a liczniki na zakładkach od razu pokazują, gdzie są trafienia.
 
 Produkty ładują się po **24 sztuki** (przycisk „Pokaż kolejne") — 300 kart naraz potrafiło zapchać przewijanie na telefonie.
 
-### Na telefonie — jeden krok na ekranie
+**Stan katalogu jest w adresie strony**, np. `/?kat=silikony&marka=soudal` albo `/?kat=kleje&pod=kleje montażowe`. Odświeżenie niczego nie gubi, a link można wysłać klientowi — po wejściu z takiego linku strona od razu pokazuje katalog. Nieistniejąca kategoria czy marka w linku jest po cichu pomijana.
 
-Telefon dostaje inny sposób wybierania niż desktop. Zasada: **nic nie chowa się poza krawędzią ekranu** — poziomo przewijany pasek wygląda jak skończona lista i nikt go nie przesuwa.
+### Na telefonie
 
-1. **Krok 1 — kategoria.** Kafelki w dwóch kolumnach, w układzie poziomym (ikona · nazwa · licznik). Wszystkie kategorie mieszczą się na jednym ekranie.
-2. **Krok 2 — podkategoria.** Po wybraniu kategorii siatka kategorii **znika i zastępuje ją siatka podkategorii** (z kafelkiem „Wszystkie w kategorii"). Nie trzeba przewijać przez całą listę kategorii, żeby dojść do produktów.
-3. **Krok 3 — marka.** Pigułki zawijają się do kolejnych linii — wszystkie widoczne naraz.
+- Pod nagłówkiem przykleja się **pasek**: zakładki kategorii (przewijane w poziomie — brzeg, za którym coś jeszcze jest, wygasa, a aktywna zakładka sama wjeżdża w pole widzenia), pod nimi przycisk **„Filtry"** z liczbą wybranych filtrów, sortowanie i liczba wyników.
+- **„Filtry"** otwiera panel od dołu: rodzaj i marka. Zmiany działają od razu, a przycisk na dole na żywo mówi, ile zostanie („Pokaż 37 produktów"). Panel zamyka ✕, tapnięcie w tło, ten przycisk albo systemowe „wstecz".
+- Po zmianie kategorii czy filtra, gdy jesteś przewinięty głęboko w listę, strona wraca na początek wyników (tuż pod przyklejony pasek). Gdy początek wyników jest widoczny — nic nie skacze.
 
-Pod nagłówkiem przykleja się **pasek kroku**: po lewej przycisk wstecz (`← Kategorie` albo `← Akryle`), po prawej gdzie właśnie jesteś i ile tam produktów. Widać go przez cały czas przewijania, więc powrót o poziom wyżej to zawsze jedno tapnięcie — z podkategorii do kategorii, z kategorii do listy wszystkich. **Cofnięcie zdejmuje też filtr marki**, żeby po powrocie dało się wybrać cokolwiek.
+**Gest wstecz telefonu cofa o jeden widok**, zamiast wyrzucać ze strony. Zmiana kategorii i rodzaju zapisuje się w historii przeglądarki; marka tylko odświeża bieżący wpis. Otwarty panel filtrów to osobny wpis — „wstecz" go zamyka, a filtry wybrane w panelu zostają.
 
-**Gest wstecz telefonu działa tak samo jak przycisk w pasku.** Zejście poziom niżej (kategoria, podkategoria) zapisuje się w historii przeglądarki, więc systemowe „wstecz" — gest od krawędzi na iOS, przycisk na Androidzie — cofa o jeden poziom, zamiast wyrzucać z całej strony w środku przeglądania. Marka nie zakłada nowego wpisu, tylko odświeża bieżący: jest doprecyzowaniem wewnątrz poziomu, więc jedno cofnięcie zawsze znaczy jeden poziom wyżej. Dlatego pasek kroku został na górze (kontekst i wyjście wyżej), a nie na dole — po zasięg kciuka użytkownik i tak sięga gestem systemowym.
-
-Strona sama zjeżdża do kolejnego kroku po wyborze (na dużym ekranie nie skacze — tam wszystkie poziomy widać naraz). Karty produktów idą w dwóch kolumnach.
+Karty produktów idą w dwóch kolumnach.
 
 Pasek kategorii w hero jest na telefonie skrócony do sześciu pozycji plus `+N kategorii` — reszta jest w katalogu, jedno tapnięcie dalej.
 
