@@ -229,11 +229,32 @@ Zdjęcia mają różne marginesy (jedne puste tło dookoła, inne kadr ciasno pr
 
 ## Mapa dowozu
 
-Sekcja **„Gdzie dowozimy"** — na stronie głównej (między „Co zyskujesz" a „Jak zacząć") i na `/dla-punktow/` (po „Bez ryzyka", w nawigacji jako „Dowóz", plus pytanie w FAQ). Mapa: baza w Płońsku (09-100), obszar dowozu poprowadzony gładką linią przez miasta na obwodzie, koło 100 km od bazy, rzeki, punkty orientacyjne (Warszawa, Płock) i mała Polska w rogu. Obok lista miast — najechanie (albo tapnięcie na telefonie) podświetla miasto na mapie; na telefonie podpisy miast pokazują się tylko po wybraniu, żeby się nie nakładały.
+Sekcja **„Gdzie dowozimy"** — na stronie głównej (między „Co zyskujesz" a „Jak zacząć") i na `/dla-punktow/` (po „Bez ryzyka", w nawigacji jako „Dowóz", plus pytanie w FAQ). Mapa: baza (domyślnie 09-100 Płońsk), obszar dowozu — gładka linia przez punkty na jego granicy, koło 100 km od bazy, rzeki, punkty orientacyjne (Warszawa, Płock), obok mała Polska z zaznaczonym obszarem i lista miejscowości (najechanie / tapnięcie podświetla punkt na mapie).
 
-**Zmiana miast:** `shared/delivery-area.js` → tablica `TOWNS`. Kolejność ma znaczenie — to obwód obszaru (dookoła, zgodnie z ruchem wskazówek zegara od Łodzi), więc nowe miasto wstaw między sąsiadów. Każde ma `lat`/`lon` (np. z Map Google: prawy klik na mapie → współrzędne) i `label` — gdzie stoi podpis (`r`, `l`, `t`, `b`). Obszar, lista pod mapą i odpowiedź w FAQ biorą się z tej tablicy. Okno mapy obejmuje ok. 51,35–53,95° N i 18,35–22,95° E.
+### Wyszukiwarka „czy dowozimy"
 
-Rzeki i kontur Polski to gotowe ścieżki SVG z Natural Earth 1:10 mln (domena publiczna) — przy zmianie miast nic się w nich nie zmienia. Mapa nie pobiera kafelków z zewnątrz i nie potrzebuje żadnej biblioteki.
+Klient wpisuje **miejscowość albo kod pocztowy** i klika „Sprawdź". Strona zamienia to na współrzędne (przez `/api/geocode`) i sprawdza, czy punkt leży w obszarze:
+
+| Wynik | Kiedy | Co widzi klient |
+|---|---|---|
+| ✓ w obszarze | w środku, dalej niż 8 km od granicy | „… jest w naszym obszarze dowozu — ok. N km od naszej bazy" + zielona pinezka na mapie |
+| ? na skraju | do 8 km od granicy (w środku albo na zewnątrz) | „… leży na skraju obszaru — napisz albo zadzwoń, potwierdzimy" |
+| → poza obszarem | dalej niż 8 km poza granicą | „… jest poza obszarem naszego transportu — wyślemy spedycją" |
+
+Kilka miejscowości o tej samej nazwie (np. „Nowa Wieś") — strona pyta, o którą chodzi (z powiatem i województwem). Brak wyniku albo awaria wyszukiwarki — komunikat i telefon. Odległości są w linii prostej. Próg „na skraju" to `EDGE_KM` w `shared/delivery-area.js`.
+
+`/api/geocode` pyta publiczny serwer **Nominatim (OpenStreetMap)** — darmowy, bez klucza. Jego zasady: przedstawiamy się w nagłówku, nie zasypujemy go zapytaniami, trzymamy wyniki w cache. Dlatego wyszukiwarka pyta dopiero po kliknięciu „Sprawdź" (nie przy każdej literze), a odpowiedzi idą przez CDN Vercela na 30 dni — to samo zapytanie od kolejnego klienta nie trafia już do Nominatim. Pod wyszukiwarką stoi wymagany podpis „© współtwórcy OpenStreetMap". Przy bardzo dużym ruchu (tysiące różnych wyszukiwań dziennie) warto przejść na płatny geokoder — wystarczy podmienić adres w `api/geocode.js`.
+
+### Edycja w panelu — zakładka „Mapa dowozu"
+
+- **Klik na mapie** dodaje punkt dokładnie w tym miejscu; nazwę podpowiada OpenStreetMap (można ją poprawić).
+- **Wyszukaj** miejscowość albo kod pocztowy → „+ Punkt" dodaje ją do granicy obszaru, „Ustaw jako bazę" przenosi bazę (od niej liczą się odległości i koło 100 km).
+- **Lista punktów** — nazwa (do edycji wprost w liście), odległość od bazy, gdzie stoi podpis na mapie (auto / prawo / lewo / góra / dół), usuwanie.
+- Kolejność punktów nie ma znaczenia: moduł układa je dookoła bazy i prowadzi przez nie gładką linię. Obszar potrzebuje co najmniej 3 punktów.
+- Pod mapą jest ta sama wyszukiwarka, co na stronie — sprawdzisz od razu, jak odpowie klientom.
+- **„Zapisz mapę"** zapisuje bazę i punkty w ustawieniach (klucz `delivery_area`, JSON). **„Przywróć domyślną"** wraca do obszaru z `shared/delivery-area.js` (baza w Płońsku, 17 miast od Łodzi po Łomżę).
+
+Mapa, wyszukiwarka i cała sekcja to jeden wspólny moduł: `shared/delivery-area.js` (komponenty bez JSX, przez `React.createElement`) i `shared/delivery-area.css` — strona główna, `/dla-punktow/` i panel używają tego samego kodu. Rzeki i kontur Polski to gotowe ścieżki SVG z Natural Earth 1:10 mln (domena publiczna); mapa nie pobiera kafelków z zewnątrz.
 
 ---
 
@@ -464,7 +485,8 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 ├── vercel.json             # Komenda builda, katalog dist/, cache /vendor/
 ├── shared/
 │   ├── langer-showcase.js  # Domyślne slajdy karuzeli Langer (strona, /dla-punktow/, panel)
-│   └── delivery-area.js    # Mapa dowozu: miasta, baza w Płońsku, rzeki i kontur Polski
+│   ├── delivery-area.js    # Mapa dowozu + wyszukiwarka „czy dowozimy" (wspólny moduł)
+│   └── delivery-area.css   # Style mapy dowozu
 ├── dla-punktow/            # Landing dla punktów handlowych (/dla-punktow/)
 │   ├── index.html          # Cała podstrona w jednym pliku
 │   └── assets/             # Zdjęcia produktów Langer: WebP przycięte do puszki + oryginały PNG
@@ -476,6 +498,7 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 │   ├── settings.js         # Ustawienia: logo, kolory, kontakt, oferta
 │   ├── img.js              # Zdjęcia i logo z bazy jako pliki (/api/img)
 │   ├── favicon.js          # Ikona karty przeglądarki (/api/favicon, /favicon.ico)
+│   ├── geocode.js          # Miejscowość / kod pocztowy -> współrzędne (OpenStreetMap)
 │   └── _images.js          # Wspólne: adresy /api/img, nagłówki cache
 ├── migrations/             # Migracje SQL — uruchamiane ręcznie w Neon
 └── project/                # Archiwum — oryginalne pliki źródłowe (rozbite)

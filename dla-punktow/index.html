@@ -346,67 +346,6 @@ button, input, textarea { font: inherit; color: inherit; }
 .safe-t { font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; line-height: 1.25; margin: 2px 0 6px; }
 .safe-d { font-size: 15px; line-height: 1.5; color: var(--ash-700); margin: 0; }
 
-/* ===== GDZIE DOWOZIMY =====
-   Mapa obszaru dowozu (dane: shared/delivery-area.js). Ta sama sekcja jest na
-   stronie głównej i na /dla-punktow/ — kopia stylów i komponentu w obu plikach. */
-.dm-sec { background: var(--white); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.dm-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .7fr); gap: 32px 40px; align-items: center; }
-.dm-card { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); background: #F3F5F8; box-shadow: var(--e1); }
-.dm-svg { display: block; width: 100%; height: auto; }
-.dm-bg { fill: #F3F5F8; }
-.dm-river { fill: #B9D1EA; }
-.dm-ring { fill: none; stroke: var(--ash); stroke-opacity: .55; stroke-width: 1.5; stroke-dasharray: 6 7; }
-.dm-ring-t { font: 600 15px var(--font-mono); fill: var(--ash); letter-spacing: .04em; }
-.dm-area { fill: rgb(240 78 35 / 0.13); stroke: var(--flame); stroke-width: 3; stroke-linejoin: round; }
-.dm-town circle { fill: var(--navy); stroke: #fff; stroke-width: 3; transition: fill .15s; }
-.dm-town text, .dm-ref text, .dm-c-t { paint-order: stroke; stroke: #F3F5F8; stroke-linejoin: round; }
-.dm-town text { font: 600 19px var(--font-text); fill: var(--navy); stroke-width: 5px; transition: fill .15s; }
-.dm-town.on circle { fill: var(--flame); }
-.dm-town.on text { fill: var(--flame-600); font-weight: 700; }
-.dm-ref rect, .dm-ref circle { fill: var(--ash); }
-.dm-ref text { font: 500 16px var(--font-text); fill: var(--ash-700); stroke-width: 5px; }
-.dm-c { fill: var(--flame); stroke: #fff; stroke-width: 4; }
-.dm-pulse { fill: var(--flame); transform-box: fill-box; transform-origin: center; animation: dm-pulse 2.4s ease-out infinite; }
-@keyframes dm-pulse { from { transform: scale(1); opacity: .45; } to { transform: scale(3.4); opacity: 0; } }
-.dm-c-t { font: 700 27px var(--font-display); fill: var(--navy); stroke-width: 6px; letter-spacing: -.01em; }
-.dm-inset-bg { fill: #fff; stroke: var(--line); }
-.dm-pl { fill: var(--light); stroke: var(--line-2); stroke-width: 1; }
-.dm-inset-area { fill: var(--flame); opacity: .85; }
-.dm-side { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-.dm-k { font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ash-700); }
-.dm-towns { display: flex; flex-wrap: wrap; gap: 6px; }
-.dm-chip { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: var(--r-full); border: 1.5px solid var(--line-2); background: var(--white);
-  font: inherit; font-size: 14px; font-weight: 600; color: var(--navy); cursor: pointer; transition: border-color .12s, background .12s, color .12s; }
-.dm-chip:hover, .dm-chip.on { border-color: var(--flame); color: var(--flame-600); }
-.dm-chip.on { background: var(--flame-tint); }
-.dm-chip:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
-.dm-note { margin: 0; padding: 16px 18px; border-radius: var(--r-md); background: var(--paper); border: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--ash-700); }
-.dm-note b { color: var(--navy); }
-.dm-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ash-700); }
-.dm-legend span { display: inline-flex; align-items: center; gap: 7px; }
-.dm-legend i { display: inline-block; flex: none; }
-.dm-li-area { width: 16px; height: 12px; border-radius: 3px; background: rgb(240 78 35 / 0.18); border: 2px solid var(--flame); }
-.dm-li-base { width: 12px; height: 12px; border-radius: 50%; background: var(--flame); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--flame); }
-.dm-li-ring { width: 16px; height: 0; border-top: 2px dashed var(--ash); }
-@media (max-width: 900px) { .dm-grid { grid-template-columns: 1fr; } }
-/* Telefon: podpisy miast nachodziłyby na siebie — zostaje Płońsk, punkty
-   orientacyjne i miasto wybrane na liście pod mapą. */
-@media (max-width: 680px) {
-  .dm-town text { display: none; }
-  .dm-town.on text { display: block; font-size: 30px; stroke-width: 7px; }
-  .dm-town circle { r: 9px; }
-  .dm-c-t { font-size: 36px; }
-  .dm-ref text { font-size: 24px; }
-  .dm-ring-t { font-size: 22px; }
-  .dm-chip { font-size: 13.5px; padding: 6px 11px; }
-}
-@media (prefers-reduced-motion: reduce) { .dm-pulse { animation: none; opacity: 0; } }
-
-.dm-head { max-width: 760px; margin-bottom: 36px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-.dm-h { font-family: var(--font-display); font-weight: 700; letter-spacing: -.03em; line-height: 1.06; margin: 0; font-size: clamp(28px, 3.4vw, 44px); color: var(--navy); text-wrap: balance; }
-.dm-lead { margin: 0; font-size: 17.5px; line-height: 1.55; color: var(--ash-700); max-width: 62ch; }
-.dm-side .btn { align-self: flex-start; }
-
 /* ===== FAQ ===== */
 .faq-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: var(--s8); align-items: start; }
 .faq-side { display: flex; flex-direction: column; gap: var(--s3); position: sticky; top: calc(var(--header-h) + 32px); }
@@ -543,6 +482,7 @@ a.direct-row:hover { color: #fff; }
   <!-- Domyślne slajdy karuzeli Langer (wspólne ze stroną główną i panelem) -->
   <script src="../shared/langer-showcase.js"></script>
   <!-- Obszar dowozu: miasta i mapa (wspólne ze stroną główną) -->
+  <link rel="stylesheet" href="../shared/delivery-area.css" />
   <script src="../shared/delivery-area.js"></script>
 
   <script type="text/babel">
@@ -576,6 +516,7 @@ const OFFER_DEFAULTS = {
   logo_dark:      '',
   brand_accent:   '#F04E23',
   langer_showcase: '',   // slajdy karuzeli Langer (JSON) — puste = domyślne
+  delivery_area:   '',   // obszar dowozu (JSON) — puste = domyślny wokół Płońska
 };
 
 const trim = v => String(v ?? '').trim();
@@ -1321,125 +1262,15 @@ function Safe({ t }) {
 }
 
 /* ===== GDZIE DOWOZIMY =====
-   Mapa obszaru dowozu z Płońska. Miasta, kolejność obwodu i punkty
-   orientacyjne: shared/delivery-area.js. Ta sama sekcja jest na stronie
-   głównej i na /dla-punktow/ (kopia komponentu w obu plikach). */
-function DeliveryMap({ hl, onPick }) {
-  const D = window.LangerDelivery;
-  const geo = useMemo(() => {
-    if (!D) return null;
-    const towns = D.TOWNS.map(t => ({ ...t, xy: D.project(t.lat, t.lon) }));
-    return {
-      towns,
-      area: D.smooth(towns.map(t => t.xy)),
-      c: D.project(D.CENTER.lat, D.CENTER.lon),
-      refs: D.REF.map(r => ({ ...r, xy: D.project(r.lat, r.lon) })),
-      inArea: D.smooth(D.TOWNS.map(t => D.projectInset(t.lat, t.lon))),
-      inC: D.projectInset(D.CENTER.lat, D.CENTER.lon),
-    };
-  }, []);
-  if (!geo) return null;
-  const V = D.VIEW, I = D.INSET, c = geo.c, R = 100 * D.kmUnits;
-  const lab = (pos, [x, y], gap = 12) => (
-    pos === 'l' ? { x: x - gap, y: y + 6, a: 'end' } :
-    pos === 't' ? { x, y: y - gap - 4, a: 'middle' } :
-    pos === 'b' ? { x, y: y + gap + 18, a: 'middle' } :
-                  { x: x + gap, y: y + 6, a: 'start' });
-  const ringLab = [c[0] - R * Math.cos(0.35) , c[1] + R * Math.sin(0.35) + 26];
-  return (
-    <svg className="dm-svg" viewBox={(V.crop || [0, 0, V.w, V.h]).join(' ')} role="img"
-         aria-label={`Mapa obszaru dowozu z ${D.CENTER.name}: ${D.TOWNS.map(t => t.name).join(', ')}`}>
-      <rect className="dm-bg" width={V.w} height={V.h} />
-      <path className="dm-river" d={D.RIVERS} />
-      <circle className="dm-ring" cx={c[0]} cy={c[1]} r={R} />
-      <text className="dm-ring-t" x={ringLab[0]} y={ringLab[1]} textAnchor="middle">100 km</text>
-      <path className="dm-area" d={geo.area} />
-      {geo.refs.map(r => {
-        const L = lab(r.label, r.xy, 10);
-        return (
-          <g key={r.name} className="dm-ref">
-            <rect x={r.xy[0] - 5} y={r.xy[1] - 5} width="10" height="10" rx="2" />
-            <text x={L.x} y={L.y} textAnchor={L.a}>{r.name}</text>
-          </g>
-        );
-      })}
-      {geo.towns.map(t => {
-        const L = lab(t.label, t.xy);
-        const on = hl === t.name;
-        return (
-          <g key={t.name} className={'dm-town' + (on ? ' on' : '')} onMouseEnter={() => onPick(t.name)} onMouseLeave={() => onPick(null)}>
-            <circle cx={t.xy[0]} cy={t.xy[1]} r={on ? 10 : 7} />
-            <text x={L.x} y={L.y} textAnchor={L.a}>{t.name}</text>
-          </g>
-        );
-      })}
-      <circle className="dm-pulse" cx={c[0]} cy={c[1]} r="13" />
-      <circle className="dm-c" cx={c[0]} cy={c[1]} r="13" />
-      <text className="dm-c-t" x={c[0] + 22} y={c[1] + 9}>{D.CENTER.name}</text>
-      <g transform={`translate(24 ${(V.crop ? V.crop[1] : 0) + 24})`} aria-hidden="true">
-        <rect className="dm-inset-bg" x="-10" y="-10" width={I.w + 20} height={I.h + 20} rx="14" />
-        <path className="dm-pl" d={D.POLAND} />
-        <path className="dm-inset-area" d={geo.inArea} />
-        <circle className="dm-c" cx={geo.inC[0]} cy={geo.inC[1]} r="3.5" strokeWidth="1.5" />
-      </g>
-    </svg>
-  );
-}
-
-function DeliverySection({ cta }) {
-  const D = window.LangerDelivery;
-  // hover = podgląd pod kursorem, sel = miasto wybrane kliknięciem/tapnięciem
-  const [hover, setHover] = useState(null);
-  const [sel, setSel] = useState(null);
-  const hl = hover || sel;
-  if (!D) return null;
-  return (
-    <section id="dowoz" className="sec dm-sec">
-      <div className="wrap">
-        <div className="dm-head">
-          <span className="eyebrow">Gdzie dowozimy</span>
-          <h2 className="dm-h">Dowozimy z Płońska{'\u00a0'}— od Łodzi po Łomżę.</h2>
-          <p className="dm-lead">
-            Własnym transportem dojeżdżamy do sklepów i hurtowni w całym zaznaczonym obszarze — od paczki
-            po paletę, pod sam sklep. Dalej wysyłamy spedycją w całej Polsce.
-          </p>
-        </div>
-        <div className="dm-grid">
-          <div className="dm-card"><DeliveryMap hl={hl} onPick={setHover} /></div>
-          <div className="dm-side">
-            <div className="dm-legend" aria-hidden="true">
-              <span><i className="dm-li-base" /> Baza: {[D.CENTER.postal, D.CENTER.name].filter(Boolean).join(' ')}</span>
-              <span><i className="dm-li-area" /> obszar dowozu</span>
-              <span><i className="dm-li-ring" /> 100 km od bazy</span>
-            </div>
-            <div>
-              <div className="dm-k" style={{ marginBottom: 10 }}>Dojeżdżamy m.in. do</div>
-              <div className="dm-towns">
-                {D.TOWNS.map(t => (
-                  <button key={t.name} type="button" className={'dm-chip' + (hl === t.name ? ' on' : '')} aria-pressed={sel === t.name}
-                          onMouseEnter={() => setHover(t.name)} onMouseLeave={() => setHover(null)}
-                          onClick={() => setSel(v => (v === t.name ? null : t.name))}>
-                    {t.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <p className="dm-note">
-              <b>Twojej miejscowości nie ma na liście?</b> Jeśli leży w zaznaczonym obszarze — dojedziemy.
-              Spoza niego wyślemy spedycją.
-            </p>
-            {cta}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+   Sekcja z mapą i wyszukiwarką „czy dowozimy" jest wspólna dla stron —
+   komponent i dane: shared/delivery-area.js, style: shared/delivery-area.css,
+   punkty obszaru: panel → „Mapa dowozu" (ustawienie delivery_area). */
+const LD = window.LangerDelivery;
 
 /* ============================================================
    PYTANIA
    ============================================================ */
-function Faq({ t }) {
+function Faq({ t, towns = [] }) {
   const items = [
     ['Ile kartonów Langera muszę kupić?',
       'Nie ma sztywnego progu. Zasada jest prosta: bierzesz Langera — zyskujesz. Im większa część Langera w zamówieniu, tym lepsze warunki na resztę. Konkretne liczby policzymy na Twoim koszyku.'],
@@ -1456,7 +1287,7 @@ function Faq({ t }) {
     ['Jak szybko dostanę ofertę?',
       'Przedstawiciel z Twojego regionu odezwie się w ciągu jednego dnia roboczego.'],
     ['Dowozicie do mojej miejscowości?',
-      `Z Płońska dojeżdżamy własnym transportem m.in. do: ${(window.LangerDelivery ? window.LangerDelivery.TOWNS.map(x => x.name) : []).join(', ')} — i wszędzie w obszarze zaznaczonym na mapie. Dalej wysyłamy spedycją w całej Polsce.`],
+      `Własnym transportem dojeżdżamy m.in. do: ${towns.join(', ')} — i wszędzie w obszarze zaznaczonym na mapie. Swoją miejscowość albo kod pocztowy sprawdzisz w wyszukiwarce przy mapie. Dalej wysyłamy spedycją w całej Polsce.`],
   ];
   return (
     <section className="sec sec-paper" id="faq">
@@ -1682,6 +1513,7 @@ function App() {
   const offer = useOffer();
   const brands = useBrands();
   const t = terms(offer);
+  const deliveryTowns = useMemo(() => (LD ? LD.resolve(offer.delivery_area).towns.map(x => x.name) : []), [offer.delivery_area]);
   const active = useActiveSection(['oferta', ...NAV.map(([id]) => id), 'bez-ryzyka', 'kontakt']);
   const atContact = useInView('kontakt');
 
@@ -1705,8 +1537,9 @@ function App() {
         <PistolBand t={t} want={want} />
         <Marketing want={want} />
         <Safe t={t} />
-        <DeliverySection cta={<a href="#kontakt" className="btn btn-flame">Zapytaj o dowóz <IArrow s={17}/></a>} />
-        <Faq t={t} />
+        {LD && <LD.Section value={offer.delivery_area} phone={t.phone}
+                           cta={<a href="#kontakt" className="btn btn-flame">Zapytaj o dowóz <IArrow s={17}/></a>} />}
+        <Faq t={t} towns={deliveryTowns} />
         <Contact t={t} picked={picked} toggle={toggle} />
       </main>
       <Footer offer={offer} t={t} />

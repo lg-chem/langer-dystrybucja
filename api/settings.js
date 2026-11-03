@@ -49,6 +49,11 @@ const DEFAULTS = {
   // Langer". JSON z listą slajdów; puste = lista domyślna z
   // shared/langer-showcase.js.
   langer_showcase: '',
+
+  // Obszar dowozu (mapa i wyszukiwarka „czy dowozimy") — panel → „Mapa
+  // dowozu". JSON { center, towns: [{ name, lat, lon, label? }] }; puste =
+  // obszar domyślny z shared/delivery-area.js.
+  delivery_area: '',
 };
 
 // Klucze, które wolno zapisywać — chroni przed zaśmieceniem tabeli
