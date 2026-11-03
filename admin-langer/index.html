@@ -148,6 +148,72 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
 
 .muted { color: var(--ash); font-size: 13px; }
 .mono { font-family: var(--font-mono); font-size: 12.5px; }
+
+/* Karuzela Langer — edytor slajdów */
+.sc-note { margin: 0 0 14px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--light); font-size: 13.5px; color: var(--ash-700); }
+.sc-note-warn { background: var(--flame-tint); color: var(--navy); }
+.sc-note-ok { background: var(--green-tint); color: #14532D; }
+.sc-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 1000px) { .sc-grid { grid-template-columns: 1fr; } }
+.sc-h { font-size: 14px; font-weight: 700; margin: 0 0 10px; }
+.sc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.sc-item { border: 1.5px solid var(--line); border-radius: var(--r-md); background: var(--white); }
+.sc-item.open { border-color: var(--flame); }
+.sc-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; }
+.sc-n { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--light); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.sc-thumb { flex: none; width: 40px; height: 52px; border-radius: 6px; background: var(--navy); display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 3px; }
+.sc-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sc-thumb-lg { width: 64px; height: 84px; }
+.sc-t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sc-t b { font-size: 14.5px; }
+.sc-t > span { font-size: 12.5px; }
+.sc-acts { display: flex; align-items: center; gap: 4px; flex: none; }
+.sc-mv { font-size: 16px; font-weight: 700; color: var(--navy); }
+.sc-mv:hover:not(:disabled) { background: var(--light); color: var(--navy); }
+.sc-mv:disabled { opacity: .3; }
+.sc-form { border-top: 1px solid var(--line); padding: 16px; display: flex; flex-direction: column; gap: 14px; background: var(--paper); border-radius: 0 0 var(--r-md) var(--r-md); }
+.sc-fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.sc-f { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sc-l { font-size: 12px; font-weight: 600; color: var(--ash-700); letter-spacing: .04em; text-transform: uppercase; }
+.sc-hint { font-size: 12px; color: var(--ash); line-height: 1.35; }
+.sc-f input, .sc-f select, .sc-f textarea, .sc-search { width: 100%; font: inherit; font-size: 14.5px; padding: 9px 11px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: var(--white); color: var(--navy); }
+.sc-f textarea { resize: vertical; line-height: 1.5; }
+.sc-f input:focus, .sc-f select:focus, .sc-f textarea:focus, .sc-search:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,21,51,.08); }
+.sc-specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.sc-spec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; padding: 6px; border-radius: var(--r-sm); background: var(--white); border: 1px solid var(--line); }
+@media (max-width: 640px) { .sc-specs { grid-template-columns: 1fr; } .sc-row { flex-wrap: wrap; } }
+.sc-imgrow { display: flex; align-items: flex-start; gap: 14px; }
+.sc-side { position: sticky; top: 16px; }
+.sc-search { margin-bottom: 10px; }
+.sc-prods { max-height: 560px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--r-md); }
+.sc-prod { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); cursor: pointer; font-size: 13.5px; }
+.sc-prod:last-child { border-bottom: none; }
+.sc-prod:hover { background: var(--paper); }
+.sc-prod.on { background: var(--flame-tint); }
+.sc-prod input { flex: none; width: 16px; height: 16px; accent-color: var(--flame); }
+.sc-prod img, .sc-ph { flex: none; width: 28px; height: 36px; object-fit: contain; border-radius: 4px; background: var(--light); }
+.sc-pt { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.sc-pt b { font-weight: 600; line-height: 1.3; }
+.sc-pt .mono { font-size: 11.5px; }
+
+/* Lista produktów — filtry, braki, sortowanie po kolumnach */
+.flt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.flt-sel { padding: 8px 10px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); font-size: 14px; background: var(--white); color: var(--navy); max-width: 100%; }
+.flt-sel.on { border-color: var(--flame); background: var(--flame-tint); }
+.gaps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 12px; }
+.gaps-k { font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ash-700); margin-right: 4px; }
+.gap-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; border: 1.5px solid var(--line-2); background: var(--white); font-size: 13px; font-weight: 600; color: var(--navy); }
+.gap-chip b { font-family: var(--font-mono); font-size: 12px; color: var(--red); }
+.gap-chip:hover:not(:disabled) { border-color: var(--navy); }
+.gap-chip.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+.gap-chip.on b { color: #fff; }
+.gap-chip.zero { opacity: .5; }
+.gap-chip.zero b { color: var(--green); }
+.res-line { font-size: 13.5px; color: var(--ash-700); margin: 0 0 4px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.th-sort { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0; font: inherit; color: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.th-sort:hover, .th-sort.on { color: var(--navy); }
+.th-ar { font-size: 10px; opacity: .5; }
+.th-sort.on .th-ar { opacity: 1; color: var(--flame); }
 .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .flex-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -238,6 +304,8 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  <!-- Domyślne slajdy karuzeli Langer — punkt startowy edytora -->
+  <script src="../shared/langer-showcase.js"></script>
   <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 
   <script type="text/babel">
@@ -293,7 +361,6 @@ const DEFAULT_BRANDING = {
   logo_mark:      '',
   favicon:        '',
   logo_height:    '38',
-  logo_show_text: '1',
   brand_accent:   '#F04E23',
 };
 
@@ -323,7 +390,7 @@ const DEFAULT_CONTACT = {
 
 /* Komplet ustawień trzymanych w tabeli `settings` — jedna wspólna mapa dla
    wszystkich kart zakładki „Ustawienia". */
-const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT, ...DEFAULT_STATS };
+const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT, ...DEFAULT_STATS, langer_showcase: '' };
 
 /* Trzy sloty logo. `bg` decyduje, na jakim tle rysujemy podgląd — logo na
    ciemne tło jest zwykle białe, więc na białym kwadracie byłoby niewidoczne. */
@@ -1795,6 +1862,288 @@ function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = 
 }
 
 /* ============================================================
+   KARUZELA LANGER — slajdy na stronie głównej i na /dla-punktow/
+   ============================================================
+   Lista slajdów trafia do ustawień jako JSON (klucz `langer_showcase`).
+   Dopóki nic nie zapiszesz, strony pokazują listę domyślną z
+   shared/langer-showcase.js — panel startuje od jej kopii, z SKU
+   dopasowanymi do produktów w bazie. */
+const SC = window.LangerShowcase || { DEFAULT: [], findProduct: () => null, norm: (s) => String(s || '').toLowerCase() };
+const SC_BADGES = ['Bestseller', 'Nowość', 'Promocja', 'Polecany'];
+const SC_SPEC_HINTS = [['Wydajność', '70 L'], ['Czas cięcia', '15–30′'], ['Odporność', '−40/+90 °C'], ['Gęstość', '25 kg/m³']];
+const scTrim = (v) => String(v ?? '').trim();
+
+/* Slajd do zapisu: bez pól roboczych i bez pustych wartości. */
+function cleanSlide(s) {
+  const out = {
+    sku: scTrim(s.sku), name: scTrim(s.name), sub: scTrim(s.sub), cat: scTrim(s.cat),
+    badge: scTrim(s.badge), desc: scTrim(s.desc), img: scTrim(s.img),
+    specs: (s.specs || []).map(x => ({ k: scTrim(x && x.k), v: scTrim(x && x.v) })).filter(x => x.k || x.v).slice(0, 4),
+    uses: (s.uses || []).map(scTrim).filter(Boolean),
+  };
+  Object.keys(out).forEach(k => {
+    if (k !== 'name' && (out[k] === '' || (Array.isArray(out[k]) && !out[k].length))) delete out[k];
+  });
+  return out;
+}
+
+let scSeq = 0;
+/* Stan startowy: zapisana lista albo domyślna. Domyślne slajdy dostają SKU
+   produktu z bazy, jeśli nazwa pasuje (Langer 70, XL Fast, Express…). */
+function initialSlides(value, products) {
+  let list = null;
+  try { const v = value ? JSON.parse(value) : null; if (Array.isArray(v) && v.length) list = v; } catch (e) { /* zła wartość */ }
+  const fromDefault = !list;
+  return {
+    fromDefault,
+    slides: (list || SC.DEFAULT).map(it => {
+      const p = SC.findProduct(it, products);
+      const { match, exclude, ...rest } = it;
+      return { ...rest, sku: String(it.sku || (p ? p.sku : '')), specs: [...(it.specs || [])], uses: [...(it.uses || [])], _id: 's' + (++scSeq) };
+    }),
+  };
+}
+
+function SlideForm({ s, onChange, langer, bySku }) {
+  const set = (k) => (e) => onChange({ [k]: e.target.value });
+  const specs = [0, 1, 2, 3].map(i => (s.specs && s.specs[i]) || { k: '', v: '' });
+  const setSpec = (i, f, v) => onChange({ specs: specs.map((x, j) => (j === i ? { ...x, [f]: v } : x)) });
+  const prod = bySku.get(String(s.sku || ''));
+  const img = s.img || (prod && prod.image_url) || '';
+  return (
+    <div className="sc-form">
+      <div className="sc-fgrid">
+        <label className="sc-f">
+          <span className="sc-l">Produkt z bazy</span>
+          <select value={s.sku || ''} onChange={e => {
+            const p = bySku.get(e.target.value);
+            onChange({ sku: e.target.value, ...(p && !scTrim(s.name) ? { name: p.name } : {}) });
+          }}>
+            <option value="">— bez powiązania —</option>
+            {s.sku && !prod && <option value={s.sku}>{s.sku} (nie ma w bazie)</option>}
+            {langer.map(p => <option key={p.sku} value={p.sku}>{p.name} · {p.sku}</option>)}
+          </select>
+          <span className="sc-hint">Daje zdjęcie z bazy i przycisk „Zobacz w katalogu".</span>
+        </label>
+        <label className="sc-f">
+          <span className="sc-l">Nazwa na slajdzie</span>
+          <input value={s.name || ''} onChange={set('name')} placeholder={prod ? prod.name : 'np. Langer 70'} />
+        </label>
+        <label className="sc-f">
+          <span className="sc-l">Druga linia</span>
+          <input value={s.sub || ''} onChange={set('sub')} placeholder="np. 870 ml · niskoprężna" />
+        </label>
+        <label className="sc-f">
+          <span className="sc-l">Rodzaj</span>
+          <input value={s.cat || ''} onChange={set('cat')} placeholder="np. Piana pistoletowa" />
+        </label>
+        <label className="sc-f">
+          <span className="sc-l">Plakietka na zdjęciu</span>
+          <input list="sc-badges" value={s.badge || ''} onChange={set('badge')} placeholder="np. Bestseller — puste = brak" />
+        </label>
+      </div>
+      <label className="sc-f">
+        <span className="sc-l">Opis</span>
+        <textarea rows="3" value={s.desc || ''} onChange={set('desc')} placeholder="Dwa, trzy zdania: do czego i dlaczego ten produkt." />
+      </label>
+      <div className="sc-f">
+        <span className="sc-l">Wyróżniki — do 4 (nazwa i wartość)</span>
+        <div className="sc-specs">
+          {specs.map((x, i) => (
+            <div className="sc-spec" key={i}>
+              <input value={x.k} onChange={e => setSpec(i, 'k', e.target.value)} placeholder={SC_SPEC_HINTS[i][0]} aria-label={`Wyróżnik ${i + 1} — nazwa`} />
+              <input value={x.v} onChange={e => setSpec(i, 'v', e.target.value)} placeholder={SC_SPEC_HINTS[i][1]} aria-label={`Wyróżnik ${i + 1} — wartość`} />
+            </div>
+          ))}
+        </div>
+      </div>
+      <label className="sc-f">
+        <span className="sc-l">Zastosowanie — oddziel przecinkami</span>
+        <input value={s.usesText ?? (s.uses || []).join(', ')}
+               onChange={e => onChange({ usesText: e.target.value, uses: e.target.value.split(',').map(scTrim).filter(Boolean) })}
+               placeholder="Okna i drzwi, Izolacja akustyczna, Szczeliny i bruzdy" />
+      </label>
+      <div className="sc-imgrow">
+        <span className="sc-thumb sc-thumb-lg">{img ? <img src={img} alt="" /> : <span className="muted" style={{ fontSize: 11 }}>brak</span>}</span>
+        <label className="sc-f" style={{ flex: 1 }}>
+          <span className="sc-l">Zdjęcie — adres (puste = zdjęcie produktu z bazy)</span>
+          <input value={s.img || ''} onChange={set('img')} placeholder="https://… albo /dla-punktow/assets/langer-70.webp" />
+          <span className="sc-hint">Strona sama przycina puste marginesy, więc każdy produkt wychodzi tej samej wielkości.</span>
+        </label>
+      </div>
+    </div>
+  );
+}
+
+function ShowcaseEditor({ st }) {
+  const [products, setProducts] = useState(null);       // null = jeszcze się ładują
+  const [state, setState] = useState(null);             // { slides, fromDefault }
+  const [open, setOpen] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const [dirty, setDirty] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [q, setQ] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    apiList()
+      .then(l => { if (alive) setProducts(Array.isArray(l) ? l : []); })
+      .catch(e => { if (alive) { setErr(e.message); setProducts([]); } });
+    return () => { alive = false; };
+  }, []);
+  // Start dopiero, gdy są i ustawienia, i produkty (do dopasowania SKU)
+  useEffect(() => {
+    if (!st.loading && products && !state) setState(initialSlides(st.values.langer_showcase, products));
+  }, [st.loading, products]);
+
+  if (!state) return <div className="adm-card"><p className="muted"><span className="spinner"/> Wczytywanie karuzeli…</p></div>;
+
+  const slides = state.slides;
+  const bySku = new Map((products || []).map(p => [String(p.sku), p]));
+  const langer = (products || []).filter(p => SC.norm(p.brand).trim() === 'langer')
+    .sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pl'));
+  const inShow = new Set(slides.map(s => String(s.sku || '')).filter(Boolean));
+  const term = q.trim().toLowerCase();
+  const shownLanger = term ? langer.filter(p => [p.name, p.sku, p.subcategory].join(' ').toLowerCase().includes(term)) : langer;
+
+  const change = (fn) => { setState(s => ({ ...s, slides: fn(s.slides) })); setDirty(true); setSaved(false); };
+  const upd = (id, patch) => change(list => list.map(s => (s._id === id ? { ...s, ...patch } : s)));
+  const move = (i, d) => change(list => {
+    const j = i + d;
+    if (j < 0 || j >= list.length) return list;
+    const a = [...list]; [a[i], a[j]] = [a[j], a[i]]; return a;
+  });
+  const remove = (s) => {
+    if (!confirm(`Usunąć „${s.name || s.sku}" z karuzeli?`)) return;
+    change(list => list.filter(x => x._id !== s._id));
+  };
+  const toggleProduct = (p) => {
+    const sku = String(p.sku);
+    if (inShow.has(sku)) {
+      const s = slides.find(x => String(x.sku) === sku);
+      if (s) remove(s);
+      return;
+    }
+    const id = 's' + (++scSeq);
+    change(list => [...list, {
+      _id: id, sku, name: p.name || '', sub: p.variant || '', cat: p.subcategory || '',
+      badge: p.role === 'magnet' ? 'Bestseller' : '', desc: '', specs: [], uses: [], img: '',
+    }]);
+    setOpen(id);
+  };
+
+  async function save() {
+    const clean = slides.map(cleanSlide).filter(s => s.name);
+    if (!clean.length) { setErr('Karuzela musi mieć przynajmniej jeden slajd z nazwą.'); return; }
+    setBusy(true); setErr('');
+    try {
+      const value = JSON.stringify(clean);
+      await apiSettingsSave({ langer_showcase: value });
+      st.set('langer_showcase', value);
+      setState(s => ({ ...s, fromDefault: false }));
+      setDirty(false); setSaved(true);
+    } catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  }
+  async function reset() {
+    if (!confirm('Przywrócić domyślną karuzelę (Langer 70, XL Fast, Express 60 s…)?\nTwoja lista slajdów zostanie zastąpiona.')) return;
+    setBusy(true); setErr('');
+    try {
+      await apiSettingsSave({ langer_showcase: '' });
+      st.set('langer_showcase', '');
+      setState(initialSlides('', products || []));
+      setOpen(null); setDirty(false); setSaved(true);
+    } catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div className="adm-card">
+      <div className="flex-between">
+        <div>
+          <h2 className="adm-card-h">Karuzela Langer</h2>
+          <p className="adm-card-d">
+            Produkty w karuzeli na <a href="/?fresh=1#langer" target="_blank" rel="noopener" className="mono">stronie głównej</a> i
+            na <a href="/dla-punktow/?fresh=1#produkty" target="_blank" rel="noopener" className="mono">/dla-punktow/</a>.
+            Zaznacz produkty po prawej, ustaw kolejność strzałkami i wpisz wyróżniki oraz zastosowanie.
+          </p>
+        </div>
+        <div className="gap-2">
+          <button type="button" className="btn btn-ghost" onClick={reset} disabled={busy}>Przywróć domyślną</button>
+          <button type="button" className="btn btn-flame" onClick={save} disabled={busy || !dirty}>
+            {busy ? <span className="spinner"/> : <ISettings s={16}/>} Zapisz karuzelę
+          </button>
+        </div>
+      </div>
+
+      {state.fromDefault && !dirty && (
+        <p className="sc-note">Na stronie jest teraz <b>lista domyślna</b>. Po pierwszym zapisie strony pokażą Twoją.</p>
+      )}
+      {dirty && <p className="sc-note sc-note-warn">Masz niezapisane zmiany — kliknij „Zapisz karuzelę".</p>}
+      {saved && !dirty && <p className="sc-note sc-note-ok">Zapisano. Strona pokaże zmiany w ciągu minuty (od razu przez linki powyżej).</p>}
+      {err && <div className="login-err">{err}</div>}
+      <datalist id="sc-badges">{SC_BADGES.map(b => <option key={b} value={b} />)}</datalist>
+
+      <div className="sc-grid">
+        <div>
+          <h3 className="sc-h">Slajdy ({slides.length}) — w tej kolejności na stronie</h3>
+          <ol className="sc-list">
+            {slides.map((s, i) => {
+              const prod = bySku.get(String(s.sku || ''));
+              const img = s.img || (prod && prod.image_url) || '';
+              const nSpecs = (s.specs || []).filter(x => x && (scTrim(x.k) || scTrim(x.v))).length;
+              const nUses = (s.uses || []).length;
+              return (
+                <li key={s._id} className={'sc-item' + (open === s._id ? ' open' : '')}>
+                  <div className="sc-row">
+                    <span className="sc-n">{i + 1}</span>
+                    <span className="sc-thumb">{img ? <img src={img} alt="" /> : null}</span>
+                    <div className="sc-t">
+                      <b>{s.name || prod?.name || '(bez nazwy)'}</b>
+                      <span className="muted">
+                        {s.sku ? <span className="mono">{s.sku}</span> : 'bez powiązania z bazą'}
+                        {s.badge ? ` · ${s.badge}` : ''} · {nSpecs} {nSpecs === 1 ? 'wyróżnik' : (nSpecs >= 2 && nSpecs <= 4 ? 'wyróżniki' : 'wyróżników')} · {nUses ? `zastosowanie: ${nUses}` : 'bez zastosowania'}
+                      </span>
+                    </div>
+                    <div className="sc-acts">
+                      <button type="button" className="btn-icon sc-mv" onClick={() => move(i, -1)} disabled={i === 0} title="Wyżej" aria-label="Przesuń wyżej">↑</button>
+                      <button type="button" className="btn-icon sc-mv" onClick={() => move(i, 1)} disabled={i === slides.length - 1} title="Niżej" aria-label="Przesuń niżej">↓</button>
+                      <button type="button" className="btn btn-ghost" onClick={() => setOpen(open === s._id ? null : s._id)} style={{ padding: '6px 12px' }}>
+                        {open === s._id ? 'Zwiń' : <><IEdit s={14}/> Edytuj</>}
+                      </button>
+                      <button type="button" className="btn-icon" onClick={() => remove(s)} title="Usuń z karuzeli" aria-label="Usuń z karuzeli"><ITrash s={18}/></button>
+                    </div>
+                  </div>
+                  {open === s._id && <SlideForm s={s} onChange={patch => upd(s._id, patch)} langer={langer} bySku={bySku} />}
+                </li>
+              );
+            })}
+          </ol>
+          {!slides.length && <p className="muted">Karuzela jest pusta — zaznacz produkty po prawej.</p>}
+        </div>
+
+        <aside className="sc-side">
+          <h3 className="sc-h">Produkty Langer w bazie ({langer.length})</h3>
+          <p className="muted" style={{ margin: '0 0 10px', fontSize: 13 }}>Zaznacz, żeby dodać do karuzeli. Odznacz, żeby usunąć.</p>
+          <input className="sc-search" value={q} onChange={e => setQ(e.target.value)} placeholder="Szukaj: nazwa, SKU…" />
+          <div className="sc-prods">
+            {shownLanger.map(p => (
+              <label key={p.sku} className={'sc-prod' + (inShow.has(String(p.sku)) ? ' on' : '')}>
+                <input type="checkbox" checked={inShow.has(String(p.sku))} onChange={() => toggleProduct(p)} />
+                {p.image_url ? <img src={p.image_url} alt="" /> : <span className="sc-ph" />}
+                <span className="sc-pt"><b>{p.name}</b><span className="mono muted">{p.sku}</span></span>
+              </label>
+            ))}
+            {!shownLanger.length && <p className="muted" style={{ padding: 14, margin: 0 }}>{langer.length ? 'Brak wyników.' : 'W bazie nie ma produktów marki Langer.'}</p>}
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    LISTA PRODUKTÓW + USUWANIE + EDYCJA
    ============================================================ */
 function ProductList({ refreshTrigger, brands, categories }) {
@@ -1806,6 +2155,12 @@ function ProductList({ refreshTrigger, brands, categories }) {
   const [editing, setEditing] = useState(null);
   const [adding, setAdding] = useState(false);
   const [sel, setSel] = useState(new Set());               // zaznaczone SKU (edycja zbiorcza)
+  const [sort, setSort] = useState({ key: 'name', dir: 1 });  // kliknięcie w nagłówek kolumny
+  const NO_FILTER = { brand: 'all', cat: 'all', sub: 'all', img: 'all' };
+  const [flt, setFlt] = useState(NO_FILTER);
+  // Zmiana kategorii czyści podkategorię (podkategorie należą do kategorii)
+  const setFilter = (k, v) => setFlt(f => ({ ...f, [k]: v, ...(k === 'cat' ? { sub: 'all' } : {}) }));
+  const fltOn = Object.keys(NO_FILTER).some(k => flt[k] !== NO_FILTER[k]);
   const [bulk, setBulk] = useState(null);                  // { done, total } trwającej operacji
 
   async function reload() {
@@ -1835,13 +2190,63 @@ function ProductList({ refreshTrigger, brands, categories }) {
     }
   }
 
+  /* Kategoria w bazie to identyfikator (np. „farbywsprayu") — w tabeli
+     i w filtrach pokazujemy nazwę z Ustawień → Kategorie. */
+  const catLabel = useMemo(() => new Map(categories.map(c => [c.id, c.label])), [categories]);
+  const blank = (v) => !String(v ?? '').trim();
+  const lc = (v) => String(v ?? '').trim().toLowerCase();
+
+  // Braki w danych — liczniki na przyciskach „Braki"
+  const gaps = useMemo(() => ({
+    img:   products.filter(p => blank(p.image_url)).length,
+    brand: products.filter(p => blank(p.brand)).length,
+    cat:   products.filter(p => blank(p.category)).length,
+    sub:   products.filter(p => blank(p.subcategory)).length,
+    unknownCat: products.filter(p => !blank(p.category) && !catLabel.has(p.category)).length,
+  }), [products, catLabel]);
+
+  // Marki do filtra — z produktów (także te spoza listy w Ustawieniach)
+  const brandOpts = useMemo(() => {
+    const m = new Map();
+    for (const p of products) if (!blank(p.brand) && !m.has(lc(p.brand))) m.set(lc(p.brand), p.brand.trim());
+    return [...m.entries()].sort((a, b) => a[1].localeCompare(b[1], 'pl'));
+  }, [products]);
+
   const filtered = useMemo(() => {
-    if (!q.trim()) return products;
     const term = q.trim().toLowerCase();
-    return products.filter(p =>
-      [p.sku, p.name, p.brand, p.category, p.subcategory].filter(Boolean).join(' ').toLowerCase().includes(term)
+    const r = products.filter(p => {
+      if (term && ![p.sku, p.name, p.brand, p.category, catLabel.get(p.category), p.subcategory]
+        .filter(Boolean).join(' ').toLowerCase().includes(term)) return false;
+      if (flt.brand === '__none' ? !blank(p.brand) : flt.brand !== 'all' && lc(p.brand) !== flt.brand) return false;
+      if (flt.cat === '__none' && !blank(p.category)) return false;
+      if (flt.cat === '__unknown' && (blank(p.category) || catLabel.has(p.category))) return false;
+      if (!flt.cat.startsWith('__') && flt.cat !== 'all' && p.category !== flt.cat) return false;
+      if (flt.sub === '__none' ? !blank(p.subcategory) : flt.sub !== 'all' && lc(p.subcategory) !== flt.sub) return false;
+      if (flt.img === 'none' && !blank(p.image_url)) return false;
+      if (flt.img === 'has' && blank(p.image_url)) return false;
+      return true;
+    });
+    // Sortowanie po klikniętej kolumnie; puste wartości zawsze na końcu
+    const val = (p) => String((sort.key === 'category' ? (catLabel.get(p.category) || p.category) : p[sort.key]) ?? '').trim();
+    return r.sort((a, b) => {
+      const va = val(a), vb = val(b);
+      if (!va !== !vb) return va ? -1 : 1;
+      return sort.dir * va.localeCompare(vb, 'pl', { numeric: true, sensitivity: 'base' })
+        || (a.name || '').localeCompare(b.name || '', 'pl');
+    });
+  }, [products, q, flt, sort, catLabel]);
+
+  const sortTh = (key, label) => {
+    const on = sort.key === key;
+    return (
+      <th aria-sort={on ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'}>
+        <button type="button" className={'th-sort' + (on ? ' on' : '')} title="Sortuj"
+                onClick={() => setSort(s => (s.key === key ? { key, dir: -s.dir } : { key, dir: 1 }))}>
+          {label}<span className="th-ar" aria-hidden="true">{on ? (sort.dir > 0 ? '▲' : '▼') : '↕'}</span>
+        </button>
+      </th>
     );
-  }, [products, q]);
+  };
 
   /* Podkategorie wyliczamy z produktów — nie ma osobnej tabeli do pilnowania.
      Stąd biorą się podpowiedzi w formularzu i lista w edycji zbiorczej. */
@@ -1859,8 +2264,19 @@ function ProductList({ refreshTrigger, brands, categories }) {
       (a.category || '').localeCompare(b.category || '', 'pl') || a.label.localeCompare(b.label, 'pl'));
   }, [products]);
 
+  const subFilterOpts = useMemo(() => {
+    const m = new Map();
+    for (const sc of subcats) {
+      if (flt.cat !== 'all' && !flt.cat.startsWith('__') && sc.category !== flt.cat) continue;
+      if (!m.has(sc.label.toLowerCase())) m.set(sc.label.toLowerCase(), sc.label);
+    }
+    return [...m.entries()].sort((a, b) => a[1].localeCompare(b[1], 'pl'));
+  }, [subcats, flt.cat]);
+
   // --- edycja zbiorcza ---
   const selProducts = useMemo(() => products.filter(p => sel.has(p.sku)), [products, sel]);
+  const filteredSkus = useMemo(() => new Set(filtered.map(p => p.sku)), [filtered]);
+  const selHidden = selProducts.filter(p => !filteredSkus.has(p.sku)).length;
   const allFilteredSelected = filtered.length > 0 && filtered.every(p => sel.has(p.sku));
 
   // Eksport bierze to, co widać: zaznaczone, a bez zaznaczenia — wynik wyszukiwania.
@@ -1877,8 +2293,10 @@ function ProductList({ refreshTrigger, brands, categories }) {
     const targets = selProducts;
     if (!targets.length) return;
     const noun = { brand: ['markę', 'pustą markę'], category: ['kategorię', 'pustą kategorię'],
-                   subcategory: ['podkategorię', 'pustą podkategorię'] }[field];
-    const label = value ? `${noun[0]} „${value}"` : noun[1];
+                   subcategory: ['podkategorię', 'pustą podkategorię'], role: ['oznaczenie', 'brak oznaczenia'] }[field];
+    const shown = field === 'category' ? (catLabel.get(value) || value)
+      : field === 'role' ? ((ROLES.find(r => r.id === value) || {}).label || value) : value;
+    const label = value ? `${noun[0]} „${shown}"` : noun[1];
     if (!confirm(`Ustawić ${label} dla ${targets.length} zaznaczonych produktów?`)) return;
     setBulk({ done: 0, total: targets.length });
     let done = 0, failed = 0;
@@ -1916,14 +2334,14 @@ function ProductList({ refreshTrigger, brands, categories }) {
       <div className="flex-between">
         <div>
           <h2 className="adm-card-h">Lista produktów ({products.length})</h2>
-          <p className="adm-card-d">Edytuj, usuwaj, dodawaj pojedyncze produkty. Zaznacz kilka, żeby ustawić markę, kategorię lub podkategorię naraz. Zmiany natychmiast widoczne na stronie.</p>
+          <p className="adm-card-d">Kliknij nagłówek kolumny, żeby posortować. Filtry „Braki" pokazują produkty bez zdjęcia, marki czy kategorii — odfiltruj je, zaznacz wszystkie i ustaw brakujące pole naraz.</p>
         </div>
         <div className="gap-2">
           <button className="btn btn-ghost" onClick={reload} disabled={loading}>
             <IRefresh s={16}/> {loading ? 'Ładuję...' : 'Odśwież'}
           </button>
           <button className="btn btn-ghost" onClick={() => exportProductsCsv(exportList)} disabled={loading || !exportList.length}
-            title={sel.size ? 'Eksportuj zaznaczone produkty' : q ? 'Eksportuj wyniki wyszukiwania' : 'Eksportuj wszystkie produkty'}>
+            title={sel.size ? 'Eksportuj zaznaczone produkty' : (q || fltOn) ? 'Eksportuj wyniki wyszukiwania i filtrów' : 'Eksportuj wszystkie produkty'}>
             <IDownload s={16}/> Eksport CSV{exportList.length !== products.length ? ` (${exportList.length})` : ''}
           </button>
           <button className="btn btn-flame" onClick={() => setAdding(true)}>
@@ -1938,12 +2356,62 @@ function ProductList({ refreshTrigger, brands, categories }) {
         value={q}
         onChange={e => setQ(e.target.value)}
         placeholder="Szukaj: SKU, nazwa, marka, kategoria..."
-        style={{ width: '100%', padding: '10px 14px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15, marginBottom: 14 }}
+        style={{ width: '100%', padding: '10px 14px', border: '1.5px solid var(--line-2)', borderRadius: 'var(--r-sm)', fontSize: 15, marginBottom: 10 }}
       />
+
+      <div className="flt">
+        <select className={'flt-sel' + (flt.brand !== 'all' ? ' on' : '')} value={flt.brand} onChange={e => setFilter('brand', e.target.value)} aria-label="Filtr marki">
+          <option value="all">Marka: wszystkie</option>
+          <option value="__none">— bez marki ({gaps.brand})</option>
+          {brandOpts.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+        </select>
+        <select className={'flt-sel' + (flt.cat !== 'all' ? ' on' : '')} value={flt.cat} onChange={e => setFilter('cat', e.target.value)} aria-label="Filtr kategorii">
+          <option value="all">Kategoria: wszystkie</option>
+          <option value="__none">— bez kategorii ({gaps.cat})</option>
+          {gaps.unknownCat > 0 && <option value="__unknown">— spoza listy kategorii ({gaps.unknownCat})</option>}
+          {categories.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+        </select>
+        <select className={'flt-sel' + (flt.sub !== 'all' ? ' on' : '')} value={flt.sub} onChange={e => setFilter('sub', e.target.value)} aria-label="Filtr podkategorii">
+          <option value="all">Podkategoria: wszystkie</option>
+          <option value="__none">— bez podkategorii</option>
+          {subFilterOpts.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+        </select>
+        <select className={'flt-sel' + (flt.img !== 'all' ? ' on' : '')} value={flt.img} onChange={e => setFilter('img', e.target.value)} aria-label="Filtr zdjęcia">
+          <option value="all">Zdjęcie: wszystkie</option>
+          <option value="none">— bez zdjęcia ({gaps.img})</option>
+          <option value="has">ze zdjęciem</option>
+        </select>
+        {fltOn && <button type="button" className="linkish" onClick={() => setFlt(NO_FILTER)}>Wyczyść filtry</button>}
+      </div>
+
+      <div className="gaps">
+        <span className="gaps-k">Braki:</span>
+        {[['img', 'none', 'Bez zdjęcia', gaps.img], ['brand', '__none', 'Bez marki', gaps.brand],
+          ['cat', '__none', 'Bez kategorii', gaps.cat], ['sub', '__none', 'Bez podkategorii', gaps.sub],
+          ...(gaps.unknownCat ? [['cat', '__unknown', 'Kategoria spoza listy', gaps.unknownCat]] : [])].map(([k, v, l, n]) => {
+          const on = flt[k] === v;
+          return (
+            <button key={k + v} type="button" className={'gap-chip' + (on ? ' on' : '') + (n ? '' : ' zero')}
+                    disabled={!n && !on} aria-pressed={on} onClick={() => setFilter(k, on ? 'all' : v)}>
+              {l} <b>{n}</b>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="res-line">
+        <span>Pokazano <strong>{filtered.length}</strong> z {products.length}</span>
+        {filtered.length > 0 && !allFilteredSelected && (q || fltOn) && (
+          <button type="button" className="linkish" onClick={toggleSelAll}>Zaznacz wszystkie wyniki ({filtered.length})</button>
+        )}
+      </p>
 
       {sel.size > 0 && (
         <div className="bulk-bar">
-          <div className="bulk-count">Zaznaczono <strong>{sel.size}</strong></div>
+          <div className="bulk-count">
+            Zaznaczono <strong>{sel.size}</strong>
+            {selHidden > 0 && <span style={{ opacity: .7 }}> (w tym {selHidden} poza bieżącym widokiem)</span>}
+          </div>
           {bulk ? (
             <div className="bulk-actions"><span className="spinner"/> Przetwarzam {bulk.done}/{bulk.total}...</div>
           ) : (
@@ -1977,6 +2445,11 @@ function ProductList({ refreshTrigger, brands, categories }) {
                 {subcats.map(sc => <option key={sc.key} value={sc.label}>{sc.label}{sc.category ? ` (${sc.category})` : ''}</option>)}
                 <option value="__clear">(wyczyść podkategorię)</option>
               </select>
+              <label className="bulk-lbl">Oznaczenie:</label>
+              <select className="bulk-sel" value="__" onChange={e => { if (e.target.value !== '__') applyBulk('role', e.target.value); }}>
+                <option value="__">— ustaw —</option>
+                {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+              </select>
               <button className="btn btn-ghost" onClick={bulkDelete} style={{ color: 'var(--red)', borderColor: 'var(--red-tint)' }}>
                 <ITrash s={16}/> Usuń ({sel.size})
               </button>
@@ -1994,7 +2467,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
             <thead>
               <tr>
                 <th className="chkcell"><input type="checkbox" checked={allFilteredSelected} onChange={toggleSelAll} title="Zaznacz wszystkie" /></th>
-                <th></th><th>SKU</th><th>Nazwa</th><th>Marka</th><th>Kategoria</th><th>Podkategoria</th><th></th>
+                <th></th>{sortTh('sku', 'SKU')}{sortTh('name', 'Nazwa')}{sortTh('brand', 'Marka')}{sortTh('category', 'Kategoria')}{sortTh('subcategory', 'Podkategoria')}<th></th>
               </tr>
             </thead>
             <tbody>
@@ -2009,7 +2482,9 @@ function ProductList({ refreshTrigger, brands, categories }) {
                   <td className="mono">{p.sku}</td>
                   <td>{p.name}</td>
                   <td>{p.brand || <span className="muted">—</span>}</td>
-                  <td>{p.category || <span className="muted">—</span>}</td>
+                  <td>{!p.category ? <span className="muted">—</span>
+                    : catLabel.has(p.category) ? catLabel.get(p.category)
+                    : <span title="Tej kategorii nie ma w Ustawieniach → Kategorie">{p.category}<span className="tag-bad">spoza listy</span></span>}</td>
                   <td>{p.subcategory || <span className="muted">—</span>}</td>
                   <td style={{ textAlign: 'right' }}>
                     <div className="gap-2" style={{ justifyContent: 'flex-end' }}>
@@ -2025,7 +2500,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
               ))}
               {filtered.length === 0 && (
                 <tr><td colSpan="8" style={{ textAlign: 'center', padding: 40, color: 'var(--ash)' }}>
-                  {q ? 'Brak wyników wyszukiwania' : 'Brak produktów'}
+                  {q || fltOn ? 'Brak produktów dla tego wyszukiwania i filtrów' : 'Brak produktów'}
                 </td></tr>
               )}
             </tbody>
@@ -2190,7 +2665,7 @@ function LogoPreview({ values, onDark }) {
   const src = onDark
     ? (values.logo_light || values.logo_dark)
     : (values.logo_dark || values.logo_light);
-  const showText = values.logo_show_text !== '0';
+  // Jak na stronie: wgrane logo stoi samo, napis tylko przy wbudowanym sygnecie
   const accent = values.brand_accent || '#F04E23';
 
   return (
@@ -2199,10 +2674,9 @@ function LogoPreview({ values, onDark }) {
         {src
           ? <img src={src} alt="" style={{ height }} />
           : <BuiltInMark size={height} accent={accent} color={onDark ? '#fff' : '#0E1533'} />}
-        {(showText || !src) && (
+        {!src && (
           <span className="prev-words">
             <span className="prev-name">LANGER</span>
-            <span className="prev-sub">DYSTRYBUCJA</span>
           </span>
         )}
       </span>
@@ -2329,17 +2803,11 @@ function BrandingSettings({ st }) {
             <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>Dotyczy nagłówka i stopki. Szerokość dopasuje się sama.</span>
           </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <span style={{ fontSize: 13, fontWeight: 700 }}>Napis obok logo</span>
-            <span className="gap-2" style={{ alignItems: 'center' }}>
-              <input type="checkbox" checked={values.logo_show_text !== '0'} disabled={loading}
-                onChange={e => set('logo_show_text', e.target.checked ? '1' : '0')} />
-              <span style={{ fontSize: 14 }}>Pokaż „LANGER / DYSTRYBUCJA"</span>
-            </span>
-            <span className="muted" style={{ fontSize: 12.5, lineHeight: 1.4 }}>
-              Wyłącz, jeśli wgrane logo ma już nazwę firmy w środku.
-            </span>
-          </label>
+          <p className="muted" style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, alignSelf: 'center' }}>
+            Wgrane logo stoi w nagłówku samo — bez dopisku „Dystrybucja". Napis „LANGER" pojawia się
+            tylko obok wbudowanego sygnetu, gdy nie ma wgranego logo. Na telefonie logo jest zmniejszane,
+            żeby zmieściło się obok przycisku.
+          </p>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -2676,6 +3144,9 @@ function App() {
         <button className={'adm-tab' + (tab === 'import' ? ' active' : '')} onClick={() => setTab('import')}>
           <IUpload s={16}/> Import CSV
         </button>
+        <button className={'adm-tab' + (tab === 'showcase' ? ' active' : '')} onClick={() => setTab('showcase')}>
+          <IImage s={16}/> Karuzela Langer
+        </button>
         <button className={'adm-tab' + (tab === 'settings' ? ' active' : '')} onClick={() => setTab('settings')}>
           <ISettings s={16}/> Ustawienia
         </button>
@@ -2684,6 +3155,7 @@ function App() {
       <main className="adm-main">
         {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories}/>}
         {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories} onConfigChange={loadConfig}/>}
+        {tab === 'showcase' && <ShowcaseEditor st={st}/>}
         {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig} st={st}/>}
       </main>
     </>

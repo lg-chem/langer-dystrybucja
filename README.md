@@ -15,6 +15,9 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML, któ
 - [Dodawanie nowych produktów](#dodawanie-nowych-produktów)
 - [Import i aktualizacja z CSV](#import-i-aktualizacja-z-csv)
 - [Kategorie i podkategorie](#kategorie-i-podkategorie)
+- [Lista produktów w panelu](#lista-produktów-w-panelu)
+- [Karuzela Langer](#karuzela-langer)
+- [Zdjęcia produktów — jedna wielkość](#zdjęcia-produktów--jedna-wielkość)
 - [Jak działa strona główna](#jak-działa-strona-główna)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
 - [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
@@ -81,7 +84,7 @@ Wgrasz tylko jedną wersję — użyjemy jej wszędzie. Nie wgrasz żadnej — s
 **Pozostałe ustawienia w tej karcie:**
 
 - **Wysokość logo** (24–72 px) — dotyczy nagłówka i stopki, szerokość dopasowuje się sama.
-- **Napis obok logo** — wyłącz, jeśli wgrane logo ma już nazwę firmy w środku.
+- **Napis obok logo** — nie ma już przełącznika: wgrane logo stoi w nagłówku samo (bez dopisku „Dystrybucja"), a napis „LANGER" pojawia się tylko obok wbudowanego sygnetu, gdy nie ma wgranego logo. Na telefonie logo jest zmniejszane, żeby zmieściło się obok przycisku.
 - **Kolor akcentu** — osiem gotowych wariantów albo dowolny hex z próbnika. Podmienia `--flame` na całej stronie (przyciski, odznaki, podkreślenia, wbudowany sygnet); odcienie hover i tła ikon strona wylicza sama.
 - **Podgląd nagłówka** — pokazuje układ na ciemnym i jasnym tle, zanim cokolwiek zapiszesz.
 
@@ -178,11 +181,47 @@ Przy aktualizacji działa też **„uzupełnij tylko braki"** — przypisze kate
 
 - **Formularz produktu** — pole „Podkategoria" podpowiada wartości już używane w wybranej kategorii (żeby „Piany pistoletowe" nie rozjechały się na trzy warianty zapisu).
 - **Import CSV** — brakujące kategorie dodasz wprost z kroku mapowania (patrz wyżej).
-- **Lista produktów** — zaznacz kilka pozycji (checkboxy) i ustaw markę, kategorię albo podkategorię naraz; „+ nowa podkategoria…" pozwala wpisać własną. Tędy też się zmienia nazwę podkategorii: wyszukaj ją w polu wyszukiwania, zaznacz wszystkie, ustaw nową nazwę.
+- **Lista produktów** — zaznacz kilka pozycji (checkboxy) i ustaw markę, kategorię albo podkategorię naraz; „+ nowa podkategoria…" pozwala wpisać własną. Tędy też się zmienia nazwę podkategorii: wyszukaj ją w polu wyszukiwania, zaznacz wszystkie, ustaw nową nazwę. Filtry i sortowanie — patrz [Lista produktów w panelu](#lista-produktów-w-panelu).
 
 ### Co widać na stronie
 
 Podkategoria pokazuje się na karcie produktu obok marki i buduje drugi poziom filtrów w bazie produktów — patrz [Jak działa strona główna](#jak-działa-strona-główna).
+
+---
+
+## Lista produktów w panelu
+
+**Panel → Produkty.** Żeby łatwiej ogarnąć kilkaset pozycji:
+
+- **Sortowanie** — kliknij nagłówek kolumny (SKU, Nazwa, Marka, Kategoria, Podkategoria); drugie kliknięcie odwraca kolejność. Puste wartości zawsze lądują na końcu.
+- **Filtry** — marka, kategoria, podkategoria (lista zawęża się do wybranej kategorii) i zdjęcie (bez / ze zdjęciem). Działają razem z wyszukiwarką.
+- **Braki** — przyciski „Bez zdjęcia", „Bez marki", „Bez kategorii", „Bez podkategorii" (i „Kategoria spoza listy", gdy produkt ma kategorię, której nie ma w Ustawieniach) z licznikami. Kliknięcie pokazuje tylko te produkty.
+- **Zbiorczo** — odfiltruj, kliknij „Zaznacz wszystkie wyniki" (albo checkbox w nagłówku tabeli) i na granatowym pasku ustaw markę, kategorię, podkategorię albo **oznaczenie** (Bestseller / Premium / …) naraz. Pasek mówi też, ile zaznaczonych jest poza bieżącym widokiem.
+- Kolumna „Kategoria" pokazuje nazwę z Ustawień, a nie identyfikator z bazy („Farby w sprayu", nie „farbywsprayu").
+- Eksport CSV bierze to, co widać: zaznaczone, a bez zaznaczenia — wynik wyszukiwania i filtrów.
+
+---
+
+## Karuzela Langer
+
+**Panel → zakładka „Karuzela Langer".** Ta sama karuzela stoi na stronie głównej (sekcja Langer) i na `/dla-punktow/` (sekcja Produkty). Wyróżniki (wydajność, czas, odporność…) i zastosowanie stoją przy produkcie, którego dotyczą.
+
+- **Po prawej** lista wszystkich produktów marki Langer z bazy z checkboxami — zaznaczasz, żeby dodać do karuzeli, odznaczasz, żeby usunąć.
+- **Po lewej** slajdy w kolejności, w jakiej pokażą się na stronie: strzałki ↑ ↓ zmieniają kolejność, „Edytuj" otwiera formularz: nazwa, druga linia (np. „870 ml · niskoprężna"), rodzaj, plakietka na zdjęciu (Bestseller, Nowość… albo pusto), opis, **do 4 wyróżników** (nazwa + wartość), **zastosowanie** (po przecinku) i zdjęcie (puste = zdjęcie produktu z bazy).
+- **„Zapisz karuzelę"** zapisuje listę w ustawieniach (klucz `langer_showcase`, JSON). **„Przywróć domyślną"** wraca do listy startowej.
+
+Lista domyślna (dopóki nic nie zapiszesz) siedzi w `shared/langer-showcase.js`: Langer 70, XL Fast, Express 60 s, Economy Line, Langer TUR, Pianoklej do styropianu (XPS/EPS), Economy Wężykowa — ze zdjęciami z `dla-punktow/assets/`. Panel sam dopasowuje te slajdy do produktów w bazie po nazwie, więc od razu są zaznaczone na liście i mają przycisk „Zobacz w katalogu". Plik czytają strona główna, `/dla-punktow/` i panel — jedna lista zamiast trzech kopii.
+
+Na komputerze karuzela to duży kadr ze szczegółami i miniatury z nazwami (działają też strzałki na klawiaturze); na telefonie — przesuwane karty z kropkami i strzałkami. Komponent `LangerCarousel` jest w obu plikach stron (`index.html`, `dla-punktow/index.html`) — zmieniając jeden, popraw drugi.
+
+---
+
+## Zdjęcia produktów — jedna wielkość
+
+Zdjęcia mają różne marginesy (jedne puste tło dookoła, inne kadr ciasno przy produkcie), więc ten sam rozmiar puszki wyglądał na mniejszy albo większy. Teraz:
+
+- **Zdjęcia z bazy** (katalog, karuzela) strona przycina sama: po wczytaniu sprawdza na małej kopii, gdzie jest produkt (przezroczyste albo jednolite tło jest pomijane), i pokazuje tylko ten fragment z jednakowym marginesem. Każdy produkt wypełnia kafel tak samo. Działa dla zdjęć wgranych do bazy i z adresów, które pozwalają odczytać obraz (CORS); obce zdjęcie bez CORS pokazuje się jak dotąd.
+- **Pliki w `dla-punktow/assets/`** są przycięte do samej puszki (2% marginesu, wysokość 840 px). Obok leżą oryginały PNG 1080 px; nowy plik przytnij tak samo albo po prostu wgraj — przycinanie w przeglądarce i tak go wyrówna.
 
 ---
 
@@ -196,16 +235,16 @@ Strona prowadzi od „co to jest i co z tego mam" do „jak zacząć". Każda se
 |---|---|---|
 | **Hero** (jasne tło, puszki Langera) | Co tu jest? Piany i kleje Langer plus cała chemia budowlana w jednym zamówieniu. Trzy korzyści: Langer w hurtowej cenie, pozostałe marki w tym samym zamówieniu, bez pełnych kartonów. | „Zobacz produkty Langer" albo „Zapytaj o cennik" |
 | **Pasek pod hero** | Jaka to skala? Liczby (produkty, kategorie, marki, czas realizacji, punkty — patrz [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)) i wszystkie marki z panelu, Langer pierwszy. | — |
-| **Dla kogo** | Co z tego mam ja? Dwie karty: sklep/hurtownia (warunki z `/dla-punktow/`: pistolet, rabat, marketing — liczby z panelu) i wykonawca. | „Oferta dla sklepów" / „Przejdź do katalogu" |
-| **Langer** | Czemu akurat Langer? Cztery liczby z kart produktów (70 L, 60 s, −10 °C, 0 rozpuszczalników) i jeden rząd produktów Langer z bazy (bestsellery i te ze zdjęciem najpierw). | „Wszystkie produkty Langer (N)" — otwiera katalog z filtrem Langer |
+| **Langer** | Czemu akurat Langer? [Karuzela](#karuzela-langer): każdy produkt z opisem, wyróżnikami i zastosowaniem. | „Zapytaj o cenę", „Zobacz w katalogu" (wyszukuje produkt po SKU), „Wszystkie produkty Langer (N)" — katalog z filtrem Langer |
+| **Dla sklepów i hurtowni** | Co z tego ma sklep? Zasada „bierzesz Langera — zyskujesz", trzy korzyści (pistolet, rabat na resztę, marketing — warunki z panelu, te same co na `/dla-punktow/`). | „Zobacz ofertę dla sklepów", „Zapytaj o warunki" |
 | **Katalog** | Co jeszcze macie? Pełna baza, Langer zawsze na początku. | „Zapytaj o cenę" na karcie |
 | **Co zyskujesz** | I co z tego? Sześć korzyści sformułowanych jako skutek dla klienta (towar na czas, jeden dostawca, brak zamrożonej gotówki, więcej za Langera, opiekun, reklamacje). | — |
 | **Jak zacząć** | Co się stanie, jak się odezwę? Cztery kroki od kontaktu do dostawy. | „Zacznij od kroku 1" |
 | **Kontakt** | Formularz z wyborem „Kim jesteś?" | „Wyślij zapytanie" |
 
-Do katalogu prowadzą nawigacja, sekcja Langer i karta wykonawcy — hero nie ma już własnego paska kategorii, więc nie ma dwóch równoległych wejść do tego samego.
+Do katalogu prowadzą nawigacja i sekcja Langer — hero nie ma własnego paska kategorii, więc nie ma dwóch równoległych wejść do tego samego.
 
-**Gdzie zmienić teksty:** wszystko w `index.html` — komponenty `Hero`, `Audience`, `LangerSection` (liczby w stałej `LANGER_FACTS`; to te same parametry co w `PRODUCTS` na `/dla-punktow/`, przy zmianie linii popraw je w obu miejscach), `WhyUs`, `Process`, `Contact`. Czas dostawy w tekstach („średnio 48 h") bierze się z panelu (Ustawienia → Liczby w hero → Średni czas realizacji); puste pole = zdania o czasie dostawy po prostu znikają. Warunki dla sklepów (pistolet, rabat) — z karty „Oferta dla punktów handlowych".
+**Gdzie zmienić teksty:** produkty w karuzeli — w panelu („Karuzela Langer"); reszta w `index.html` — komponenty `Hero`, `LangerSection`, `ShopBand`, `WhyUs`, `Process`, `Contact`. Czas dostawy w tekstach („średnio 48 h") bierze się z panelu (Ustawienia → Liczby w hero → Średni czas realizacji); puste pole = zdania o czasie dostawy po prostu znikają. Warunki dla sklepów (pistolet, rabat) — z karty „Oferta dla punktów handlowych".
 
 Zdjęcia puszek w hero to pliki z `dla-punktow/assets/` (przezroczyste WebP).
 
@@ -333,11 +372,9 @@ patrz [Logo i kolory z panelu](#logo-i-kolory-z-panelu).
 
 Wszystko w `dla-punktow/index.html`:
 
-- **Produkty** — stała `PRODUCTS` (opisy, parametry, zastosowania). To osobny
-  zestaw od bazy produktów na stronie głównej, bo tutaj liczą się parametry
-  techniczne, a nie SKU. Zdjęcia w `dla-punktow/assets/`: strona używa `.webp`
-  (840 px), `.png` obok to oryginały 1080 px. Nowe zdjęcie wrzuć jako WebP i
-  podmień `img:` w `PRODUCTS`.
+- **Produkty** — już nie w kodzie: karuzelę ustawiasz w panelu („Karuzela
+  Langer"), a lista domyślna leży w `shared/langer-showcase.js` — patrz
+  [Karuzela Langer](#karuzela-langer).
 - **Usługi marketingowe** — stała `MARKETING` (ikona, etykieta, tytuł, opis;
   kolejność w tablicy = kolejność kafli).
 - **Pytania** — tablica w komponencie `Faq`.
@@ -413,9 +450,11 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 ├── README.md               # Ten plik
 ├── build.mjs               # Build na Vercelu: kompilacja JSX -> dist/
 ├── vercel.json             # Komenda builda, katalog dist/, cache /vendor/
+├── shared/
+│   └── langer-showcase.js  # Domyślne slajdy karuzeli Langer (strona, /dla-punktow/, panel)
 ├── dla-punktow/            # Landing dla punktów handlowych (/dla-punktow/)
 │   ├── index.html          # Cała podstrona w jednym pliku
-│   └── assets/             # Zdjęcia produktów linii Langer (WebP + oryginały PNG)
+│   └── assets/             # Zdjęcia produktów Langer: WebP przycięte do puszki + oryginały PNG
 ├── admin-langer/           # Panel admina (/admin-langer/)
 ├── api/                    # Funkcje serverless Vercela (Neon DB)
 │   ├── products.js         # Lista i zapis produktów
