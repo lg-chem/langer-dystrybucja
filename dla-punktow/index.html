@@ -481,9 +481,12 @@ a.direct-row:hover { color: #fff; }
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
   <!-- Domyślne slajdy karuzeli Langer (wspólne ze stroną główną i panelem) -->
   <script src="../shared/langer-showcase.js"></script>
+  <!-- Obszar dowozu: miasta i mapa (wspólne ze stroną główną) -->
+  <link rel="stylesheet" href="../shared/delivery-area.css" />
+  <script src="../shared/delivery-area.js"></script>
 
   <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
 /* ============================================================
    PARAMETRY OFERTY I KONTAKT
@@ -513,6 +516,7 @@ const OFFER_DEFAULTS = {
   logo_dark:      '',
   brand_accent:   '#F04E23',
   langer_showcase: '',   // slajdy karuzeli Langer (JSON) — puste = domyślne
+  delivery_area:   '',   // obszar dowozu (JSON) — puste = domyślny wokół Płońska
 };
 
 const trim = v => String(v ?? '').trim();
@@ -729,7 +733,7 @@ function showLogoText(cfg = {}) {
 /* ============================================================
    HEADER
    ============================================================ */
-const NAV = [['jak-to-dziala', 'Jak to działa'], ['produkty', 'Produkty'], ['marketing', 'Marketing'], ['faq', 'Pytania']];
+const NAV = [['jak-to-dziala', 'Jak to działa'], ['produkty', 'Produkty'], ['marketing', 'Marketing'], ['dowoz', 'Dowóz'], ['faq', 'Pytania']];
 
 function Header({ offer = {}, active }) {
   return (
@@ -1257,10 +1261,16 @@ function Safe({ t }) {
   );
 }
 
+/* ===== GDZIE DOWOZIMY =====
+   Sekcja z mapą i wyszukiwarką „czy dowozimy" jest wspólna dla stron —
+   komponent i dane: shared/delivery-area.js, style: shared/delivery-area.css,
+   punkty obszaru: panel → „Mapa dowozu" (ustawienie delivery_area). */
+const LD = window.LangerDelivery;
+
 /* ============================================================
    PYTANIA
    ============================================================ */
-function Faq({ t }) {
+function Faq({ t, towns = [] }) {
   const items = [
     ['Ile kartonów Langera muszę kupić?',
       'Nie ma sztywnego progu. Zasada jest prosta: bierzesz Langera — zyskujesz. Im większa część Langera w zamówieniu, tym lepsze warunki na resztę. Konkretne liczby policzymy na Twoim koszyku.'],
@@ -1276,6 +1286,8 @@ function Faq({ t }) {
       'Punkty, które spełnią odpowiednie warunki współpracy. Zakres i warunki ustalamy indywidualnie — zaznacz „Współpraca marketingowa" w formularzu, a przedstawiciel omówi je przy ofercie.'],
     ['Jak szybko dostanę ofertę?',
       'Przedstawiciel z Twojego regionu odezwie się w ciągu jednego dnia roboczego.'],
+    ['Dowozicie do mojej miejscowości?',
+      `Własnym transportem dojeżdżamy m.in. do: ${towns.join(', ')} — i wszędzie w obszarze zaznaczonym na mapie. Swoją miejscowość albo kod pocztowy sprawdzisz w wyszukiwarce przy mapie. Dalej wysyłamy spedycją w całej Polsce.`],
   ];
   return (
     <section className="sec sec-paper" id="faq">
@@ -1501,6 +1513,7 @@ function App() {
   const offer = useOffer();
   const brands = useBrands();
   const t = terms(offer);
+  const deliveryTowns = useMemo(() => (LD ? LD.resolve(offer.delivery_area).towns.map(x => x.name) : []), [offer.delivery_area]);
   const active = useActiveSection(['oferta', ...NAV.map(([id]) => id), 'bez-ryzyka', 'kontakt']);
   const atContact = useInView('kontakt');
 
@@ -1524,7 +1537,9 @@ function App() {
         <PistolBand t={t} want={want} />
         <Marketing want={want} />
         <Safe t={t} />
-        <Faq t={t} />
+        {LD && <LD.Section value={offer.delivery_area} phone={t.phone}
+                           cta={<a href="#kontakt" className="btn btn-flame">Zapytaj o dowóz <IArrow s={17}/></a>} />}
+        <Faq t={t} towns={deliveryTowns} />
         <Contact t={t} picked={picked} toggle={toggle} />
       </main>
       <Footer offer={offer} t={t} />

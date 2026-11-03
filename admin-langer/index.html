@@ -149,6 +149,32 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
 .muted { color: var(--ash); font-size: 13px; }
 .mono { font-family: var(--font-mono); font-size: 12.5px; }
 
+/* Mapa dowozu — edytor */
+.dz-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 4px; }
+@media (max-width: 1000px) { .dz-grid { grid-template-columns: 1fr; } }
+.dz-map { position: relative; border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; background: #F3F5F8; }
+.dz-busy { position: absolute; left: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: var(--navy); color: #fff; font-size: 13px; }
+.dz-side { position: sticky; top: 16px; }
+.dz-base { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-md); margin-bottom: 14px; font-size: 14.5px; }
+.dz-base-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--flame); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--flame); }
+.dz-search { display: flex; gap: 8px; }
+.dz-search input { flex: 1; min-width: 0; font: inherit; font-size: 14.5px; padding: 9px 11px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); }
+.dz-search input:focus { outline: none; border-color: var(--navy); }
+.dz-found { margin-top: 8px; border: 1px solid var(--line); border-radius: var(--r-md); }
+.dz-found-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.dz-found-row:last-child { border-bottom: none; }
+.dz-found-t { display: flex; flex-direction: column; min-width: 0; font-size: 13.5px; }
+.dz-found-t .muted { font-size: 12px; }
+.dz-list { list-style: none; margin: 0; padding: 0; max-height: 520px; overflow-y: auto; border: 1px solid var(--line); border-radius: var(--r-md); }
+.dz-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 8px; align-items: center; padding: 6px 8px 6px 10px; border-bottom: 1px solid var(--line); }
+.dz-row:last-child { border-bottom: none; }
+.dz-row.on { background: var(--flame-tint); }
+.dz-name { min-width: 0; font: inherit; font-size: 14px; font-weight: 600; padding: 6px 8px; border: 1.5px solid transparent; border-radius: var(--r-sm); background: transparent; color: var(--navy); }
+.dz-name:hover { border-color: var(--line-2); background: #fff; }
+.dz-name:focus { outline: none; border-color: var(--navy); background: #fff; }
+.dz-km { font-size: 12px; color: var(--ash-700); white-space: nowrap; }
+.dz-lab { font-size: 12.5px; padding: 5px 6px; border: 1.5px solid var(--line-2); border-radius: var(--r-sm); background: #fff; color: var(--navy); }
+
 /* Karuzela Langer — edytor slajdów */
 .sc-note { margin: 0 0 14px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--light); font-size: 13.5px; color: var(--ash-700); }
 .sc-note-warn { background: var(--flame-tint); color: var(--navy); }
@@ -306,6 +332,9 @@ table.tbl tr.row-sel td { background: var(--flame-tint); }
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
   <!-- Domyślne slajdy karuzeli Langer — punkt startowy edytora -->
   <script src="../shared/langer-showcase.js"></script>
+  <!-- Mapa dowozu: wspólny moduł i style (strona główna, /dla-punktow/, panel) -->
+  <link rel="stylesheet" href="../shared/delivery-area.css" />
+  <script src="../shared/delivery-area.js"></script>
   <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
 
   <script type="text/babel">
@@ -384,13 +413,13 @@ const DEFAULT_CONTACT = {
   contact_phone:   '+48 000 000 000',
   contact_email:   'biuro@langerdystrybucja.pl',
   contact_street:  'ul. Przykładowa 00',
-  contact_city:    '00-000 Miasto',
+  contact_city:    '09-100 Płońsk',
   contact_company: 'Langer Dystrybucja',
 };
 
 /* Komplet ustawień trzymanych w tabeli `settings` — jedna wspólna mapa dla
    wszystkich kart zakładki „Ustawienia". */
-const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT, ...DEFAULT_STATS, langer_showcase: '' };
+const DEFAULT_SETTINGS = { ...DEFAULT_OFFER, ...DEFAULT_BRANDING, ...DEFAULT_CONTACT, ...DEFAULT_STATS, langer_showcase: '', delivery_area: '' };
 
 /* Trzy sloty logo. `bg` decyduje, na jakim tle rysujemy podgląd — logo na
    ciemne tło jest zwykle białe, więc na białym kwadracie byłoby niewidoczne. */
@@ -621,6 +650,7 @@ const ITrash  = (p) => <Svg {...p}><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 01
 const IImage  = (p) => <Svg {...p}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></Svg>;
 const IList   = (p) => <Svg {...p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></Svg>;
 const IPlus   = (p) => <Svg {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></Svg>;
+const IMapPin = (p) => <Svg {...p}><path d="M12 22s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></Svg>;
 const ILogout = (p) => <Svg {...p}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></Svg>;
 const IRefresh = (p) => <Svg {...p}><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></Svg>;
 const IDownload = (p) => <Svg {...p}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></Svg>;
@@ -2170,6 +2200,207 @@ function ShowcaseEditor({ st }) {
 }
 
 /* ============================================================
+   MAPA DOWOZU — baza i punkty obszaru (strona główna, /dla-punktow/)
+   ============================================================
+   Zapis w ustawieniach jako JSON (klucz `delivery_area`). Mapa, wyszukiwarka
+   i rachunki („czy w obszarze") są we wspólnym module shared/delivery-area.js
+   — tu tylko edytujemy punkty. Kolejność punktów nie ma znaczenia: moduł
+   układa je po kącie wokół bazy. */
+const LD = window.LangerDelivery;
+const DZ_LABELS = [['', 'auto'], ['r', 'prawo'], ['l', 'lewo'], ['t', 'góra'], ['b', 'dół']];
+const dzKey = (t) => `${t.lat},${t.lon}`;
+
+function draftFrom(value) {
+  const a = LD.resolve(value);
+  return {
+    fromDefault: !a.custom,
+    draft: { center: { ...a.center }, towns: a.towns.map(t => ({ name: t.name, lat: t.lat, lon: t.lon, ...(t.auto ? {} : { label: t.label }) })) },
+  };
+}
+
+function DeliveryEditor({ st }) {
+  const [state, setState] = useState(null);      // { draft, fromDefault }
+  const [dirty, setDirty] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const [q, setQ] = useState('');
+  const [found, setFound] = useState(null);
+  const [searching, setSearching] = useState(false);
+  const [hl, setHl] = useState(null);
+  const [pin, setPin] = useState(null);
+  const [clickBusy, setClickBusy] = useState(false);
+
+  useEffect(() => {
+    if (LD && !st.loading && !state) setState(draftFrom(st.values.delivery_area));
+  }, [st.loading]);
+
+  if (!LD) return <div className="adm-card"><div className="login-err">Brak pliku shared/delivery-area.js — mapa nie może się wczytać.</div></div>;
+  if (!state) return <div className="adm-card"><p className="muted"><span className="spinner"/> Wczytywanie mapy…</p></div>;
+
+  const draft = state.draft;
+  const enough = draft.towns.length >= 3;
+  const area = LD.resolve(enough ? draft : '');     // podgląd: przy <3 punktach — obszar domyślny
+  const change = (fn) => { setState(s => ({ ...s, draft: fn(s.draft) })); setDirty(true); setSaved(false); setErr(''); };
+
+  function addTown(p) {
+    const dup = draft.towns.find(t => LD.km(t, p) < 2);
+    if (dup) { setErr(`W tym miejscu jest już punkt „${dup.name}".`); return; }
+    change(d => ({ ...d, towns: [...d.towns, { name: p.name, lat: p.lat, lon: p.lon }] }));
+    setHl(p.name);
+  }
+  const removeTown = (t) => change(d => ({ ...d, towns: d.towns.filter(x => dzKey(x) !== dzKey(t)) }));
+  const patchTown = (t, patch) => change(d => ({ ...d, towns: d.towns.map(x => {
+    if (dzKey(x) !== dzKey(t)) return x;
+    const n = { ...x, ...patch };
+    if (!n.label) delete n.label;
+    return n;
+  }) }));
+  const setCenter = (p) => {
+    if (!confirm(`Ustawić „${[p.postcode, p.name].filter(Boolean).join(' ')}" jako bazę? Od niej liczymy odległości i koło 100 km.`)) return;
+    change(d => ({ ...d, center: { name: p.name, postal: p.postcode || '', lat: p.lat, lon: p.lon } }));
+  };
+
+  async function onMapClick(lat, lon) {
+    if (clickBusy) return;
+    setClickBusy(true);
+    const r = await LD.reverse(lat, lon);
+    setClickBusy(false);
+    const name = (prompt('Nowy punkt na granicy obszaru — nazwa miejscowości:', r ? r.name : '') || '').trim();
+    if (name) addTown({ name, lat, lon });
+  }
+
+  async function search(e) {
+    e.preventDefault();
+    if (q.trim().length < 2) return;
+    setSearching(true); setFound(null); setErr('');
+    try { setFound(await LD.geocode(q)); }
+    catch (e2) { setErr('Wyszukiwarka nie odpowiada: ' + e2.message + '. Możesz dodać punkt kliknięciem na mapie.'); }
+    finally { setSearching(false); }
+  }
+
+  async function save() {
+    if (!enough) { setErr('Obszar potrzebuje co najmniej 3 punktów.'); return; }
+    if (draft.towns.some(t => !t.name.trim())) { setErr('Każdy punkt musi mieć nazwę.'); return; }
+    setBusy(true); setErr('');
+    try {
+      const value = JSON.stringify({
+        center: draft.center,
+        towns: draft.towns.map(t => ({ name: t.name.trim(), lat: t.lat, lon: t.lon, ...(t.label ? { label: t.label } : {}) })),
+      });
+      await apiSettingsSave({ delivery_area: value });
+      st.set('delivery_area', value);
+      setState(s => ({ ...s, fromDefault: false }));
+      setDirty(false); setSaved(true);
+    } catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  }
+  async function reset() {
+    if (!confirm('Przywrócić domyślny obszar (baza w Płońsku, 17 miast od Łodzi po Łomżę)?\nTwoje punkty zostaną zastąpione.')) return;
+    setBusy(true); setErr('');
+    try {
+      await apiSettingsSave({ delivery_area: '' });
+      st.set('delivery_area', '');
+      setState(draftFrom(''));
+      setDirty(false); setSaved(true); setPin(null);
+    } catch (e) { setErr(e.message); }
+    finally { setBusy(false); }
+  }
+
+  const c = draft.center;
+  return (
+    <div className="adm-card">
+      <div className="flex-between">
+        <div>
+          <h2 className="adm-card-h">Mapa dowozu</h2>
+          <p className="adm-card-d">
+            Obszar z sekcji „Gdzie dowozimy" na <a href="/?fresh=1#dowoz" target="_blank" rel="noopener" className="mono">stronie głównej</a> i
+            na <a href="/dla-punktow/?fresh=1#dowoz" target="_blank" rel="noopener" className="mono">/dla-punktow/</a> — według niego
+            wyszukiwarka odpowiada klientom „dowozimy / nie dowozimy". <b>Kliknij na mapie</b>, żeby dodać punkt na granicy obszaru,
+            albo wyszukaj miejscowość po prawej. Kolejność nie ma znaczenia — obszar to gładka linia przez punkty wokół bazy.
+          </p>
+        </div>
+        <div className="gap-2">
+          <button type="button" className="btn btn-ghost" onClick={reset} disabled={busy}>Przywróć domyślną</button>
+          <button type="button" className="btn btn-flame" onClick={save} disabled={busy || !dirty}>
+            {busy ? <span className="spinner"/> : <ISettings s={16}/>} Zapisz mapę
+          </button>
+        </div>
+      </div>
+
+      {state.fromDefault && !dirty && <p className="sc-note">Na stronie jest teraz <b>obszar domyślny</b>. Po pierwszym zapisie strony pokażą Twój.</p>}
+      {dirty && <p className="sc-note sc-note-warn">Masz niezapisane zmiany — kliknij „Zapisz mapę".</p>}
+      {saved && !dirty && <p className="sc-note sc-note-ok">Zapisano. Strona pokaże zmiany w ciągu minuty (od razu przez linki powyżej).</p>}
+      {!enough && <p className="sc-note sc-note-warn">Obszar potrzebuje co najmniej 3 punktów — na podglądzie widać na razie obszar domyślny.</p>}
+      {err && <div className="login-err">{err}</div>}
+
+      <div className="dz-grid">
+        <div>
+          <div className="dz-map">
+            <LD.MapView area={area} hl={hl} onHover={setHl} pin={pin} onMapClick={onMapClick} />
+            {clickBusy && <span className="dz-busy"><span className="spinner"/> Szukam nazwy miejsca…</span>}
+          </div>
+          <p className="muted" style={{ fontSize: 12.5, margin: '8px 0 18px' }}>
+            Klik na mapie = nowy punkt dokładnie w tym miejscu; nazwę podpowie OpenStreetMap, możesz ją poprawić.
+          </p>
+          <h3 className="sc-h">Sprawdź, jak odpowie wyszukiwarka</h3>
+          <LD.Checker area={area} id="dz-check" onPin={setPin} />
+        </div>
+
+        <aside className="dz-side">
+          <h3 className="sc-h">Baza</h3>
+          <div className="dz-base">
+            <span className="dz-base-dot" aria-hidden="true" />
+            <b>{[c.postal, c.name].filter(Boolean).join(' ')}</b>
+            <span className="mono muted">{c.lat.toFixed(3)}, {c.lon.toFixed(3)}</span>
+          </div>
+
+          <form className="dz-search" onSubmit={search}>
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Wyszukaj miejscowość albo kod pocztowy" />
+            <button type="submit" className="btn btn-ghost" disabled={searching || q.trim().length < 2}>
+              {searching ? <span className="spinner"/> : 'Szukaj'}
+            </button>
+          </form>
+          {found && (
+            <div className="dz-found">
+              {!found.length && <p className="muted" style={{ margin: 0 }}>Nic nie znaleziono — sprawdź pisownię albo kliknij na mapie.</p>}
+              {found.map((r, i) => (
+                <div key={i} className="dz-found-row">
+                  <span className="dz-found-t"><b>{[r.postcode, r.name].filter(Boolean).join(' ')}</b>{r.area && <span className="muted">{r.area}</span>}</span>
+                  <span className="gap-2">
+                    <button type="button" className="btn btn-ghost" style={{ padding: '5px 10px' }} onClick={() => addTown(r)}><IPlus s={14}/> Punkt</button>
+                    <button type="button" className="linkish" onClick={() => setCenter(r)}>Ustaw jako bazę</button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <h3 className="sc-h" style={{ marginTop: 18 }}>Punkty obszaru ({draft.towns.length})</h3>
+          <ol className="dz-list">
+            {area.towns.filter(() => enough).map(t => (
+              <li key={dzKey(t)} className={'dz-row' + (hl === t.name ? ' on' : '')}
+                  onMouseEnter={() => setHl(t.name)} onMouseLeave={() => setHl(null)}>
+                <input className="dz-name" value={(draft.towns.find(x => dzKey(x) === dzKey(t)) || t).name}
+                       onChange={e => patchTown(t, { name: e.target.value })} aria-label="Nazwa punktu" />
+                <span className="dz-km mono">{LD.fmtKm(t.km)} km</span>
+                <select className="dz-lab" value={t.auto ? '' : t.label} onChange={e => patchTown(t, { label: e.target.value })} title="Gdzie stoi podpis na mapie">
+                  {DZ_LABELS.map(([v, l]) => <option key={v} value={v}>{v ? `podpis: ${l}` : `podpis: auto`}</option>)}
+                </select>
+                <button type="button" className="btn-icon" onClick={() => removeTown(t)} title="Usuń punkt" aria-label={`Usuń ${t.name}`}><ITrash s={16}/></button>
+              </li>
+            ))}
+          </ol>
+          <p className="muted" style={{ fontSize: 12.5, margin: '10px 0 0' }}>
+            Odległości od bazy w linii prostej. Lista jest ułożona dookoła, od zachodu — tak biegnie granica obszaru.
+          </p>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    LISTA PRODUKTÓW + USUWANIE + EDYCJA
    ============================================================ */
 function ProductList({ refreshTrigger, brands, categories, onConfigChange }) {
@@ -3196,6 +3427,9 @@ function App() {
         <button className={'adm-tab' + (tab === 'showcase' ? ' active' : '')} onClick={() => setTab('showcase')}>
           <IImage s={16}/> Karuzela Langer
         </button>
+        <button className={'adm-tab' + (tab === 'delivery' ? ' active' : '')} onClick={() => setTab('delivery')}>
+          <IMapPin s={16}/> Mapa dowozu
+        </button>
         <button className={'adm-tab' + (tab === 'settings' ? ' active' : '')} onClick={() => setTab('settings')}>
           <ISettings s={16}/> Ustawienia
         </button>
@@ -3205,6 +3439,7 @@ function App() {
         {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories} onConfigChange={loadConfig}/>}
         {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories} onConfigChange={loadConfig}/>}
         {tab === 'showcase' && <ShowcaseEditor st={st}/>}
+        {tab === 'delivery' && <DeliveryEditor st={st}/>}
         {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig} st={st}/>}
       </main>
     </>

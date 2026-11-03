@@ -25,7 +25,7 @@ const DEFAULTS = {
   contact_phone:  '+48 000 000 000',
   contact_email:  'biuro@langerdystrybucja.pl',
   contact_street: 'ul. Przykładowa 00',
-  contact_city:   '00-000 Miasto',
+  contact_city:   '09-100 Płońsk',
   contact_company:'Langer Dystrybucja',
 
   // Liczby w hero strony głównej. Produkty i marki puste = liczymy je z bazy
@@ -49,6 +49,11 @@ const DEFAULTS = {
   // Langer". JSON z listą slajdów; puste = lista domyślna z
   // shared/langer-showcase.js.
   langer_showcase: '',
+
+  // Obszar dowozu (mapa i wyszukiwarka „czy dowozimy") — panel → „Mapa
+  // dowozu". JSON { center, towns: [{ name, lat, lon, label? }] }; puste =
+  // obszar domyślny z shared/delivery-area.js.
+  delivery_area: '',
 };
 
 // Klucze, które wolno zapisywać — chroni przed zaśmieceniem tabeli

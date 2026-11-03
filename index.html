@@ -636,6 +636,9 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
   <!-- Domyślne slajdy karuzeli Langer (wspólne ze stroną /dla-punktow/ i panelem) -->
   <script src="shared/langer-showcase.js"></script>
+  <!-- Obszar dowozu: miasta i mapa (wspólne ze stroną /dla-punktow/) -->
+  <link rel="stylesheet" href="shared/delivery-area.css" />
+  <script src="shared/delivery-area.js"></script>
 
   <script type="text/babel">
 const { useState, useEffect, useRef, useMemo } = React;
@@ -667,7 +670,7 @@ let SITE = {
   contact_phone:   '+48 000 000 000',
   contact_email:   'biuro@langerdystrybucja.pl',
   contact_street:  'ul. Przykładowa 00',
-  contact_city:    '00-000 Miasto',
+  contact_city:    '09-100 Płońsk',
   contact_company: 'Langer Dystrybucja',
   stat_products:   '',   // puste = liczymy z bazy
   stat_brands:     '',   // puste = liczymy z bazy
@@ -677,6 +680,7 @@ let SITE = {
   landing_discount_text: 'kilka procent',
   landing_pistol_price:  '1',
   langer_showcase:       '',   // slajdy karuzeli Langer (JSON) — puste = domyślne
+  delivery_area:         '',   // obszar dowozu (JSON) — puste = domyślny wokół Płońska
 };
 
 /* Logo dla danego tła. Gdy wgrano tylko jedną wersję — używamy jej wszędzie,
@@ -1584,6 +1588,12 @@ function LangerSection({ products, onShowAll, onFind }) {
   );
 }
 
+/* ===== GDZIE DOWOZIMY =====
+   Sekcja z mapą i wyszukiwarką „czy dowozimy" jest wspólna dla stron —
+   komponent i dane: shared/delivery-area.js, style: shared/delivery-area.css,
+   punkty obszaru: panel → „Mapa dowozu" (ustawienie delivery_area). */
+const LD = window.LangerDelivery;
+
 /* ===== KONTAKT =====
    Formularz nie ma jeszcze własnego serwera do wysyłki. Zamiast udawać
    wysyłkę, składa gotową wiadomość i otwiera ją w poczcie klienta na adres
@@ -1709,7 +1719,7 @@ function Footer({ products = [], onPick }) {
           <div className="footer-col">
             <div className="footer-h">Nawigacja</div>
             <a href="#langer">Langer</a><a href="#baza">Katalog</a><a href="/dla-punktow/">Oferta dla sklepów</a>
-            <a href="#korzysci">Co zyskujesz</a><a href="#jak-zaczac">Jak zacząć</a><a href="#kontakt">Kontakt</a>
+            <a href="#korzysci">Co zyskujesz</a><a href="#dowoz">Gdzie dowozimy</a><a href="#jak-zaczac">Jak zacząć</a><a href="#kontakt">Kontakt</a>
           </div>
           <div className="footer-col">
             <div className="footer-h">Katalog</div>
@@ -2459,6 +2469,8 @@ function App() {
       <ShopBand />
       <ProductDatabase products={products} initialCatRef={catRef} />
       <WhyUs />
+      {LD && <LD.Section value={SITE.delivery_area} phone={SITE.contact_phone}
+                         cta={<a href="#kontakt" className="btn btn-flame">Zapytaj o dowóz <IArrow/></a>} />}
       <Process />
       <Contact />
       <Footer products={products} onPick={pickCat} />
