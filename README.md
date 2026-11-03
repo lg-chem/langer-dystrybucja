@@ -18,6 +18,7 @@ Strona internetowa hurtowej dystrybucji chemii budowlanej. Jeden plik HTML, któ
 - [Lista produktów w panelu](#lista-produktów-w-panelu)
 - [Karuzela Langer](#karuzela-langer)
 - [Zdjęcia produktów — jedna wielkość](#zdjęcia-produktów--jedna-wielkość)
+- [Mapa dowozu](#mapa-dowozu)
 - [Jak działa strona główna](#jak-działa-strona-główna)
 - [Zmiana statystyk w hero](#zmiana-statystyk-w-hero)
 - [Podstrona dla punktów handlowych](#podstrona-dla-punktów-handlowych)
@@ -223,6 +224,16 @@ Zdjęcia mają różne marginesy (jedne puste tło dookoła, inne kadr ciasno pr
 
 - **Zdjęcia z bazy** (katalog, karuzela) strona przycina sama: po wczytaniu sprawdza na małej kopii, gdzie jest produkt (przezroczyste albo jednolite tło jest pomijane), i pokazuje tylko ten fragment z jednakowym marginesem. Każdy produkt wypełnia kafel tak samo. Działa dla zdjęć wgranych do bazy i z adresów, które pozwalają odczytać obraz (CORS); obce zdjęcie bez CORS pokazuje się jak dotąd.
 - **Pliki w `dla-punktow/assets/`** są przycięte do samej puszki (2% marginesu, wysokość 840 px). Obok leżą oryginały PNG 1080 px; nowy plik przytnij tak samo albo po prostu wgraj — przycinanie w przeglądarce i tak go wyrówna.
+
+---
+
+## Mapa dowozu
+
+Sekcja **„Gdzie dowozimy"** — na stronie głównej (między „Co zyskujesz" a „Jak zacząć") i na `/dla-punktow/` (po „Bez ryzyka", w nawigacji jako „Dowóz", plus pytanie w FAQ). Mapa: baza w Płońsku (09-100), obszar dowozu poprowadzony gładką linią przez miasta na obwodzie, koło 100 km od bazy, rzeki, punkty orientacyjne (Warszawa, Płock) i mała Polska w rogu. Obok lista miast — najechanie (albo tapnięcie na telefonie) podświetla miasto na mapie; na telefonie podpisy miast pokazują się tylko po wybraniu, żeby się nie nakładały.
+
+**Zmiana miast:** `shared/delivery-area.js` → tablica `TOWNS`. Kolejność ma znaczenie — to obwód obszaru (dookoła, zgodnie z ruchem wskazówek zegara od Łodzi), więc nowe miasto wstaw między sąsiadów. Każde ma `lat`/`lon` (np. z Map Google: prawy klik na mapie → współrzędne) i `label` — gdzie stoi podpis (`r`, `l`, `t`, `b`). Obszar, lista pod mapą i odpowiedź w FAQ biorą się z tej tablicy. Okno mapy obejmuje ok. 51,35–53,95° N i 18,35–22,95° E.
+
+Rzeki i kontur Polski to gotowe ścieżki SVG z Natural Earth 1:10 mln (domena publiczna) — przy zmianie miast nic się w nich nie zmienia. Mapa nie pobiera kafelków z zewnątrz i nie potrzebuje żadnej biblioteki.
 
 ---
 
@@ -452,7 +463,8 @@ Po wdrożeniu w panelu Vercela: **Settings → Domains → Add** i podaj swoją 
 ├── build.mjs               # Build na Vercelu: kompilacja JSX -> dist/
 ├── vercel.json             # Komenda builda, katalog dist/, cache /vendor/
 ├── shared/
-│   └── langer-showcase.js  # Domyślne slajdy karuzeli Langer (strona, /dla-punktow/, panel)
+│   ├── langer-showcase.js  # Domyślne slajdy karuzeli Langer (strona, /dla-punktow/, panel)
+│   └── delivery-area.js    # Mapa dowozu: miasta, baza w Płońsku, rzeki i kontur Polski
 ├── dla-punktow/            # Landing dla punktów handlowych (/dla-punktow/)
 │   ├── index.html          # Cała podstrona w jednym pliku
 │   └── assets/             # Zdjęcia produktów Langer: WebP przycięte do puszki + oryginały PNG
