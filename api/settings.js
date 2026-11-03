@@ -43,8 +43,12 @@ const DEFAULTS = {
   logo_mark:      '',   // sam sygnet (kwadrat) — znak wodny w hero
   favicon:        '',   // ikona w karcie przeglądarki; puste = sygnet / wbudowany znak (api/favicon.js)
   logo_height:    '38', // wysokość logo w headerze, px
-  logo_show_text: '1',  // '1' = pokaż napis LANGER / DYSTRYBUCJA obok znaku
   brand_accent:   '#F04E23', // kolor akcentu (--flame) — przyciski, odznaki
+
+  // Karuzela Langer (strona główna i /dla-punktow/) — panel → „Karuzela
+  // Langer". JSON z listą slajdów; puste = lista domyślna z
+  // shared/langer-showcase.js.
+  langer_showcase: '',
 };
 
 // Klucze, które wolno zapisywać — chroni przed zaśmieceniem tabeli

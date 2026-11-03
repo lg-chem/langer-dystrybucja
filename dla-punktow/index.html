@@ -88,10 +88,10 @@ button, input, textarea { font: inherit; color: inherit; }
   backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);
 }
 .hdr-in { display: flex; align-items: center; gap: var(--s6); height: var(--header-h); }
-.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--navy); }
+.logo { display: inline-flex; align-items: center; gap: 10px; color: var(--navy); min-width: 0; }
+.logo img { max-width: 100%; }
 .logo-words { display: flex; flex-direction: column; line-height: 1; }
 .logo-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-.logo-sub { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.22em; color: var(--ash-700); margin-top: 3px; }
 .hdr-nav { display: flex; align-items: center; gap: var(--s5); margin-left: auto; }
 .hdr-link { position: relative; font-size: 15px; font-weight: 600; color: var(--ash-700); transition: color .15s; }
 .hdr-link:hover, .hdr-link.on { color: var(--navy); }
@@ -109,9 +109,10 @@ button, input, textarea { font: inherit; color: inherit; }
   .hdr-cta { margin-left: auto; }
 }
 @media (max-width: 420px) {
-  .logo-sub { display: none; }
   .cta-long { display: none; } .cta-short { display: inline; }
 }
+/* Logo z panelu nie może wejść pod przycisk „Oferta" */
+@media (max-width: 560px) { .hdr .logo img { max-height: 32px; max-width: 46vw; } .hdr-in { gap: 16px; } }
 
 /* ===== HERO ===== */
 .hero {
@@ -218,51 +219,79 @@ button, input, textarea { font: inherit; color: inherit; }
   .bseg { min-height: 0; }
 }
 
-/* ===== SLIDER PRODUKTÓW (desktop) ===== */
-.slider-nav { display: flex; gap: var(--s2); }
-.snav {
-  width: 52px; height: 52px; border-radius: 50%; background: var(--white); color: var(--navy);
-  border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: var(--e1); transition: background .15s, color .15s, border-color .15s, transform .15s;
-}
-.snav:hover { background: var(--flame); color: #fff; border-color: var(--flame); transform: translateY(-2px); }
+/* ===== KARUZELA LANGER =====
+   Ten sam wygląd na stronie głównej i na /dla-punktow/ (kopia stylów i
+   komponentu jest w obu plikach — zmieniając jeden, popraw drugi).
+   Komputer: duży kadr + szczegóły + miniatury z nazwami.
+   Telefon: przesuwane karty z kropkami i strzałkami. */
+.lc-show { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--e1); }
+.lc-media { position: relative; display: flex; align-items: center; justify-content: center; padding: 56px 76px; min-height: 520px;
+  background: radial-gradient(58% 52% at 50% 46%, rgb(255 255 255 / 0.10), transparent 72%), var(--navy); }
+.lc-photo { display: block; width: 100%; height: 400px; object-fit: contain; filter: drop-shadow(0 24px 30px rgb(0 0 0 / 0.42)); }
+.lc-noimg { display: flex; align-items: center; justify-content: center; filter: none; color: rgb(255 255 255 / 0.45);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.lc-badge { position: absolute; top: 22px; left: 22px; z-index: 2; background: var(--flame); color: #fff; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; padding: 7px 12px; border-radius: var(--r-sm); }
+.lc-count { position: absolute; bottom: 22px; left: 24px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; color: rgb(255 255 255 / 0.55); }
+.lc-nav { position: absolute; top: 50%; z-index: 2; transform: translateY(-50%); width: 46px; height: 46px; border-radius: 50%; padding: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; color: #fff; background: rgb(255 255 255 / 0.08); border: 1px solid rgb(255 255 255 / 0.2);
+  transition: background .15s, border-color .15s; }
+.lc-nav:hover { background: var(--flame); border-color: var(--flame); }
+.lc-prev { left: 16px; } .lc-next { right: 16px; }
+.lc-body { padding: 44px 48px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.lc-cat { font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--ash); }
+.lc-name { font-family: var(--font-display); font-size: clamp(30px, 3vw, 42px); font-weight: 700; letter-spacing: -.03em; line-height: 1.02; margin: 0; color: var(--navy); }
+.lc-sub { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--flame); margin-top: 8px; }
+.lc-desc { font-size: 16.5px; line-height: 1.55; color: var(--ash-700); margin: 0; max-width: 60ch; }
+.lc-specs { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
+.lc-spec { background: var(--white); padding: 14px; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.lc-spec-k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ash); }
+.lc-spec-v { font-family: var(--font-display); font-size: 19px; font-weight: 700; color: var(--navy); line-height: 1.15; overflow-wrap: anywhere; }
+.lc-uses { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.lc-use { border: 1px solid var(--line-2); border-radius: var(--r-full); font-size: 13.5px; font-weight: 600; color: var(--navy); padding: 6px 12px; line-height: 1.3; }
+.lc-acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 6px; }
+.lc-thumbs { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 10px; margin-top: 14px; }
+.lc-thumb { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px 8px 8px; border: 1.5px solid var(--line); border-radius: var(--r-md);
+  background: var(--white); cursor: pointer; text-align: left; font: inherit; color: var(--navy); transition: border-color .15s, box-shadow .15s; }
+.lc-thumb:hover { border-color: var(--line-2); }
+.lc-thumb.on { border-color: var(--flame); box-shadow: 0 0 0 3px rgb(240 78 35 / 0.12); }
+.lc-thumb-img { flex: none; display: block; width: 34px; height: 50px; object-fit: contain; }
+.lc-thumb-img.lc-noimg { background: var(--light); border-radius: 4px; }
+.lc-thumb-t { min-width: 0; font-size: 13px; font-weight: 700; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.lc-anim { animation: lc-in .35s ease both; }
+@keyframes lc-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.lc-nav:focus-visible, .lc-thumb:focus-visible, .lc-dot:focus-visible, .lc-mnav:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
+@media (max-width: 1080px) { .lc-specs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lc-media { padding: 48px 64px; } .lc-body { padding: 36px; } }
 
-.pshow { display: grid; grid-template-columns: 0.85fr 1.15fr; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--e1); }
-.pshow-img { position: relative; background: var(--navy); display: flex; align-items: center; justify-content: center; padding: var(--s7); min-height: 520px; }
-.pshow-img img { height: 420px; max-height: 46vh; width: auto; object-fit: contain; filter: drop-shadow(0 24px 40px rgb(0 0 0 / .45)); }
-.pshow-badge { position: absolute; top: 24px; left: 24px; background: var(--flame); color: #fff; font-family: var(--font-mono); font-size: 10.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; padding: 8px 14px; border-radius: var(--r-sm); }
-.pshow-count { position: absolute; bottom: 24px; right: 24px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; color: rgba(255,255,255,.55); }
-.pshow-body { padding: var(--s7); display: flex; flex-direction: column; gap: var(--s5); }
-.pshow-cat { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--ash); }
-.pshow-name { font-family: var(--font-display); font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; letter-spacing: -0.03em; line-height: 1; margin: 0; }
-.pshow-sub { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--flame); margin-top: 8px; }
-.pshow-desc { font-size: 16.5px; line-height: 1.55; color: var(--ash-700); max-width: 60ch; text-wrap: pretty; margin: 0; }
-
-.specs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
-.spec { background: var(--white); padding: 16px 14px; display: flex; flex-direction: column; gap: 5px; }
-.spec-k { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ash); }
-.spec-v { font-size: 19px; font-weight: 700; color: var(--navy); line-height: 1.15; }
-@media (max-width: 1080px) { .specs { grid-template-columns: repeat(2, 1fr); } }
-
-.uses { display: flex; gap: var(--s2); flex-wrap: wrap; }
-.use { border: 1px solid var(--line-2); border-radius: var(--r-full); color: var(--navy); font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 8px 14px; }
-
-.thumbs { display: flex; gap: var(--s2); margin-top: auto; padding-top: var(--s4); border-top: 1px solid var(--line); flex-wrap: wrap; }
-.thumb { width: 70px; height: 84px; border: 1.5px solid var(--line); border-radius: var(--r-sm); background: var(--paper); display: flex; align-items: center; justify-content: center; padding: 7px; cursor: pointer; transition: border-color .15s, opacity .15s, transform .15s; opacity: .55; }
-.thumb:hover { opacity: .85; transform: translateY(-2px); }
-.thumb.on { border-color: var(--flame); opacity: 1; }
-.thumb img { height: 100%; width: auto; object-fit: contain; }
-
-/* ===== KARUZELA PRODUKTÓW (mobile) ===== */
-.pscroll { display: flex; gap: var(--s3); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: var(--s3); margin-inline: calc(-1 * var(--s4)); padding-inline: var(--s4); }
-.pcard { flex: 0 0 254px; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; scroll-snap-align: start; display: flex; flex-direction: column; }
-.pcard-img { position: relative; height: 210px; background: var(--light); display: flex; align-items: center; justify-content: center; padding: var(--s4); }
-.pcard-img img { height: 100%; width: auto; object-fit: contain; }
-.pcard-badge { position: absolute; top: 10px; left: 10px; background: var(--flame); color: #fff; font-family: var(--font-mono); font-size: 9.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: 6px 10px; border-radius: var(--r-sm); }
-.pcard-body { padding: var(--s4); display: flex; flex-direction: column; gap: var(--s3); flex: 1; }
-.pcard-name { font-family: var(--font-display); font-size: 21px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0; }
-.pcard-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: auto; padding-top: var(--s3); border-top: 1px solid var(--line); }
-.pscroll-hint { font-size: 13.5px; color: var(--ash); }
+/* telefon: przesuwane karty */
+.lc-track { display: grid; grid-auto-flow: column; grid-auto-columns: 84%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scroll-padding-inline: 20px; margin-inline: -20px; padding: 2px 20px 6px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.lc-track::-webkit-scrollbar { display: none; }
+.lc-card { scroll-snap-align: start; display: flex; flex-direction: column; min-width: 0; background: var(--white); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+.lc-card-media { position: relative; height: 260px; padding: 24px; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(60% 55% at 50% 46%, rgb(255 255 255 / 0.10), transparent 72%), var(--navy); }
+.lc-card-media .lc-photo { height: 100%; }
+.lc-card-media .lc-badge { top: 12px; left: 12px; font-size: 9.5px; padding: 6px 10px; }
+.lc-card-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.lc-card-name { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; margin: 0; color: var(--navy); }
+.lc-card .lc-sub { margin-top: 4px; font-size: 11.5px; }
+.lc-card .lc-desc { font-size: 14.5px; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.lc-card .lc-specs { grid-template-columns: 1fr 1fr; }
+.lc-card .lc-spec { padding: 10px 12px; }
+.lc-card .lc-spec-v { font-size: 16px; }
+.lc-card .lc-uses { margin-top: 0; gap: 6px; }
+.lc-card .lc-use { font-size: 12.5px; padding: 5px 10px; }
+.lc-card .lc-acts { flex-direction: column; padding-top: 4px; }
+.lc-card .lc-acts .btn { width: 100%; padding: 13px 16px; font-size: 15px; }
+.lc-mbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.lc-dots { display: flex; flex-wrap: wrap; justify-content: center; min-width: 0; }
+.lc-dot { width: 24px; height: 24px; padding: 0; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.lc-dot::before { content: ''; width: 8px; height: 8px; border-radius: 4px; background: var(--line-2); transition: width .2s, background .2s; }
+.lc-dot.on::before { width: 20px; background: var(--flame); }
+.lc-mnav { flex: none; width: 42px; height: 42px; padding: 0; border-radius: 50%; border: 1.5px solid var(--line-2); background: var(--white); color: var(--navy);
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.lc-mnav:disabled { opacity: .35; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .lc-anim { animation: none; } }
 
 /* „Nie wiesz, od czego zacząć?" pod produktami */
 .prod-cta { margin-top: var(--s5); display: flex; align-items: center; justify-content: space-between; gap: var(--s5); padding: 22px 28px; background: var(--white); border: 1.5px dashed var(--line-2); border-radius: var(--r-lg); }
@@ -450,6 +479,8 @@ a.direct-row:hover { color: #fff; }
   <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  <!-- Domyślne slajdy karuzeli Langer (wspólne ze stroną główną i panelem) -->
+  <script src="../shared/langer-showcase.js"></script>
 
   <script type="text/babel">
 const { useState, useEffect, useRef } = React;
@@ -480,8 +511,8 @@ const OFFER_DEFAULTS = {
   // Puste logo = wbudowany sygnet, tak jak dotąd.
   logo_light:     '',
   logo_dark:      '',
-  logo_show_text: '1',
   brand_accent:   '#F04E23',
+  langer_showcase: '',   // slajdy karuzeli Langer (JSON) — puste = domyślne
 };
 
 const trim = v => String(v ?? '').trim();
@@ -526,71 +557,6 @@ function applyAccent(hex) {
   root.setProperty('--flame-tint', shade(hex, 0.86));
   root.setProperty('--flame-glow', shade(hex, 0.14));
 }
-
-/* ============================================================
-   DANE PRODUKTÓW
-   ============================================================
-   Linia własna Langer — treści i zdjęcia z projektu landingu.
-   To osobny zestaw od bazy produktów na stronie głównej: tutaj liczą się
-   parametry techniczne i zastosowania, a nie SKU i jednostka sprzedaży. */
-const CATS = {
-  piany:      'Piana pistoletowa',
-  wezyk:      'Piana wężykowa',
-  pianokleje: 'Pianoklej',
-  kleje:      'Klej montażowy',
-};
-
-const PRODUCTS = [
-  {
-    id: 'l70', cat: 'piany', name: 'Langer 70', sub: '870 ml · niskoprężna', badge: 'Bestseller',
-    img: 'assets/langer-70.webp',
-    desc: 'Profesjonalna piana niskoprężna do precyzyjnego montażu. Stabilna struktura i pełna izolacja termiczno-akustyczna. Dostępna też w wersji zimowej od −10 °C.',
-    specs: [{ k: 'Wydajność', v: '70 L' }, { k: 'Czas cięcia', v: '15–30′' }, { k: 'Odporność', v: '−40/+90 °C' }, { k: 'Gęstość', v: '25 kg/m³' }],
-    uses: ['Okna i drzwi', 'Izolacja akustyczna', 'Szczeliny i bruzdy'],
-  },
-  {
-    id: 'xl', cat: 'piany', name: 'Langer XL Fast', sub: '870 ml · szybkowiążąca', badge: 'Nowość',
-    img: 'assets/xl-fast.webp',
-    desc: 'Szybkowiążąca piana do montażu stolarki. Niska rozszerzalność wtórna oznacza brak naprężeń na ościeżnicach i montaż bez korekt.',
-    specs: [{ k: 'Wydajność', v: '65 L' }, { k: 'Czas obróbki', v: '20′' }, { k: 'Odporność', v: '−60/+100 °C' }, { k: 'Rozsz. wtórna', v: 'Niska' }],
-    uses: ['Okna i drzwi', 'Złącza G-K', 'Przepusty'],
-  },
-  {
-    id: 'eco', cat: 'piany', name: 'Economy Line', sub: '750 ml · pistoletowa', badge: '',
-    img: 'assets/economy-line.webp',
-    desc: 'Jednoskładnikowa piana o kontrolowanym wzroście objętości. Sprawdzona, powtarzalna formuła w codziennym montażu.',
-    specs: [{ k: 'Wydajność', v: '45 L' }, { k: 'Wzrost obj.', v: '30 %' }, { k: 'Czas cięcia', v: '30–40′' }, { k: 'Odporność', v: '−50/+90 °C' }],
-    uses: ['Ościeżnice', 'Okablowanie', 'Szczeliny'],
-  },
-  {
-    id: 'ecow', cat: 'wezyk', name: 'Economy Wężykowa', sub: '700 ml · bez pistoletu', badge: '',
-    img: 'assets/economy-wezykowa.webp',
-    desc: 'Ta sama niskoprężna formuła w wersji aplikowanej przez rurkę. Gotowa do pracy od razu — do drobnych prac i szybkich napraw.',
-    specs: [{ k: 'Aplikacja', v: 'Rurka' }, { k: 'Wzrost obj.', v: '30 %' }, { k: 'Odporność', v: '−50/+90 °C' }, { k: 'Opakowanie', v: '700 ml' }],
-    uses: ['Drobne naprawy', 'Okablowanie', 'Małe szczeliny'],
-  },
-  {
-    id: 'exp', cat: 'pianokleje', name: 'Express 60 s', sub: '750 ml · pianoklej', badge: '',
-    img: 'assets/express-60.webp',
-    desc: 'Pianoklej poliuretanowy o błyskawicznym utwardzaniu. Chwyt w 60 sekund, bez podpierania elementów. Jedna puszka zastępuje worki kleju cementowego.',
-    specs: [{ k: 'Pocz. utwardz.', v: '60 s' }, { k: 'Czas korekty', v: '2 min' }, { k: 'Odporność', v: '−20/+85 °C' }, { k: 'Gęstość', v: '20–30 kg/m³' }],
-    uses: ['Płyty EPS / XPS', 'Płyty G-K', 'OSB i drewno'],
-  },
-  {
-    id: 'sty', cat: 'pianokleje', name: 'Do styropianu', sub: '750 ml · XPS / EPS', badge: '',
-    img: 'assets/styropian.webp',
-    desc: 'Pianka o niskiej ekspansji do mocowania płyt styropianowych na fasadach i fundamentach. Niska wodochłonność i doskonałe parametry cieplne.',
-    specs: [{ k: 'Wydajność', v: '10 m²' }, { k: 'Przewodn.', v: 'λ 0,034' }, { k: 'Odporność', v: '−50/+90 °C' }, { k: 'Izol. akust.', v: '60 dB' }],
-    uses: ['Fasady', 'Fundamenty', 'Parapety i dachówki'],
-  },
-  {
-    id: 'tur', cat: 'kleje', name: 'Langer TUR', sub: '290 ml · MS Polimer', badge: '',
-    img: 'assets/tur.webp',
-    desc: 'Klej na bazie MS Polimeru o natychmiastowym mocowaniu i bardzo wysokiej przyczepności początkowej. Bez rozpuszczalników i izocyjanianów.',
-    specs: [{ k: 'Przyczep. pocz.', v: '500 kg/m²' }, { k: 'Wytrzym. końc.', v: '22 kg/cm²' }, { k: 'Odporność', v: '−40/+95 °C' }, { k: 'Elastyczność', v: '±25 %' }],
-    uses: ['Parapety', 'Listwy i panele', 'Lustra'],
-  },
-];
 
 /* Co klient może zaznaczyć w formularzu. Przyciski w sekcjach („Zapytaj
    o współpracę marketingową", „Dopisz do oferty") zaznaczają właściwą
@@ -653,6 +619,8 @@ function useIsMobile(query = '(max-width: 860px)') {
   return match;
 }
 
+const useNarrow = useIsMobile;
+
 /* Która sekcja jest teraz na środku ekranu — podświetla link w nagłówku. */
 function useActiveSection(ids) {
   const [active, setActive] = useState('');
@@ -704,8 +672,8 @@ function Reveal({ as: Tag = 'div', className = '', children, ...rest }) {
 /* ============================================================
    IKONY
    ============================================================ */
-const Svg = ({ s = 18, children }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
+const Svg = ({ s = 18, style, children }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={style}>{children}</svg>
 );
 const IArrow   = (p) => <Svg {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Svg>;
 const ILeft    = (p) => <Svg {...p}><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></Svg>;
@@ -753,10 +721,9 @@ function BrandMark({ cfg = {}, size = 38, onDark = false }) {
   return <img src={src} alt="" style={{ height: size, width: 'auto', display: 'block' }} />;
 }
 
-/* Napis obok logo znika, gdy wgrane logo ma już nazwę firmy w środku. */
+/* Wgrane logo ma już nazwę marki — napis „LANGER" obok tylko przy wbudowanym sygnecie. */
 function showLogoText(cfg = {}) {
-  const src = cfg.logo_light || cfg.logo_dark;
-  return !src || cfg.logo_show_text !== '0';
+  return !(cfg.logo_light || cfg.logo_dark);
 }
 
 /* ============================================================
@@ -773,7 +740,6 @@ function Header({ offer = {}, active }) {
           {showLogoText(offer) && (
             <span className="logo-words">
               <span className="logo-name">LANGER</span>
-              <span className="logo-sub">DYSTRYBUCJA</span>
             </span>
           )}
         </a>
@@ -909,123 +875,264 @@ function HowItWorks({ t, brands }) {
 }
 
 /* ============================================================
-   PRODUKTY
+   PRODUKTY — karuzela Langer
    ============================================================ */
-function Spec({ k, v }) {
+/* ===== ZDJĘCIA PRODUKTÓW: JEDNA WIELKOŚĆ =====
+   Wiele zdjęć ma szerokie, puste marginesy (przezroczyste albo jednolite
+   tło), przez co produkt wygląda na mniejszy od sąsiada. Po wczytaniu
+   liczymy na małej kopii, gdzie naprawdę jest produkt, i pokazujemy tylko
+   ten fragment — SVG z viewBox skaluje go jak object-fit: contain, więc
+   każdy produkt wypełnia kadr tak samo. Zdjęcie z obcej domeny bez CORS
+   (canvas go nie odczyta) zostaje pokazane tak, jak jest. */
+function contentBox(img) {
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  if (!nw || !nh) return null;
+  const k = Math.min(1, 160 / Math.max(nw, nh));
+  const w = Math.max(1, Math.round(nw * k)), h = Math.max(1, Math.round(nh * k));
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;       // rzuca błąd przy braku CORS
+  const at = (x, y) => (y * w + x) * 4;
+  // Tło: kolor nieprzezroczystych rogów. Przezroczyste rogi = tło przezroczyste.
+  let r = 0, g = 0, b = 0, n = 0;
+  for (const i of [at(0, 0), at(w - 1, 0), at(0, h - 1), at(w - 1, h - 1)]) {
+    if (d[i + 3] > 200) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+  }
+  const solid = n >= 3;
+  if (solid) { r /= n; g /= n; b /= n; }
+  let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = at(x, y);
+    if (d[i + 3] < 24) continue;
+    if (solid && Math.abs(d[i] - r) + Math.abs(d[i + 1] - g) + Math.abs(d[i + 2] - b) < 40) continue;
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  if (x1 < 0) return null;
+  const bx = x0 / k, by = y0 / k, bw = (x1 - x0 + 1) / k, bh = (y1 - y0 + 1) / k;
+  if (bw > nw * 0.94 && bh > nh * 0.94) return null;  // produkt już wypełnia kadr
+  const pad = Math.max(bw, bh) * 0.03;
+  return { nw, nh, x: bx - pad, y: by - pad, w: bw + 2 * pad, h: bh + 2 * pad, bg: solid ? `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})` : null };
+}
+
+const sameOrigin = (src) => { try { return new URL(src, location.href).origin === location.origin; } catch (e) { return false; } };
+
+/* Zdjęcie przycięte do produktu. onBg dostaje kolor tła zdjęcia (albo null),
+   żeby kafel mógł się do niego dopasować. */
+function FitImage({ src, alt = '', className = '', onBg, lazy = true }) {
+  const [cors, setCors] = useState(true);
+  const [box, setBox] = useState(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setBox(null); setFailed(false); setCors(true); }, [src]);
+
+  if (!src || failed) return <span className={className + ' lc-noimg'} role="img" aria-label={alt}>{className.includes('thumb') ? '' : 'Zdjęcie wkrótce'}</span>;
+  if (box) return (
+    <svg className={className} viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label={alt}>
+      <image href={src} width={box.nw} height={box.nh} />
+    </svg>
+  );
   return (
-    <div className="spec">
-      <span className="spec-k">{k}</span>
-      <span className="spec-v">{v}</span>
+    <img key={cors ? 'c' : 'p'} src={src} alt={alt} className={className} decoding="async" loading={lazy ? 'lazy' : undefined}
+      crossOrigin={cors ? 'anonymous' : undefined}
+      onLoad={e => {
+        try { const bx = contentBox(e.target); if (onBg) onBg(bx ? bx.bg : null); if (bx) setBox(bx); }
+        catch (err) { if (onBg) onBg(null); }
+      }}
+      onError={() => { if (cors && !sameOrigin(src)) setCors(false); else setFailed(true); }} />
+  );
+}
+
+/* ===== KARUZELA LANGER ===== */
+/* Slajdy: lista z panelu (Karuzela Langer) albo domyślna z
+   shared/langer-showcase.js. Brakujące pola uzupełnia produkt z bazy. */
+function showcaseSlides(value, products = []) {
+  const S = window.LangerShowcase;
+  if (!S) return [];
+  return S.items(value).map((it, i) => {
+    const prod = S.findProduct(it, products);
+    const sku = String(it.sku || (prod && prod.sku) || '');
+    return {
+      key: (sku || it.name || 'slajd') + ':' + i,
+      sku,
+      name: it.name || (prod && prod.name) || '',
+      sub: it.sub || (prod && prod.variant) || '',
+      cat: it.cat || '',
+      badge: it.badge || '',
+      desc: it.desc || '',
+      specs: (it.specs || []).filter(s => s && (s.k || s.v)).slice(0, 4),
+      uses: (it.uses || []).map(u => String(u).trim()).filter(Boolean),
+      img: it.img || (prod && (prod.image || prod.image_url)) || (sku ? '/api/img?sku=' + encodeURIComponent(sku) : ''),
+    };
+  }).filter(s => s.name);
+}
+
+const pad2 = (x) => String(x).padStart(2, '0');
+
+function LcSpecs({ specs }) {
+  if (!specs.length) return null;
+  return (
+    <div className="lc-specs" style={{ '--n': Math.min(4, specs.length) }}>
+      {specs.map((s, i) => (
+        <div className="lc-spec" key={i}><span className="lc-spec-k">{s.k}</span><span className="lc-spec-v">{s.v}</span></div>
+      ))}
     </div>
   );
 }
 
-/* Desktop: jeden produkt na dużym kadrze + miniatury do przełączania */
-function ProductShowcase() {
-  const [i, setI] = useState(0);
-  const cur = PRODUCTS[i];
-  const prev = () => setI(v => (v - 1 + PRODUCTS.length) % PRODUCTS.length);
-  const next = () => setI(v => (v + 1) % PRODUCTS.length);
-  const pad = n => String(n).padStart(2, '0');
-
+function LcUses({ uses, label = true }) {
+  if (!uses.length) return null;
   return (
-    <>
-      <div className="sec-head">
-        <div className="sec-head-l">
-          <span className="eyebrow">Linia Langer</span>
-          <h2 className="h2">Co stawiasz na półce</h2>
-        </div>
-        <div className="slider-nav">
-          <button className="snav" onClick={prev} aria-label="Poprzedni produkt"><ILeft s={20}/></button>
-          <button className="snav" onClick={next} aria-label="Następny produkt"><IArrow s={20}/></button>
-        </div>
-      </div>
-
-      <Reveal className="pshow">
-        <div className="pshow-img">
-          <img src={cur.img} alt={cur.name} decoding="async" />
-          {cur.badge && <span className="pshow-badge">{cur.badge}</span>}
-          <span className="pshow-count">{pad(i + 1)} / {pad(PRODUCTS.length)}</span>
-        </div>
-        <div className="pshow-body">
-          <span className="pshow-cat">{CATS[cur.cat]}</span>
-          <div>
-            <h3 className="pshow-name">{cur.name}</h3>
-            <div className="pshow-sub">{cur.sub}</div>
-          </div>
-          <p className="pshow-desc">{cur.desc}</p>
-          <div className="specs">
-            {cur.specs.map(s => <Spec key={s.k} k={s.k} v={s.v} />)}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <span className="pshow-cat">Zastosowanie</span>
-            <div className="uses">
-              {cur.uses.map(u => <span key={u} className="use">{u}</span>)}
-            </div>
-          </div>
-          <div className="thumbs">
-            {PRODUCTS.map((p, k) => (
-              <button
-                key={p.id}
-                className={'thumb' + (k === i ? ' on' : '')}
-                onClick={() => setI(k)}
-                aria-label={p.name}
-                aria-current={k === i}
-              >
-                <img src={p.img} alt="" loading="lazy" decoding="async" />
-              </button>
-            ))}
-          </div>
-        </div>
-      </Reveal>
-    </>
+    <div>
+      {label && <span className="lc-cat">Zastosowanie</span>}
+      <div className="lc-uses">{uses.map(u => <span className="lc-use" key={u}>{u}</span>)}</div>
+    </div>
   );
 }
 
-/* Mobile: przesuwana taśma kafli — kciukiem, bez strzałek */
-function ProductScroller() {
+/* Komputer: duży kadr, szczegóły, miniatury z nazwami. Strzałki klawiatury
+   przełączają produkty, gdy fokus jest w karuzeli. */
+function LcShowcase({ slides, cta }) {
+  const [i, setI] = useState(0);
+  const n = slides.length;
+  const k = Math.min(i, n - 1);
+  const cur = slides[k];
+  const go = (d) => setI(v => (Math.min(v, n - 1) + d + n) % n);
+  const onKey = (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  };
   return (
-    <>
-      <div className="sec-head-l" style={{ marginBottom: 'var(--s5)' }}>
-        <span className="eyebrow">Linia Langer</span>
-        <h2 className="h2">Co stawiasz na półce</h2>
-        <span className="pscroll-hint">Przesuń, aby zobaczyć wszystkie {PRODUCTS.length} pozycji →</span>
+    <div className="lc" onKeyDown={onKey}>
+      <div className="lc-show">
+        <div className="lc-media">
+          <FitImage key={'m' + cur.key} src={cur.img} alt={cur.name} className="lc-photo lc-anim" lazy={false} />
+          {cur.badge && <span className="lc-badge">{cur.badge}</span>}
+          <span className="lc-count">{pad2(k + 1)} / {pad2(n)}</span>
+          {n > 1 && (
+            <>
+              <button type="button" className="lc-nav lc-prev" onClick={() => go(-1)} aria-label="Poprzedni produkt"><IArrow s={20} style={{ transform: 'rotate(180deg)' }} /></button>
+              <button type="button" className="lc-nav lc-next" onClick={() => go(1)} aria-label="Następny produkt"><IArrow s={20} /></button>
+            </>
+          )}
+        </div>
+        <div className="lc-body lc-anim" key={'b' + cur.key} aria-live="polite">
+          {cur.cat && <span className="lc-cat">{cur.cat}</span>}
+          <div>
+            <h3 className="lc-name">{cur.name}</h3>
+            {cur.sub && <div className="lc-sub">{cur.sub}</div>}
+          </div>
+          {cur.desc && <p className="lc-desc">{cur.desc}</p>}
+          <LcSpecs specs={cur.specs} />
+          <LcUses uses={cur.uses} />
+          <div className="lc-acts">{cta(cur)}</div>
+        </div>
       </div>
-      <div className="pscroll">
-        {PRODUCTS.map(p => (
-          <article key={p.id} className="pcard">
-            <div className="pcard-img">
-              <img src={p.img} alt={p.name} loading="lazy" decoding="async" />
-              {p.badge && <span className="pcard-badge">{p.badge}</span>}
+      {n > 1 && (
+        <div className="lc-thumbs" role="tablist" aria-label="Produkty w karuzeli">
+          {slides.map((s, j) => (
+            <button key={s.key} type="button" role="tab" aria-selected={j === k}
+                    className={'lc-thumb' + (j === k ? ' on' : '')} onClick={() => setI(j)}>
+              <FitImage src={s.img} alt="" className="lc-thumb-img" />
+              <span className="lc-thumb-t">{s.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Telefon: przesuwane kciukiem karty. Kropki i strzałki pokazują, gdzie
+   jesteś i ile jest jeszcze produktów. */
+function LcScroller({ slides, cta }) {
+  const ref = useRef(null);
+  const [i, setI] = useState(0);
+  const n = slides.length;
+  useEffect(() => {
+    const t = ref.current;
+    if (!t) return;
+    let raf = 0;
+    const on = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const first = t.firstElementChild;
+        if (!first) return;
+        const step = first.getBoundingClientRect().width + 12;
+        const atEnd = t.scrollLeft + t.clientWidth >= t.scrollWidth - 4;
+        setI(atEnd ? n - 1 : Math.max(0, Math.min(n - 1, Math.round(t.scrollLeft / step))));
+      });
+    };
+    t.addEventListener('scroll', on, { passive: true });
+    return () => { t.removeEventListener('scroll', on); cancelAnimationFrame(raf); };
+  }, [n]);
+  const go = (j) => {
+    const t = ref.current;
+    const card = t && t.children[Math.max(0, Math.min(n - 1, j))];
+    if (card) t.scrollTo({ left: card.offsetLeft - t.firstElementChild.offsetLeft, behavior: 'smooth' });
+  };
+  return (
+    <div className="lc">
+      <div className="lc-track" ref={ref} aria-label="Produkty w karuzeli">
+        {slides.map(s => (
+          <article className="lc-card" key={s.key}>
+            <div className="lc-card-media">
+              <FitImage src={s.img} alt={s.name} className="lc-photo" />
+              {s.badge && <span className="lc-badge">{s.badge}</span>}
             </div>
-            <div className="pcard-body">
-              <span className="pshow-cat">{CATS[p.cat]}</span>
+            <div className="lc-card-body">
+              {s.cat && <span className="lc-cat">{s.cat}</span>}
               <div>
-                <h3 className="pcard-name">{p.name}</h3>
-                <div className="pshow-sub">{p.sub}</div>
+                <h3 className="lc-card-name">{s.name}</h3>
+                {s.sub && <div className="lc-sub">{s.sub}</div>}
               </div>
-              <div className="pcard-specs">
-                {p.specs.map(s => (
-                  <div key={s.k} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <span className="spec-k">{s.k}</span>
-                    <span className="spec-v" style={{ fontSize: 15 }}>{s.v}</span>
-                  </div>
-                ))}
-              </div>
+              {s.desc && <p className="lc-desc">{s.desc}</p>}
+              <LcSpecs specs={s.specs} />
+              <LcUses uses={s.uses} label={false} />
+              <div className="lc-acts">{cta(s)}</div>
             </div>
           </article>
         ))}
       </div>
-    </>
+      {n > 1 && (
+        <div className="lc-mbar">
+          <button type="button" className="lc-mnav" onClick={() => go(i - 1)} disabled={i === 0} aria-label="Poprzedni produkt"><IArrow s={18} style={{ transform: 'rotate(180deg)' }} /></button>
+          <div className="lc-dots">
+            {slides.map((s, j) => (
+              <button key={s.key} type="button" className={'lc-dot' + (j === i ? ' on' : '')} onClick={() => go(j)}
+                      aria-label={`${s.name} (${j + 1} z ${n})`} aria-current={j === i ? 'true' : undefined} />
+            ))}
+          </div>
+          <button type="button" className="lc-mnav" onClick={() => go(i + 1)} disabled={i === n - 1} aria-label="Następny produkt"><IArrow s={18} /></button>
+        </div>
+      )}
+    </div>
   );
 }
 
-function Products({ want }) {
-  const isMobile = useIsMobile();
+function LangerCarousel({ slides, cta }) {
+  const narrow = useNarrow('(max-width: 860px)');
+  if (!slides.length) return null;
+  return narrow ? <LcScroller slides={slides} cta={cta} /> : <LcShowcase slides={slides} cta={cta} />;
+}
+
+/* Slajdy z panelu (Karuzela Langer) albo domyślne z shared/langer-showcase.js */
+function Products({ want, offer }) {
+  const slides = showcaseSlides(offer.langer_showcase);
+  const cta = () => (
+    <a href="#kontakt" className="btn btn-flame" onClick={() => want('langer')}>Zapytaj o ten produkt <IArrow s={17}/></a>
+  );
   return (
     <section className="sec sec-paper" id="produkty">
       <div className="wrap">
-        {isMobile ? <ProductScroller /> : <ProductShowcase />}
+        <div className="sec-head">
+          <div className="sec-head-l">
+            <span className="eyebrow">Linia Langer</span>
+            <h2 className="h2">Co stawiasz na półce</h2>
+          </div>
+          <p className="lead sec-head-r">Przy każdym produkcie: parametry, które pokażesz klientowi, i zastosowanie.</p>
+        </div>
+        <LangerCarousel slides={slides} cta={cta} />
         <div className="prod-cta">
           <p><strong>Nie wiesz, od czego zacząć?</strong> Doradzimy zestaw Langera na start — dobrany do Twojego punktu i Twoich klientów.</p>
           <a href="#kontakt" className="btn btn-dark" style={{ flex: 'none' }} onClick={() => want('langer')}>
@@ -1357,7 +1464,6 @@ function Footer({ offer = {}, t }) {
           {showLogoText(offer) && (
             <span className="logo-words">
               <span className="logo-name" style={{ fontSize: 17 }}>LANGER</span>
-              <span className="logo-sub" style={{ color: 'rgba(255,255,255,.5)' }}>DYSTRYBUCJA</span>
             </span>
           )}
         </a>
@@ -1414,7 +1520,7 @@ function App() {
       <main>
         <Hero t={t} />
         <HowItWorks t={t} brands={brands} />
-        <Products want={want} />
+        <Products want={want} offer={offer} />
         <PistolBand t={t} want={want} />
         <Marketing want={want} />
         <Safe t={t} />
