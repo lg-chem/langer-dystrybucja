@@ -221,6 +221,9 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 .tb-l { color: var(--flame); }
 
 /* ===== DLA SKLEPÓW ===== */
+/* Karta = oferta (granat) + mapa dowozu (biel) połączone w jedną całość */
+.shop-join { border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--e2); border: 1px solid var(--line); background: var(--white); }
+.shop-join .shop { border-radius: 0; }
 .shop { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 36px 56px; align-items: center;
   padding: 56px; border-radius: var(--r-xl); background: var(--navy); color: #fff; }
 .shop::before { content: ''; position: absolute; right: -160px; top: -180px; width: 480px; height: 480px; border-radius: 50%;
@@ -239,6 +242,7 @@ h1,h2,h3,h4 { font-family: var(--font-display); margin: 0; line-height: 1.02; le
 @media (max-width: 900px) { .shop { grid-template-columns: 1fr; padding: 40px 32px; } }
 @media (max-width: 680px) {
   .shop { padding: 30px 20px; border-radius: var(--r-lg); }
+  .shop-join { border-radius: var(--r-lg); }
   .perk { padding: 16px; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; }
   .perk-ic { width: 44px; height: 44px; border-radius: 12px; }
   .perk b { font-size: 18px; }
@@ -1206,7 +1210,9 @@ function ShopBand() {
   return (
     <section id="dla-sklepow" className="sec sec-shop">
       <div className="wrap">
-        <div className="shop reveal">
+        {/* Oferta i mapa dowozu w jednej karcie: „co zyskujesz" + „czy do Ciebie dojedziemy" */}
+        <div className="shop-join reveal">
+        <div className="shop">
           <div className="shop-copy">
             <span className="eyebrow on-dark">Dla sklepów i hurtowni</span>
             <h2 className="h-sec">Bierzesz Langera{'\u00a0'}— zyskujesz na całym zamówieniu.</h2>
@@ -1227,6 +1233,8 @@ function ShopBand() {
               </li>
             ))}
           </ul>
+        </div>
+        {LD && <LD.Section embedded value={SITE.delivery_area} phone={SITE.contact_phone} />}
         </div>
       </div>
     </section>
@@ -2469,8 +2477,6 @@ function App() {
       <ShopBand />
       <ProductDatabase products={products} initialCatRef={catRef} />
       <WhyUs />
-      {LD && <LD.Section value={SITE.delivery_area} phone={SITE.contact_phone}
-                         cta={<a href="#kontakt" className="btn btn-flame">Zapytaj o dowóz <IArrow/></a>} />}
       <Process />
       <Contact />
       <Footer products={products} onPick={pickCat} />

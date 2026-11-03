@@ -229,7 +229,9 @@ Zdjęcia mają różne marginesy (jedne puste tło dookoła, inne kadr ciasno pr
 
 ## Mapa dowozu
 
-Sekcja **„Gdzie dowozimy"** — na stronie głównej (między „Co zyskujesz" a „Jak zacząć") i na `/dla-punktow/` (po „Bez ryzyka", w nawigacji jako „Dowóz", plus pytanie w FAQ). Mapa: baza (domyślnie 09-100 Płońsk), obszar dowozu — gładka linia przez punkty na jego granicy, koło 100 km od bazy, rzeki, punkty orientacyjne (Warszawa, Płock), obok mała Polska z zaznaczonym obszarem i lista miejscowości (najechanie / tapnięcie podświetla punkt na mapie).
+Sekcja **„Gdzie dowozimy"** — na stronie głównej spięta z ofertą „Dla sklepów i hurtowni" w jedną kartę (u góry oferta, pod nią mapa z wyszukiwarką), a na `/dla-punktow/` jako osobna sekcja po „Bez ryzyka" (w nawigacji „Dowóz", plus pytanie w FAQ). Mapa: baza (domyślnie 09-100 Płońsk), obszar dowozu — gładka linia przez punkty na jego granicy, koło 100 km od bazy, rzeki, **większe miasta w środku i wokół obszaru** (szare kwadraty: Ciechanów, Mława, Ostrołęka, Pułtusk, Wyszków, Kutno, Łowicz, Sochaczew, Warszawa, Płock, Toruń…), **główne drogi** (A1, A2, S7, S8, S61 i krajowe 10, 50, 60, 61, 62, 92 — z tabliczkami numerów), obok mała Polska z zaznaczonym obszarem i lista miejscowości (najechanie / tapnięcie podświetla punkt na mapie). Na telefonie podpisy zostają tylko przy największych miastach.
+
+**Drogi są schematyczne** — linia przez kolejne miejscowości na trasie, nie dokładny przebieg z mapy drogowej; mają pokazać, którędy się jedzie i co leży „po drodze". Miasta orientacyjne (`REF`) i drogi (`ROADS`) zmienisz w `shared/delivery-area.js` — miasto to nazwa, współrzędne, strona podpisu i `major` (podpis widoczny też na telefonie); droga to numer, rodzaj (`a` autostrada/ekspresowa, `dk` krajowa), punkty trasy i miejsce tabliczki. Same w sobie nie oznaczają dowozu — o tym decyduje obszar.
 
 ### Wyszukiwarka „czy dowozimy"
 

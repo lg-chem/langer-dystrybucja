@@ -42,10 +42,46 @@
       { name: 'Rawa Mazowiecka', lat: 51.7642, lon: 20.2522, label: 'r' },
     ],
   };
-  // Punkty orientacyjne (szare) — nie oznaczają dowozu
+  /* Miasta orientacyjne (szare kwadraty) — żeby było widać, co leży w
+     obszarze i wokół niego. Same w sobie nie oznaczają dowozu (o tym mówi
+     obszar). major — podpis zostaje też na telefonie. */
   var REF = [
-    { name: 'Warszawa', lat: 52.2297, lon: 21.0122, label: 'r' },
-    { name: 'Płock',    lat: 52.5468, lon: 19.7064, label: 'r' },
+    { name: 'Warszawa',       lat: 52.2297, lon: 21.0122, label: 'r', major: true },
+    { name: 'Płock',          lat: 52.5468, lon: 19.7064, label: 'b', major: true },
+    { name: 'Ciechanów',      lat: 52.8813, lon: 20.6200, label: 'r', major: true },
+    { name: 'Ostrołęka',      lat: 53.0842, lon: 21.5749, label: 'r', major: true },
+    { name: 'Kutno',          lat: 52.2306, lon: 19.3646, label: 'r', major: true },
+    { name: 'Toruń',          lat: 53.0138, lon: 18.5984, label: 'r', major: true },
+    { name: 'Mława',          lat: 53.1123, lon: 20.3843, label: 'r' },
+    { name: 'Działdowo',      lat: 53.2366, lon: 20.1782, label: 'r' },
+    { name: 'Przasnysz',      lat: 53.0190, lon: 20.8800, label: 'r' },
+    { name: 'Pułtusk',        lat: 52.7027, lon: 21.0827, label: 'r' },
+    { name: 'Wyszków',        lat: 52.5939, lon: 21.4580, label: 'l' },
+    { name: 'Ostrów Maz.',    lat: 52.8022, lon: 21.8956, label: 'l' },
+    { name: 'Sierpc',         lat: 52.8570, lon: 19.6690, label: 'r' },
+    { name: 'Nowy Dwór Maz.', lat: 52.4300, lon: 20.7170, label: 'l' },
+    { name: 'Sochaczew',      lat: 52.2294, lon: 20.2385, label: 'r' },
+    { name: 'Łowicz',         lat: 52.1070, lon: 19.9440, label: 'r' },
+    { name: 'Skierniewice',   lat: 51.9547, lon: 20.1580, label: 'r' },
+  ];
+
+  /* Główne drogi — SCHEMATYCZNIE: linia przez kolejne miejscowości na
+     trasie, nie dokładny przebieg. Wystarczy, żeby było widać, którędy
+     jedzie się z bazy. kind: 'a' autostrada/ekspresowa, 'dk' krajowa;
+     at — gdzie stoi tabliczka z numerem (bez at = bez tabliczki). */
+  var ROADS = [
+    { ref: 'S7', kind: 'a', at: [52.98, 20.35], pts: [[53.59, 20.29], [53.36, 20.43], [53.10, 20.42], [52.90, 20.29], [52.62, 20.40], [52.51, 20.53], [52.38, 20.70], [52.31, 20.86], [52.22, 20.95], [52.05, 20.88], [51.87, 20.87]] },
+    { ref: 'S8', kind: 'a', at: [52.70, 21.68], pts: [[52.32, 21.10], [52.42, 21.20], [52.58, 21.45], [52.79, 21.90], [52.98, 22.25], [53.07, 22.60], [53.12, 22.95]] },
+    { ref: 'S8', kind: 'a', pts: [[52.17, 20.92], [51.97, 20.52], [51.77, 20.26], [51.53, 20.00], [51.40, 19.70]] },
+    { ref: 'A1', kind: 'a', at: [51.72, 19.59], pts: [[53.03, 18.60], [52.62, 19.03], [52.52, 19.15], [52.25, 19.30], [52.07, 19.47], [51.92, 19.58], [51.78, 19.60], [51.60, 19.55], [51.42, 19.70]] },
+    { ref: 'A2', kind: 'a', at: [52.17, 21.85], pts: [[52.19, 18.40], [52.09, 18.82], [52.04, 19.18], [51.92, 19.58], [52.06, 19.93], [52.08, 20.35], [52.13, 20.62], [52.20, 20.86], [52.17, 21.10], [52.18, 21.55], [52.15, 22.25], [52.10, 22.95]] },
+    { ref: 'S61', kind: 'a', at: [53.40, 22.16], pts: [[52.79, 21.90], [53.15, 22.05], [53.38, 22.15], [53.56, 22.29], [53.85, 22.36]] },
+    { ref: '10', kind: 'dk', at: [52.85, 19.42], pts: [[52.62, 20.38], [52.74, 19.99], [52.86, 19.67], [52.84, 19.18], [53.01, 18.60]] },
+    { ref: '60', kind: 'dk', at: [52.85, 21.65], pts: [[52.23, 19.36], [52.43, 19.46], [52.55, 19.70], [52.74, 19.99], [52.78, 20.11], [52.88, 20.62], [52.88, 21.40], [52.80, 21.89]] },
+    { ref: '50', kind: 'dk', at: [52.31, 20.21], pts: [[52.88, 20.62], [52.62, 20.38], [52.39, 20.19], [52.23, 20.24], [52.05, 20.45], [51.97, 20.52]] },
+    { ref: '61', kind: 'dk', at: [52.79, 21.24], pts: [[52.40, 20.93], [52.51, 21.06], [52.70, 21.08], [52.88, 21.40], [53.08, 21.57], [53.18, 22.06]] },
+    { ref: '62', kind: 'dk', pts: [[52.55, 19.70], [52.39, 20.19], [52.43, 20.61], [52.43, 20.72], [52.51, 21.06], [52.59, 21.46]] },
+    { ref: '92', kind: 'dk', at: [52.21, 20.75], pts: [[52.23, 19.36], [52.11, 19.94], [52.23, 20.24], [52.20, 20.62], [52.22, 20.90]] },
   ];
   var EDGE_KM = 8;          // tyle km od granicy mówimy „na skraju obszaru"
   var LABELS = ['r', 'l', 't', 'b'];
@@ -87,6 +123,25 @@
       return 'C' + [s[1][0], s[1][1], s[2][0], s[2][1], s[3][0], s[3][1]].map(f).join(' ');
     }).join('') + 'Z';
   }
+  // Otwarta, gładka linia przez punkty (drogi)
+  function openPath(pts) {
+    if (pts.length < 2) return '';
+    var f = function (v) { return v.toFixed(1); };
+    var P = [pts[0]].concat(pts, [pts[pts.length - 1]]), d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (var i = 1; i < P.length - 2; i++) {
+      var p0 = P[i - 1], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2];
+      d += 'C' + [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6, p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]].map(f).join(' ');
+    }
+    return d;
+  }
+  var roadCache = null;
+  function roads() {
+    if (!roadCache) roadCache = ROADS.map(function (r) {
+      return { ref: r.ref, kind: r.kind, d: openPath(r.pts.map(function (q) { return project(q[0], q[1]); })), at: r.at ? project(r.at[0], r.at[1]) : null };
+    });
+    return roadCache;
+  }
+
   // Ta sama krzywa jako wielokąt (do sprawdzania „czy w środku")
   function sample(pts) {
     var out = [];
@@ -182,13 +237,26 @@
     var kids = [
       h('rect', { key: 'bg', className: 'dm-bg', x: fr[0] - 400, y: fr[1] - 400, width: fr[2] + 800, height: fr[3] + 800 }),
       h('path', { key: 'rv', className: 'dm-river', d: RIVERS }),
+      h('g', { key: 'rd', className: 'dm-roads' }, roads().map(function (r, i) {
+        return h('path', { key: i, className: 'dm-road dm-road-' + r.kind, d: r.d });
+      })),
       h('circle', { key: 'rg', className: 'dm-ring', cx: c[0], cy: c[1], r: R }),
       h('text', { key: 'rt', className: 'dm-ring-t', x: ring[0], y: ring[1], textAnchor: 'middle' }, '100 km'),
       h('path', { key: 'ar', className: 'dm-area', d: area.path }),
     ];
+    roads().forEach(function (r, i) {
+      if (!r.at) return;
+      var w = 12 + r.ref.length * 9.5;
+      kids.push(h('g', { key: 'sh' + i, className: 'dm-shield dm-shield-' + r.kind },
+        h('rect', { x: r.at[0] - w / 2, y: r.at[1] - 10, width: w, height: 20, rx: 4 }),
+        h('text', { x: r.at[0], y: r.at[1] + 5, textAnchor: 'middle' }, r.ref)));
+    });
+    // Szukane miejsce ma już podpis na mapie? Wtedy pinezka nie dubluje nazwy.
+    var near = function (o) { return p.pin && km(p.pin, o) < 6; };
+    var pinNamed = p.pin && (area.towns.some(near) || area.refs.some(near));
     area.refs.forEach(function (r) {
       var xy = project(r.lat, r.lon), L = labelPos(r.label, xy, 10);
-      kids.push(h('g', { key: 'r' + r.name, className: 'dm-ref' },
+      kids.push(h('g', { key: 'r' + r.name, className: 'dm-ref' + (r.major ? ' dm-ref-major' : '') },
         h('rect', { x: xy[0] - 5, y: xy[1] - 5, width: 10, height: 10, rx: 2 }),
         h('text', { x: L.x, y: L.y, textAnchor: L.a }, r.name)));
     });
@@ -213,7 +281,7 @@
         kids.push(h('g', { key: 'pin', className: 'dm-pin dm-pin-' + p.pin.verdict },
           h('path', { d: 'M' + q[0] + ' ' + q[1] + 'c-7-11-15-18-15-28a15 15 0 1 1 30 0c0 10-8 17-15 28z' }),
           h('circle', { cx: q[0], cy: q[1] - 29, r: 5.5, className: 'dm-pin-dot' }),
-          h('text', { x: q[0], y: q[1] - 52, textAnchor: 'middle' }, p.pin.name)));
+          pinNamed ? null : h('text', { x: q[0], y: q[1] - 52, textAnchor: 'middle' }, p.pin.name)));
       }
     }
     var onClick = p.onMapClick ? function (e) {
@@ -312,20 +380,20 @@
   }
 
   /* Cała sekcja „Gdzie dowozimy". props: value (ustawienie delivery_area),
-     cta (przycisk pod spodem), ctaHref, phone */
+     cta (przycisk pod spodem), ctaHref, phone, embedded — wersja do
+     wstawienia w inną kartę (strona główna: pod ofertą dla sklepów). */
   function Section(p) {
     var R = window.React;
     var area = R.useMemo(function () { return resolve(p.value); }, [p.value]);
     var hv = R.useState(null), sl = R.useState(null), pn = R.useState(null);
     var hl = hv[0] || sl[0];
-    return h('section', { id: 'dowoz', className: 'sec dm-sec' },
-      h('div', { className: 'wrap' },
-        h('div', { className: 'dm-head' },
+    var base = [area.center.postal, area.center.name].filter(Boolean).join(' ');
+    var head = h('div', { className: 'dm-head' },
           h('span', { className: 'eyebrow' }, 'Gdzie dowozimy'),
-          h('h2', { className: 'dm-h' }, 'Sprawdź, czy dowozimy do\u00a0Ciebie.'),
+          h(p.embedded ? 'h3' : 'h2', { className: 'dm-h' }, p.embedded ? 'Sprawdź, czy do Ciebie dojedziemy.' : 'Sprawdź, czy dowozimy do\u00a0Ciebie.'),
           h('p', { className: 'dm-lead' }, 'Baza: ' + [area.center.postal, area.center.name].filter(Boolean).join(' ') +
-            '. Własnym transportem dojeżdżamy do sklepów i hurtowni w całym zaznaczonym obszarze — od paczki po paletę, pod sam sklep. Dalej wysyłamy spedycją w całej Polsce.')),
-        h('div', { className: 'dm-grid' },
+            '. Własnym transportem dojeżdżamy do sklepów i hurtowni w całym zaznaczonym obszarze — od paczki po paletę, pod sam sklep. Dalej wysyłamy spedycją w całej Polsce.'));
+    var body = h('div', { className: 'dm-grid' },
           h('div', { className: 'dm-card' }, h(MapView, { area: area, hl: hl, onHover: hv[1], pin: pn[0] })),
           h('div', { className: 'dm-side' },
             h(Checker, { area: area, onPin: pn[1], ctaHref: p.ctaHref || '#kontakt', phone: p.phone }),
@@ -334,7 +402,8 @@
               h('div', { className: 'dm-legend', 'aria-hidden': 'true' },
                 h('span', null, h('i', { className: 'dm-li-base' }), ' Baza: ' + [area.center.postal, area.center.name].filter(Boolean).join(' ')),
                 h('span', null, h('i', { className: 'dm-li-area' }), ' obszar dowozu'),
-                h('span', null, h('i', { className: 'dm-li-ring' }), ' 100 km od bazy'))),
+                h('span', null, h('i', { className: 'dm-li-ring' }), ' 100 km od bazy'),
+                h('span', null, h('i', { className: 'dm-li-road' }), ' główne drogi (schemat)'))),
             h('div', null,
               h('div', { className: 'dm-k', style: { marginBottom: 10 } }, 'Dojeżdżamy m.in. do'),
               h('div', { className: 'dm-towns' }, area.towns.map(function (t) {
@@ -342,11 +411,13 @@
                   onMouseEnter: function () { hv[1](t.name); }, onMouseLeave: function () { hv[1](null); },
                   onClick: function () { sl[1](function (v) { return v === t.name ? null : t.name; }); } }, t.name);
               }))),
-            p.cta || null))));
+            p.cta || null));
+    if (p.embedded) return h('div', { id: 'dowoz', className: 'dm-embed' }, head, body);
+    return h('section', { id: 'dowoz', className: 'sec dm-sec' }, h('div', { className: 'wrap' }, head, body));
   }
 
   window.LangerDelivery = {
-    DEFAULT: DEFAULT, REF: REF, VIEW: VIEW, INSET: INSET, RIVERS: RIVERS, POLAND: POLAND, EDGE_KM: EDGE_KM,
+    DEFAULT: DEFAULT, REF: REF, ROADS: ROADS, VIEW: VIEW, INSET: INSET, RIVERS: RIVERS, POLAND: POLAND, EDGE_KM: EDGE_KM,
     project: project, unproject: unproject, km: km, resolve: resolve, check: check, frame: frame, autoLabel: autoLabel,
     geocode: geocode, reverse: reverse, placeLabel: placeLabel, fmtKm: fmtKm,
     MapView: MapView, Inset: Inset, Checker: Checker, Section: Section,

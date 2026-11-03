@@ -8,6 +8,16 @@
 .dm-svg { display: block; width: 100%; height: auto; }
 .dm-bg { fill: #F3F5F8; }
 .dm-river { fill: #B9D1EA; }
+/* drogi: pod obszarem, jasne — tło dla miast, nie główny temat */
+.dm-road { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.dm-road-a { stroke: #A4ADBB; stroke-width: 3.6; }
+.dm-road-dk { stroke: #C3CAD4; stroke-width: 2.2; }
+.dm-shield rect { stroke: #fff; stroke-width: 2; }
+.dm-shield text { font: 700 13px var(--font-text); }
+.dm-shield-a rect { fill: #5B6472; }
+.dm-shield-a text { fill: #fff; }
+.dm-shield-dk rect { fill: #fff; stroke: #A4ADBB; stroke-width: 1.5; }
+.dm-shield-dk text { fill: #5B6472; }
 .dm-ring { fill: none; stroke: var(--ash); stroke-opacity: .55; stroke-width: 1.5; stroke-dasharray: 6 7; }
 .dm-ring-t { font: 600 15px var(--font-mono); fill: var(--ash); letter-spacing: .04em; }
 .dm-area { fill: rgb(240 78 35 / 0.13); stroke: var(--flame); stroke-width: 3; stroke-linejoin: round; }
@@ -18,6 +28,7 @@
 .dm-town.on text { fill: var(--flame-600); font-weight: 700; }
 .dm-ref rect, .dm-ref circle { fill: var(--ash); }
 .dm-ref text { font: 500 16px var(--font-text); fill: var(--ash-700); stroke-width: 5px; }
+.dm-ref-major text { font-weight: 700; fill: #3F4652; }
 .dm-c { fill: var(--flame); stroke: #fff; stroke-width: 4; }
 .dm-pulse { fill: var(--flame); transform-box: fill-box; transform-origin: center; animation: dm-pulse 2.4s ease-out infinite; }
 @keyframes dm-pulse { from { transform: scale(1); opacity: .45; } to { transform: scale(3.4); opacity: 0; } }
@@ -41,6 +52,7 @@
 .dm-li-area { width: 16px; height: 12px; border-radius: 3px; background: rgb(240 78 35 / 0.18); border: 2px solid var(--flame); }
 .dm-li-base { width: 12px; height: 12px; border-radius: 50%; background: var(--flame); box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--flame); }
 .dm-li-ring { width: 16px; height: 0; border-top: 2px dashed var(--ash); }
+.dm-li-road { width: 16px; height: 0; border-top: 3px solid #A4ADBB; border-radius: 2px; }
 @media (max-width: 900px) { .dm-grid { grid-template-columns: 1fr; } }
 /* Telefon: podpisy miast nachodziłyby na siebie — zostaje Płońsk, punkty
    orientacyjne i miasto wybrane na liście pod mapą. */
@@ -50,6 +62,8 @@
   .dm-town circle { r: 9px; }
   .dm-c-t { font-size: 36px; }
   .dm-ref text { font-size: 24px; }
+  .dm-ref:not(.dm-ref-major) text, .dm-shield-dk { display: none; }
+  .dm-shield text { font-size: 18px; }
   .dm-ring-t { font-size: 22px; }
   .dm-chip { font-size: 13.5px; padding: 6px 11px; }
 }
@@ -95,3 +109,12 @@
   .dm-check { padding: 14px; }
   .dm-inset { width: 80px; }
 }
+
+/* Wersja wbudowana — strona główna: mapa pod ofertą „Dla sklepów i hurtowni",
+   w tej samej karcie */
+.dm-embed { background: var(--white); padding: 44px 56px 52px; }
+.dm-embed .dm-head { margin-bottom: 28px; }
+.dm-embed .dm-grid { align-items: start; }
+.dm-embed .dm-h { font-size: clamp(24px, 2.6vw, 34px); }
+@media (max-width: 900px) { .dm-embed { padding: 32px 32px 40px; } }
+@media (max-width: 680px) { .dm-embed { padding: 26px 18px 30px; } }
