@@ -479,6 +479,18 @@ async function apiDelete(sku)             { return apiCall(`/api/products/${enco
 
 async function apiBrands()                { return apiCall('/api/brands'); }
 async function apiBrandAdd(name)          { return apiCall('/api/brands', { method: 'POST', body: JSON.stringify({ name }) }); }
+
+/* „+ nowa marka…" w liście produktów i w formularzu produktu. Pyta o nazwę;
+   jeśli taka marka już jest (bez względu na wielkość liter), zwraca jej
+   pisownię z listy zamiast tworzyć duplikat. Zwraca { name, created } albo
+   null, gdy anulowano. */
+async function promptNewBrand(brands) {
+  const name = (prompt('Nazwa nowej marki, np. „Mapei":') || '').trim().replace(/\s+/g, ' ');
+  if (!name) return null;
+  const existing = brands.find(b => b.trim().toLowerCase() === name.toLowerCase());
+  if (existing) return { name: existing, created: false };
+  return { name, created: true };
+}
 async function apiBrandDel(name)          { return apiCall(`/api/brands?name=${encodeURIComponent(name)}`, { method: 'DELETE' }); }
 async function apiCategories()            { return apiCall('/api/categories'); }
 async function apiCategoryAdd(c)          { return apiCall('/api/categories', { method: 'POST', body: JSON.stringify(c) }); }
@@ -1675,7 +1687,7 @@ function exportProductsCsv(list) {
 /* ============================================================
    FORMULARZ POJEDYNCZEGO PRODUKTU (dodanie / edycja)
    ============================================================ */
-function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = [] }) {
+function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = [], onConfigChange }) {
   const isEdit = !!initial;
   const [p, setP] = useState(initial || {
     sku: '', name: '', brand: '', category: '', subcategory: '',
@@ -1685,9 +1697,10 @@ function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = 
   const [err, setErr] = useState('');
   const [imgBusy, setImgBusy] = useState(false);
   const [imgErr, setImgErr] = useState('');
+  const [brandBusy, setBrandBusy] = useState(false);
   const fileRef = useRef(null);
 
-  function set(k, v) { setP({ ...p, [k]: v }); }
+  function set(k, v) { setP(cur => ({ ...cur, [k]: v })); }
 
   // Podpowiedzi podkategorii: najpierw te z wybranej kategorii, potem reszta.
   const subcatHints = useMemo(() => {
@@ -1761,8 +1774,21 @@ function ProductForm({ initial, onSave, onCancel, brands, categories, subcats = 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div className="field">
             <label>Marka</label>
-            <select value={p.brand || ''} onChange={e => set('brand', e.target.value)}>
+            <select value={p.brand || ''} disabled={brandBusy} onChange={async e => {
+              const v = e.target.value;
+              if (v !== '__new') { set('brand', v); return; }
+              const nb = await promptNewBrand(brands);
+              if (!nb) return;
+              if (nb.created) {
+                setBrandBusy(true);
+                try { await apiBrandAdd(nb.name); if (onConfigChange) await onConfigChange(); }
+                catch (e2) { setErr('Nie udało się dodać marki: ' + e2.message); return; }
+                finally { setBrandBusy(false); }
+              }
+              set('brand', nb.name);
+            }}>
               <option value="">— brak (uzupełnię później) —</option>
+              <option value="__new">+ nowa marka…</option>
               {p.brand && !brands.includes(p.brand) && <option value={p.brand}>{p.brand} (spoza listy)</option>}
               {brands.map(b => <option key={b} value={b}>{b}</option>)}
             </select>
@@ -2146,7 +2172,7 @@ function ShowcaseEditor({ st }) {
 /* ============================================================
    LISTA PRODUKTÓW + USUWANIE + EDYCJA
    ============================================================ */
-function ProductList({ refreshTrigger, brands, categories }) {
+function ProductList({ refreshTrigger, brands, categories, onConfigChange }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -2289,7 +2315,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
     setSel(allFilteredSelected ? new Set() : new Set(filtered.map(p => p.sku)));
   }
 
-  async function applyBulk(field, value) {
+  async function applyBulk(field, value, { confirmed = false } = {}) {
     const targets = selProducts;
     if (!targets.length) return;
     const noun = { brand: ['markę', 'pustą markę'], category: ['kategorię', 'pustą kategorię'],
@@ -2297,7 +2323,7 @@ function ProductList({ refreshTrigger, brands, categories }) {
     const shown = field === 'category' ? (catLabel.get(value) || value)
       : field === 'role' ? ((ROLES.find(r => r.id === value) || {}).label || value) : value;
     const label = value ? `${noun[0]} „${shown}"` : noun[1];
-    if (!confirm(`Ustawić ${label} dla ${targets.length} zaznaczonych produktów?`)) return;
+    if (!confirmed && !confirm(`Ustawić ${label} dla ${targets.length} zaznaczonych produktów?`)) return;
     setBulk({ done: 0, total: targets.length });
     let done = 0, failed = 0;
     for (const p of targets) {
@@ -2310,6 +2336,23 @@ function ProductList({ refreshTrigger, brands, categories }) {
     setBulk(null);
     if (failed) alert(`Zaktualizowano ${done - failed}/${done}. Błędów: ${failed}.`);
     await reload();
+  }
+
+  /* Nowa marka prosto z paska zbiorczego: dopisujemy ją do listy marek
+     (Ustawienia → Marki) i od razu ustawiamy zaznaczonym produktom. */
+  async function bulkNewBrand() {
+    const nb = await promptNewBrand(brands);
+    if (!nb) return;
+    const n = selProducts.length;
+    const q = nb.created
+      ? `Dodać nową markę „${nb.name}" i ustawić ją dla ${n} zaznaczonych produktów?`
+      : `Marka „${nb.name}" już jest na liście. Ustawić ją dla ${n} zaznaczonych produktów?`;
+    if (!confirm(q)) return;
+    if (nb.created) {
+      try { await apiBrandAdd(nb.name); if (onConfigChange) await onConfigChange(); }
+      catch (e) { alert('Nie udało się dodać marki: ' + e.message); return; }
+    }
+    await applyBulk('brand', nb.name, { confirmed: true });
   }
 
   async function bulkDelete() {
@@ -2417,8 +2460,14 @@ function ProductList({ refreshTrigger, brands, categories }) {
           ) : (
             <div className="bulk-actions">
               <label className="bulk-lbl">Marka:</label>
-              <select className="bulk-sel" value="__" onChange={e => { if (e.target.value !== '__') applyBulk('brand', e.target.value === '__clear' ? '' : e.target.value); }}>
+              <select className="bulk-sel" value="__" onChange={e => {
+                const v = e.target.value;
+                if (v === '__') return;
+                if (v === '__new') { bulkNewBrand(); return; }
+                applyBulk('brand', v === '__clear' ? '' : v);
+              }}>
                 <option value="__">— ustaw —</option>
+                <option value="__new">+ nowa marka…</option>
                 {brands.map(b => <option key={b} value={b}>{b}</option>)}
                 <option value="__clear">(wyczyść markę)</option>
               </select>
@@ -2508,8 +2557,8 @@ function ProductList({ refreshTrigger, brands, categories }) {
         </div>
       )}
 
-      {editing && <ProductForm initial={editing} brands={brands} categories={categories} subcats={subcats} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
-      {adding && <ProductForm brands={brands} categories={categories} subcats={subcats} onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
+      {editing && <ProductForm initial={editing} brands={brands} categories={categories} subcats={subcats} onConfigChange={onConfigChange} onSave={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} />}
+      {adding && <ProductForm brands={brands} categories={categories} subcats={subcats} onConfigChange={onConfigChange} onSave={() => { setAdding(false); reload(); }} onCancel={() => setAdding(false)} />}
     </div>
   );
 }
@@ -3153,7 +3202,7 @@ function App() {
       </nav>
 
       <main className="adm-main">
-        {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories}/>}
+        {tab === 'list' && <ProductList refreshTrigger={refreshKey} brands={brands} categories={categories} onConfigChange={loadConfig}/>}
         {tab === 'import' && <CsvImport onDone={() => setRefreshKey(k => k + 1)} brands={brands} categories={categories} onConfigChange={loadConfig}/>}
         {tab === 'showcase' && <ShowcaseEditor st={st}/>}
         {tab === 'settings' && <Settings brands={brands} categories={categories} onChange={loadConfig} st={st}/>}

@@ -108,7 +108,7 @@ Wartości domyślne, gdy baza nie odpowiada, siedzą w `api/settings.js` (obiekt
 |---|---|
 | SKU | Unikalny kod produktu. Po nim dopasowuje się import z pliku — nie da się go zmienić po zapisaniu. |
 | Nazwa | To, co widać na karcie produktu. |
-| Marka | Jedna z listy (Ustawienia → Marki). Filtr na stronie. |
+| Marka | Jedna z listy (Ustawienia → Marki) albo „+ nowa marka…" — dopisuje ją do listy i od razu wybiera. Filtr na stronie. |
 | Kategoria | Jedna z listy (Ustawienia → Kategorie). Pierwszy poziom filtrów. |
 | Podkategoria | Swobodny tekst z podpowiedziami — patrz [Kategorie i podkategorie](#kategorie-i-podkategorie). |
 | Wariant / pojemność | Druga linia na karcie, np. „Pistoletowa · 750 ml". |
@@ -197,6 +197,7 @@ Podkategoria pokazuje się na karcie produktu obok marki i buduje drugi poziom f
 - **Filtry** — marka, kategoria, podkategoria (lista zawęża się do wybranej kategorii) i zdjęcie (bez / ze zdjęciem). Działają razem z wyszukiwarką.
 - **Braki** — przyciski „Bez zdjęcia", „Bez marki", „Bez kategorii", „Bez podkategorii" (i „Kategoria spoza listy", gdy produkt ma kategorię, której nie ma w Ustawieniach) z licznikami. Kliknięcie pokazuje tylko te produkty.
 - **Zbiorczo** — odfiltruj, kliknij „Zaznacz wszystkie wyniki" (albo checkbox w nagłówku tabeli) i na granatowym pasku ustaw markę, kategorię, podkategorię albo **oznaczenie** (Bestseller / Premium / …) naraz. Pasek mówi też, ile zaznaczonych jest poza bieżącym widokiem.
+- **Nowa marka bez wychodzenia z listy** — w pasku zbiorczym „Marka → + nowa marka…": wpisujesz nazwę, marka trafia do listy (Ustawienia → Marki) i od razu ustawia się zaznaczonym produktom. To samo jest w formularzu produktu. Jeśli taka marka już jest (np. wpiszesz „soudal"), panel użyje istniejącej „Soudal" zamiast robić duplikat.
 - Kolumna „Kategoria" pokazuje nazwę z Ustawień, a nie identyfikator z bazy („Farby w sprayu", nie „farbywsprayu").
 - Eksport CSV bierze to, co widać: zaznaczone, a bez zaznaczenia — wynik wyszukiwania i filtrów.
 
