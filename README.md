@@ -377,7 +377,9 @@ Każda sekcja odpowiada na kolejne pytanie i kończy się przyciskiem do następ
 Przyciski w sekcjach **zaznaczają właściwą pozycję w formularzu** (np. „Zapytaj
 o współpracę marketingową" zaznacza „Współpraca marketingowa") — klient dochodzi
 do formularza z gotowym wyborem. Link w nagłówku podświetla sekcję, w której
-jest klient. Na telefonie na dole wisi pasek „Poproś o ofertę" + „Zadzwoń";
+jest klient. Logo w nagłówku prowadzi na stronę główną. Na węższych ekranach
+(telefon, tablet) linki są w menu ☰ — pierwsza pozycja to „← Strona główna".
+Na telefonie na dole wisi pasek „Poproś o ofertę" + „Zadzwoń";
 znika przy formularzu, żeby go nie zasłaniać.
 
 ### Co zmienisz z panelu
@@ -388,10 +390,15 @@ znika przy formularzu, żeby go nie zasłaniać.
 |---|---|
 | Rabat na pozostałe marki (tekst) | Wszędzie po słowie „nawet": „kilka procent", „3%", „do 5%". Puste = „kilka procent". |
 | Pistolet — cena (zł) | Hero, kafel, pasek, pytania, formularz. `0` = na stronie „gratis". |
-| Telefon | Kontakt, pytania, stopka, przycisk „Zadzwoń" na telefonie. Puste = telefon z „Danych kontaktowych". |
 | E-mail na zapytania | Kontakt, stopka i adres, na który formularz składa wiadomość. Puste = e-mail z „Danych kontaktowych". |
 | Osoba kontaktowa | Sekcja kontakt. Puste = nie pokazujemy. |
 | Godziny kontaktu | Sekcja kontakt. Puste = nie pokazujemy. |
+
+**Telefon** podstrona bierze zawsze z karty **Dane kontaktowe** — ten sam
+numer co na stronie głównej (kontakt, pytania, stopka, przycisk „Zadzwoń" na
+telefonie). Osobnego pola telefonu w karcie oferty już nie ma; stary klucz
+`landing_phone`, jeśli został w bazie, nie jest czytany (sprzątanie:
+`migrations/009_settings_drop_landing_phone.sql`, opcjonalnie).
 
 Wartości trafiają do bazy (tabela `settings`) i podstrona pobiera je z
 `/api/settings` przy każdym wejściu. Opcjonalna migracja

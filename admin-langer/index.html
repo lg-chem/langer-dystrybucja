@@ -361,7 +361,6 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_OFFER = {
   landing_discount_text: 'kilka procent',
   landing_pistol_price:  '1',
-  landing_phone:         '',
   landing_email:         '',
   landing_person:        '',
   landing_hours:         '',
@@ -374,10 +373,10 @@ const OFFER_FIELDS = [
   { key: 'landing_pistol_price',  label: 'Pistolet — cena',          unit: 'zł',    type: 'number', min: 0,   placeholder: '1',             hint: 'Pistolet teflonowy do zamówionych kartonów Langera. 0 = na stronie „gratis".' },
 ];
 
-/* Kontakt na podstronie. Puste telefon i e-mail = dane z karty „Dane
-   kontaktowe" (podpowiedź widać w polu na szaro). */
+/* Kontakt na podstronie. Telefonu tu nie ma — podstrona bierze go zawsze
+   z karty „Dane kontaktowe", żeby na całej stronie był jeden numer. Puste
+   e-mail = dane z „Danych kontaktowych" (podpowiedź widać w polu na szaro). */
 const LANDING_CONTACT_FIELDS = [
-  { key: 'landing_phone',  label: 'Telefon',            type: 'tel',   fallback: 'contact_phone', hint: 'Sekcja kontakt, pytania, stopka i przycisk „Zadzwoń" na telefonie.' },
   { key: 'landing_email',  label: 'E-mail na zapytania', type: 'email', fallback: 'contact_email', hint: 'Na ten adres formularz „Poproś o ofertę" składa gotową wiadomość.' },
   { key: 'landing_person', label: 'Osoba kontaktowa',   type: 'text',  placeholder: 'np. Jan Kowalski — przedstawiciel handlowy', hint: 'Opcjonalnie. Puste = nie pokazujemy.' },
   { key: 'landing_hours',  label: 'Godziny kontaktu',   type: 'text',  placeholder: 'np. pn–pt 8:00–16:00', hint: 'Opcjonalnie. Puste = nie pokazujemy.' },
@@ -450,7 +449,7 @@ const ACCENT_PRESETS = [
 /* Pola karty „Dane kontaktowe" — podmieniają się na stronie głównej
    (sekcja „Kontakt" i stopka) bez ruszania kodu. */
 const CONTACT_FIELDS = [
-  { key: 'contact_phone',   label: 'Telefon',        type: 'tel',   hint: 'Sekcja „Kontakt" i stopka. Link tel: tworzy się automatycznie.' },
+  { key: 'contact_phone',   label: 'Telefon',        type: 'tel',   hint: 'Jeden numer dla całej strony: kontakt i stopka na stronie głównej oraz na /dla-punktow/ (też przycisk „Zadzwoń" na telefonie). Link tel: tworzy się automatycznie.' },
   { key: 'contact_email',   label: 'E-mail',         type: 'email', hint: 'Sekcja „Kontakt" i stopka. Klikalny link mailto:.' },
   { key: 'contact_street',  label: 'Ulica i numer',  type: 'text',  hint: 'Pierwsza linia adresu magazynu i biura.' },
   { key: 'contact_city',    label: 'Kod i miasto',   type: 'text',  hint: 'Druga linia adresu, np. „62-800 Kalisz".' },
@@ -2861,7 +2860,7 @@ function OfferSettings({ st }) {
   const discount = (values.landing_discount_text || '').trim() || 'kilka procent';
   const price = String(values.landing_pistol_price ?? '').trim() || '1';
   const pistol = Number(price.replace(',', '.')) === 0 ? 'gratis' : `za ${price} zł`;
-  const phone = (values.landing_phone || '').trim() || (values.contact_phone || '').trim();
+  const phone = (values.contact_phone || '').trim();
   const email = (values.landing_email || '').trim() || (values.contact_email || '').trim();
 
   const field = f => (
@@ -2906,6 +2905,10 @@ function OfferSettings({ st }) {
         </p>
 
         <h3 style={{ ...sub, marginTop: 8 }}>Kontakt na podstronie</h3>
+        <p className="muted" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>
+          Telefon: <strong>{phone || '— brak —'}</strong> — ten sam numer co na stronie głównej.
+          Zmieniasz go w karcie „Dane kontaktowe" poniżej.
+        </p>
         <div style={grid}>{LANDING_CONTACT_FIELDS.map(field)}</div>
 
         <p className="muted" style={{ margin: 0, fontSize: 13.5, lineHeight: 1.5 }}>
@@ -3216,7 +3219,8 @@ function ContactSettings({ st }) {
       <h2 className="adm-card-h">Dane kontaktowe</h2>
       <p className="adm-card-d">
         Telefon, e-mail i adres z sekcji „Kontakt" oraz stopki na <a href="/?fresh=1" target="_blank" rel="noopener" className="mono">stronie głównej</a>.
-        Zapis podmienia je we wszystkich miejscach naraz — także na /dla-punktow/, jeśli w karcie oferty pola kontaktu są puste.
+        Zapis podmienia je we wszystkich miejscach naraz. Telefon pokazuje się też na /dla-punktow/ (zawsze ten sam numer),
+        e-mail — jeśli w karcie oferty pole e-mail jest puste.
       </p>
 
       {err && <div className="login-err">{err}</div>}
