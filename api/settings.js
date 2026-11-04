@@ -12,16 +12,17 @@ const DEFAULTS = {
   landing_discount_text:  'kilka procent',
   landing_pistol_price:   '1',   // '0' = pistolet „gratis"
 
-  // Kontakt na /dla-punktow/. Puste telefon/e-mail = podstrona bierze
-  // contact_phone / contact_email. Puste osoba/godziny = nie pokazujemy.
-  landing_phone:          '',
+  // Kontakt na /dla-punktow/. Telefon podstrona bierze zawsze z
+  // contact_phone (jeden numer na całej stronie — dawnego landing_phone już
+  // nie czytamy). Puste e-mail = contact_email. Puste osoba/godziny = nie
+  // pokazujemy.
   landing_email:          '',    // tu trafiają zapytania z formularza
   landing_person:         '',
   landing_hours:          '',
 
   // Dane kontaktowe strony głównej — panel → Ustawienia → „Dane kontaktowe".
-  // Podmieniają się globalnie: sekcja „Kontakt" i stopka (oraz /dla-punktow/,
-  // gdy pola landing_phone / landing_email są puste).
+  // Podmieniają się globalnie: sekcja „Kontakt" i stopka. Telefon także na
+  // /dla-punktow/, e-mail — gdy landing_email jest pusty.
   contact_phone:  '+48 000 000 000',
   contact_email:  'biuro@langerdystrybucja.pl',
   contact_street: 'ul. Przykładowa 00',
