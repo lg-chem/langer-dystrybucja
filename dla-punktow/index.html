@@ -612,16 +612,39 @@ const interestLabel = (k, label, t) => (k === 'pistolet' ? `Pistolet ${t.pistol}
 /* ============================================================
    HOOKI
    ============================================================ */
+/* Pamięć ostatnich ustawień i marek w przeglądarce — wspólna ze stroną główną
+   (ten sam klucz, te same /api/settings i /api/brands). Przy kolejnym wejściu
+   logo, kolor i telefon są właściwe od pierwszej klatki, zamiast przeskakiwać
+   z wartości domyślnych, gdy dojdzie odpowiedź API. Brak localStorage (okno
+   prywatne) = brak pamięci, strona działa jak dawniej. */
+const BOOT_CACHE = 'ld-boot-v1';
+function readBootCache() {
+  try { const c = JSON.parse(localStorage.getItem(BOOT_CACHE)); return c && typeof c === 'object' ? c : {}; }
+  catch (e) { return {}; }
+}
+function rememberBoot(key, value) {
+  try { const c = readBootCache(); c[key] = value; localStorage.setItem(BOOT_CACHE, JSON.stringify(c)); }
+  catch (e) {}
+}
+const cleanBrands = (d) => (Array.isArray(d) ? d.filter(b => typeof b === 'string' && b.trim()) : []);
+
 /* Parametry oferty z panelu. Błąd sieci/API nie może wywrócić strony —
-   w najgorszym razie zostają wartości domyślne. */
+   w najgorszym razie zostają wartości domyślne (albo zapamiętane). */
 function useOffer() {
-  const [offer, setOffer] = useState(OFFER_DEFAULTS);
+  const [offer, setOffer] = useState(() => {
+    const c = readBootCache().settings;
+    return c && typeof c === 'object' && !Array.isArray(c) ? { ...OFFER_DEFAULTS, ...c } : OFFER_DEFAULTS;
+  });
   useEffect(() => {
     let alive = true;
     // ?fresh (link z panelu) omija cache CDN — zmiany widać od razu po zapisie
     fetch('/api/settings' + (/[?&]fresh\b/.test(location.search) ? '?fresh=1' : ''))
       .then(r => (r.ok ? r.json() : null))
-      .then(d => { if (alive && d && typeof d === 'object') setOffer(o => ({ ...o, ...d })); })
+      .then(d => {
+        if (!d || typeof d !== 'object' || Array.isArray(d)) return;
+        rememberBoot('settings', d);
+        if (alive) setOffer(o => ({ ...o, ...d }));
+      })
       .catch(() => {});
     return () => { alive = false; };
   }, []);
@@ -631,12 +654,16 @@ function useOffer() {
 /* Marki z panelu (Ustawienia → Marki) — w schemacie zamówienia pokazujemy
    konkretne nazwy zamiast „innych marek". Bez API zostaje opis ogólny. */
 function useBrands() {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState(() => cleanBrands(readBootCache().brands));
   useEffect(() => {
     let alive = true;
     fetch('/api/brands')
       .then(r => (r.ok ? r.json() : null))
-      .then(d => { if (alive && Array.isArray(d)) setList(d.filter(b => typeof b === 'string' && b.trim())); })
+      .then(d => {
+        if (!Array.isArray(d)) return;
+        if (d.length) rememberBoot('brands', d);
+        if (alive) setList(cleanBrands(d));
+      })
       .catch(() => {});
     return () => { alive = false; };
   }, []);
